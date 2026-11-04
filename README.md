@@ -1,6 +1,6 @@
 # SIONA
 
-A restrained, responsive website for **Siona Group LLC**, built with Next.js App Router, TypeScript, and Tailwind CSS. The homepage is statically rendered; only navigation and the contact form need client JavaScript. The architectural symbol is SVG, with self-hosted DM Sans and Instrument Serif fonts. No external image, font, or analytics requests are needed to render the page.
+A restrained, responsive website for **Siona Group LLC**, built with Next.js App Router, TypeScript, and Tailwind CSS. The homepage is statically rendered; only navigation and the contact form need client JavaScript. The metallic ribbon S and layered onyx backgrounds are optimized local WebP assets, paired with self-hosted DM Sans and Instrument Serif fonts. No external image, font, or analytics requests are needed to render the page.
 
 ## Local development
 
@@ -90,6 +90,6 @@ tests/contact.test.ts       Endpoint tests with a simulated provider
 tests/e2e/                  Desktop/mobile browser tests
 ```
 
-Design tokens and responsive layouts live in `src/app/globals.css`; `BrandSymbol` is the single source for the homepage/navigation symbol. The logo is an original geometric design for this project, not a claim of trademark registration. Footer copyright text follows the supplied 2026 brand copy.
+Design tokens and responsive layouts live in `src/app/globals.css`; `BrandSymbol` shares the metallic symbol across the homepage and navigation. The refreshed assets are reconstructed from the supplied LinkedIn screenshot; see `public/brand/README.md` for provenance and replacement guidance. The same symbol is used in the favicon, app/Apple icons, and generated social image. The charcoal, ivory, sandstone, champagne, and sage treatment preserves the existing copy and contact functionality. Footer copyright text follows the supplied 2026 brand copy.
 
 Font licenses are retained in `public/licenses/`.

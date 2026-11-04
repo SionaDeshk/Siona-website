@@ -10,11 +10,8 @@ export function Hero() {
         <p className="hero-philosophy">The path<br />is the way.</p>
         <a href="#about" className="explore-link">Discover Siona <Arrow direction="down" /></a>
       </div>
-      <figure className="hero-art" aria-label="The SIONA symbol: a continuous, architectural fold">
+      <figure className="hero-art" aria-label="The SIONA symbol: a sculptural metallic ribbon">
         <div className="art-board">
-          <div className="art-grid" aria-hidden="true" />
-          <span className="registration registration-tl" aria-hidden="true" />
-          <span className="registration registration-br" aria-hidden="true" />
           <span className="art-topline" aria-hidden="true">S — 01</span>
           <div className="sculpture">
             <BrandSymbol sculptural className="sculpture-symbol" />

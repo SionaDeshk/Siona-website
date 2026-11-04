@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const client = createServerClient(supabaseUrl,key,{
     cookies: {
       getAll(){return request.cookies.getAll();},
-      setAll(items){
+      setAll(items: {name:string;value:string;options?:import('@supabase/ssr').CookieOptions}[]){
         items.forEach(({name,value})=>request.cookies.set(name,value));
         response = NextResponse.redirect(new URL(next,url.origin));
         items.forEach(({name,value,options})=>response.cookies.set(name,value,options));

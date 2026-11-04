@@ -1,6 +1,10 @@
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
 import { About } from "@/components/about";
+import { Mission } from "@/components/mission";
+import { Pathways } from "@/components/pathways";
+import { Vision } from "@/components/vision";
+import { FounderNote } from "@/components/founder-note";
 import { Contact } from "@/components/contact";
 import { Footer } from "@/components/footer";
 
@@ -11,6 +15,10 @@ export default function Home() {
       <main id="main">
         <Hero />
         <About />
+        <Mission />
+        <Pathways />
+        <Vision />
+        <FounderNote />
         <Contact />
       </main>
       <Footer />

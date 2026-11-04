@@ -28,22 +28,18 @@ export function Header() {
       </a>
       <nav aria-label="Main navigation" className="desktop-nav">
         <a href="#about" className="nav-link">About</a>
+        <a href="#pathways" className="nav-link">Who we serve</a>
+        <a href="#vision" className="nav-link">Vision</a>
         <a href="#contact" className="nav-link contact-link">Get in touch <Arrow /></a>
       </nav>
-      <button
-        ref={menuButton}
-        type="button"
-        className="menu-toggle"
-        aria-expanded={open}
-        aria-controls="mobile-navigation"
-        aria-label={open ? "Close navigation" : "Open navigation"}
-        onClick={() => setOpen(!open)}
-      >
+      <button ref={menuButton} type="button" className="menu-toggle" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "Close navigation" : "Open navigation"} onClick={() => setOpen(!open)}>
         <span>{open ? "Close" : "Menu"}</span>
         <span className={`menu-lines ${open ? "is-open" : ""}`} aria-hidden="true"><i /><i /></span>
       </button>
       <nav id="mobile-navigation" aria-label="Mobile navigation" className="mobile-nav" hidden={!open}>
         <a href="#about" onClick={() => setOpen(false)}>About <Arrow /></a>
+        <a href="#pathways" onClick={() => setOpen(false)}>Who we serve <Arrow /></a>
+        <a href="#vision" onClick={() => setOpen(false)}>Vision <Arrow /></a>
         <a href="#contact" onClick={() => setOpen(false)}>Get in touch <Arrow /></a>
       </nav>
     </header>

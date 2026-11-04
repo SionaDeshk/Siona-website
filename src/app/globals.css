@@ -208,3 +208,31 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+
+/* Siona positioning: editorial sections that preserve the existing brand language. */
+.mission-section,.vision-section,.founder-section{display:grid;grid-template-columns:30% 1fr;gap:5%;padding-block:105px;border-top:1px solid var(--rule)}
+.mission-section{background:#e8e1d4}
+.mission-headline,.vision-headline{font-size:clamp(48px,6vw,100px);line-height:1.03;letter-spacing:-.055em;font-weight:400;margin:0 0 35px}
+.mission-headline em,.vision-headline em,.pathway-card h3 em{font-family:var(--font-serif),Georgia,serif;font-weight:400}
+.mission-description,.vision-description{max-width:710px;font-size:clamp(19px,2.1vw,30px);line-height:1.5;letter-spacing:-.02em;margin:0}
+.mission-signature{font-family:var(--font-serif),Georgia,serif;font-size:28px;font-style:italic;margin:42px 0 0;color:#666b60}
+.pathways-section{padding-block:100px;border-top:1px solid var(--rule)}
+.pathways-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.pathway-card{min-height:350px;display:flex;flex-direction:column;align-items:flex-start;padding:38px;background:#e8e1d4}
+.pathway-card:nth-child(2){background:#dcded4}
+.pathway-index{font-size:10px;letter-spacing:.12em}
+.pathway-card h3{font-weight:400;font-size:clamp(33px,3.6vw,60px);letter-spacing:-.04em;line-height:1.15;margin:40px 0 20px}
+.pathway-card p{font-size:15px;line-height:1.7;max-width:450px;margin:0 0 32px}
+.pathway-card a{margin-top:auto;display:inline-flex;align-items:center;gap:20px;border-bottom:1px solid currentColor;padding-bottom:8px;font-size:12px}
+.pathway-card a svg{width:16px;height:16px}
+.vision-section{background:#292d2a;color:#f6f2e9;border-color:#454945}
+.vision-section .section-number,.vision-note{color:#c0c3b5}
+.vision-description{color:#e5e2d9}
+.vision-note{font-size:11px;margin:35px 0 0}
+.founder-section blockquote{margin:0;max-width:800px}
+.founder-section blockquote p{font-size:clamp(23px,2.8vw,42px);line-height:1.4;letter-spacing:-.03em;margin:0}
+.founder-section blockquote footer{font-size:12px;color:#686f60;margin-top:35px}
+.founder-section blockquote footer span{font-family:var(--font-serif),Georgia,serif;font-size:19px;font-style:italic;display:block;margin-top:10px}
+@media(max-width:1000px){.desktop-nav{gap:24px}.mission-section,.vision-section,.founder-section{grid-template-columns:25% 1fr;padding-block:80px}}
+@media(max-width:640px){.mission-section,.vision-section,.founder-section{grid-template-columns:1fr;gap:32px;padding-block:65px}.mission-headline,.vision-headline{font-size:clamp(48px,12vw,70px)}.mission-description,.vision-description{font-size:19px}.pathways-section{padding-block:65px}.pathways-grid{grid-template-columns:1fr;gap:15px;margin-top:30px}.pathway-card{min-height:300px;padding:28px}.pathway-card h3{font-size:43px;margin:30px 0 18px}.pathway-card p{font-size:14px}.founder-section blockquote p{font-size:27px}}

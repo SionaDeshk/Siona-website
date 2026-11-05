@@ -1,0 +1,13 @@
+export function BiologicsVisual(){
+ return <figure className="biologics-visual" aria-label="Abstract scientific illustration of a pipette dispensing a droplet above laboratory sample vessels">
+ <svg viewBox="0 0 1100 470" role="img" aria-label="Illustrated laboratory pipette, molecular forms and sample vessels" xmlns="http://www.w3.org/2000/svg">
+ <defs><linearGradient id="bio-bg" x2="1" y2="1"><stop stopColor="#d8e0d8"/><stop offset="1" stopColor="#5c746d"/></linearGradient><linearGradient id="glass" x2="1" y2="0"><stop stopColor="#e9f1e8" stopOpacity=".65"/><stop offset=".5" stopColor="#f8faf5" stopOpacity=".08"/><stop offset="1" stopColor="#e9f1e8" stopOpacity=".5"/></linearGradient><radialGradient id="bio-light"><stop stopColor="#f7f5e8" stopOpacity=".75"/><stop offset="1" stopColor="#f7f5e8" stopOpacity="0"/></radialGradient></defs>
+ <rect width="1100" height="470" fill="url(#bio-bg)"/><circle cx="690" cy="175" r="320" fill="url(#bio-light)"/>
+ <g stroke="#eaf0e7" opacity=".28" fill="none"><path d="M0 140 Q300 20 590 160 T1100 120"/><path d="M0 250 Q290 90 600 230 T1100 220"/><path d="M0 350 Q330 180 640 310 T1100 330"/></g>
+ <g stroke="#e9f4eb" opacity=".35" strokeWidth="1.5"><path d="M190 100 L245 150 L325 120 L385 205 L460 160"/><path d="M690 110 L750 75 L815 132 L870 90"/><circle cx="245" cy="150" r="5" fill="#f8f7e9"/><circle cx="385" cy="205" r="4" fill="#f8f7e9"/><circle cx="815" cy="132" r="5" fill="#f8f7e9"/></g>
+ <g transform="translate(800 -40) rotate(34)"><rect x="0" y="0" width="55" height="270" rx="11" fill="#d7e4df" stroke="#fff" strokeWidth="2"/><rect x="10" y="0" width="35" height="190" fill="#8ba9a3" opacity=".7"/><path d="M8 265 L27 350 L47 265" fill="#eaf2ed" stroke="#fff" strokeWidth="2"/><path d="M27 350 L27 383" stroke="#fff" strokeWidth="3"/></g>
+ <path d="M589 290 C589 275 603 260 603 247 C603 260 617 275 617 290 A14 14 0 0 1 589 290" fill="#f6f5e7" opacity=".95"/>
+ <g stroke="#f2f6f0" strokeWidth="3" fill="url(#glass)"><path d="M330 280 L330 405 Q330 435 362 435 L455 435 Q488 435 488 405 L488 280Z"/><rect x="323" y="262" width="172" height="22" rx="9"/><path d="M535 310 L535 410 Q535 440 570 440 L655 440 Q690 440 690 410 L690 310Z"/><rect x="529" y="290" width="167" height="24" rx="9"/><path d="M730 350 L730 425 Q730 448 757 448 L825 448 Q853 448 853 425 L853 350Z"/><rect x="723" y="333" width="137" height="20" rx="9"/></g>
+ <path d="M337 383 Q410 363 481 383 L481 405 Q481 430 455 430 L362 430 Q337 430 337 405Z" fill="#789f97" opacity=".5"/><path d="M542 385 Q610 365 683 385 L683 410 Q683 435 655 435 L570 435 Q542 435 542 410Z" fill="#789f97" opacity=".4"/>
+ </svg><figcaption>Life sciences / Research infrastructure / Future pathways</figcaption></figure>;
+}

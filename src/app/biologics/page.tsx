@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Siona Biologics | Concept",
+  title: "Siona Biologics | Institutional Research Supply",
   description: "An emerging concept exploring responsible life-sciences supply and research partnerships.",
   robots: { index: false, follow: false },
 };

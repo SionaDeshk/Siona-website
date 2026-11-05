@@ -1,29 +1,5 @@
 import { Header } from "@/components/header";
-import { Hero } from "@/components/hero";
-import { About } from "@/components/about";
-import { Mission } from "@/components/mission";
-import { Pathways } from "@/components/pathways";
-import { Vision } from "@/components/vision";
-import { FounderNote } from "@/components/founder-note";
+import { PathExperience } from "@/components/path-experience";
 import { Contact } from "@/components/contact";
-import { ResearchPreview } from "@/components/research-preview";
 import { Footer } from "@/components/footer";
-
-export default function Home() {
-  return (
-    <div id="top" className="site-shell">
-      <Header />
-      <main id="main">
-        <Hero />
-        <About />
-        <Mission />
-        <Pathways />
-        <Vision />
-        <FounderNote />
-        <ResearchPreview />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
-  );
-}
+export default function Home(){return <div id="top" className="site-shell"><Header/><main id="main"><PathExperience/><section className="path-summary page-gutter" id="about"><p className="eyebrow">AN EVOLVING ENTERPRISE</p><h2>Not a collection of businesses. <em>A connected system.</em></h2><div className="path-summary-grid"><a href="#contact"><span>01 / HEALTHCARE</span><h3>People first.</h3><p>Exploring clinician-centered partnerships and workforce solutions.</p><strong>Connect with us ↗</strong></a><a href="/biologics"><span>02 / BIOLOGICS</span><h3>Supply the future.</h3><p>Building a thesis around qualified research supply and institutional trust.</p><strong>Discover Biologics ↗</strong></a><a href="/intelligence"><span>03 / INTELLIGENCE</span><h3>See what changes.</h3><p>Turning evidence and emerging signals into questions worth acting on.</p><strong>Explore Intelligence ↗</strong></a></div></section><Contact/></main><Footer/></div>}

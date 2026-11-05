@@ -323,3 +323,58 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 .biologics-visual figcaption{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:#687166;margin-top:15px}
 @media(max-width:1000px){.research-preview{grid-template-columns:25% 1fr;padding-block:80px}.research-grid{grid-template-columns:1fr;gap:25px}.research-item{max-width:700px}.hero-network-refined svg{width:165%}}
 @media(max-width:640px){.research-preview{grid-template-columns:1fr;gap:30px;padding-block:65px}.research-intro{font-size:44px}.research-grid{margin-top:35px}.hero-network-refined svg{width:115%}.biologics-visual-wrap{padding-bottom:40px}}
+
+/* Interactive network and Biologics editorial, v3 */
+.living-network{position:relative;min-height:480px;overflow:hidden;align-self:stretch;isolation:isolate}
+.living-network canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.living-network .network-caption{bottom:8%;right:5%;letter-spacing:.08em}
+.bio-page{background:#f6f2e9;color:#242625;min-height:100vh}
+.bio-header,.bio-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:27px clamp(24px,6vw,100px);border-bottom:1px solid #d9d1c2}
+.bio-brand{display:inline-flex;align-items:center;gap:13px;font-size:20px;letter-spacing:.16em;font-weight:600}
+.bio-back{font-size:12px;border-bottom:1px solid #b8b4a7;padding-bottom:5px}
+.bio-kicker{font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:#667366}
+.bio-hero{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:3%;min-height:720px;padding:80px clamp(24px,6vw,100px) 100px;overflow:hidden}
+.bio-hero-copy{position:relative;z-index:2}
+.bio-hero h1{font-size:clamp(60px,7.8vw,132px);font-weight:400;line-height:1.03;letter-spacing:-.065em;margin:40px 0 28px}
+.bio-hero h1 em,.bio-statement h2 em,.bio-perspectives h2 em,.bio-invitation h2 em{font-family:var(--font-serif),Georgia,serif;font-weight:400}
+.bio-lead{font-size:clamp(21px,2.6vw,37px);line-height:1.28;letter-spacing:-.03em;max-width:670px}
+.bio-intro{font-size:14px;line-height:1.9;color:#62695f;max-width:610px;margin:30px 0}
+.bio-text-link{display:inline-block;font-size:13px;border-bottom:1px solid currentColor;padding-bottom:9px;margin-top:14px}
+.bio-emergence{height:540px;position:relative;isolation:isolate;filter:saturate(.7)}
+.bio-emergence::before{content:"";position:absolute;inset:7%;border-radius:50%;background:radial-gradient(ellipse at 45% 45%,#d7d9c4 0%,#b4c4b6 30%,#d6dfd2 50%,transparent 73%);filter:blur(26px)}
+.bio-orbit{position:absolute;inset:14% 8%;border:1px solid #7f9a84;border-radius:45% 55% 63% 37% / 45% 35% 65% 55%;box-shadow:inset 0 0 60px #b4c3b36b,0 0 35px #a9bba54d;transform:rotate(-24deg)}
+.bio-orbit-one{border-width:2px;inset:18% 13%;transform:rotate(-30deg) skewY(12deg)}
+.bio-orbit-two{inset:10% 21%;transform:rotate(45deg) skewY(-16deg);border-color:#e5e5d2}
+.bio-orbit-three{inset:28% 5%;transform:rotate(115deg) skewY(18deg);border-color:#526f60;opacity:.6}
+.bio-core{position:absolute;inset:32%;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eff0df,#a3bba8 48%,#5c806c 75%,#456b5a);box-shadow:0 0 65px #9bb39b9c, inset -15px -20px 40px #426c5655}
+.bio-statement{padding:120px clamp(24px,9vw,170px);background:#e6e8df}
+.bio-statement h2{font-size:clamp(35px,5.1vw,82px);line-height:1.15;letter-spacing:-.045em;font-weight:400;max-width:1200px;margin:30px 0}
+.bio-statement>p:last-child{font-size:17px;line-height:1.85;max-width:730px;color:#586257}
+.bio-architecture,.bio-perspectives,.bio-essays,.bio-invitation{padding:105px clamp(24px,6vw,100px)}
+.bio-architecture-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:35px;margin-top:50px}
+.bio-architecture-grid article{border-top:1px solid #b8bdb2;padding-top:18px}
+.bio-architecture-grid span,.bio-paper>span{font-size:10px;letter-spacing:.12em;color:#687366}
+.bio-architecture-grid h3{font-size:clamp(30px,3.5vw,54px);font-weight:400;letter-spacing:-.04em;margin:35px 0 16px}
+.bio-architecture-grid p{font-size:15px;line-height:1.8;color:#596258}
+.bio-perspectives{background:#27382f;color:#f6f2e9}
+.bio-perspectives .bio-kicker,.bio-perspectives .bio-paper>span{color:#b4c8b8}
+.bio-perspectives-head h2{font-size:clamp(45px,6vw,92px);font-weight:400;letter-spacing:-.05em;margin:30px 0}
+.bio-perspectives-head>p:last-child{max-width:680px;font-size:15px;line-height:1.8;color:#d1dcd0}
+.bio-paper-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;margin-top:70px}
+.bio-paper{display:flex;flex-direction:column;align-items:flex-start;border-top:1px solid #8ba392;padding:25px 0 12px;min-height:300px}
+.bio-paper h3{font-size:clamp(24px,2.7vw,39px);font-weight:400;line-height:1.2;letter-spacing:-.035em;margin:35px 0 20px}
+.bio-paper p{font-size:13px;line-height:1.75;color:#d1dcd0}
+.bio-paper strong{font-size:12px;font-weight:400;margin-top:auto;padding-top:30px;border-bottom:1px solid #d1dcd0;padding-bottom:8px}
+.bio-essays{display:grid;grid-template-columns:1fr;gap:0;max-width:1250px;margin:auto}
+.bio-essays article{padding:65px 0;border-bottom:1px solid #c9c9bd;scroll-margin-top:40px}
+.bio-essays h2{font-size:clamp(34px,4vw,62px);font-weight:400;letter-spacing:-.04em;margin:25px 0}
+.bio-essays article>p:not(.bio-kicker){max-width:800px;font-size:16px;line-height:1.9;color:#4e5a50}
+.bio-source a{text-decoration:underline;text-underline-offset:5px}
+.bio-invitation{background:#dce4da}
+.bio-invitation h2{font-size:clamp(40px,5vw,75px);font-weight:400;line-height:1.12;letter-spacing:-.045em;max-width:1000px;margin:25px 0}
+.bio-invitation>p:not(.bio-kicker){font-size:16px;line-height:1.85;max-width:750px}
+.bio-footer{border-top:1px solid #c2c9be;border-bottom:0;min-height:115px}
+.bio-footer>span{font-size:11px;color:#647063}
+@media(prefers-reduced-motion:no-preference){.bio-orbit-one{animation:bio-rotate 28s linear infinite}.bio-orbit-two{animation:bio-rotate-reverse 37s linear infinite}.bio-orbit-three{animation:bio-rotate 46s linear infinite}@keyframes bio-rotate{to{transform:rotate(330deg) skewY(12deg)}}@keyframes bio-rotate-reverse{to{transform:rotate(-315deg) skewY(-16deg)}}}
+@media(max-width:900px){.bio-hero{grid-template-columns:1fr;min-height:0;padding-block:70px}.bio-emergence{height:360px;max-width:600px;width:100%;margin:auto}.bio-architecture-grid,.bio-paper-grid{grid-template-columns:1fr}.bio-paper{min-height:0}.bio-statement,.bio-architecture,.bio-perspectives,.bio-essays,.bio-invitation{padding-block:70px}.living-network{min-height:350px}}
+@media(max-width:640px){.living-network{min-height:300px}.bio-hero h1{font-size:clamp(55px,12vw,78px)}.bio-emergence{height:300px}.bio-header,.bio-footer{padding-block:20px}.bio-footer{flex-wrap:wrap}.bio-statement h2{font-size:40px}.bio-perspectives-head h2{font-size:52px}}

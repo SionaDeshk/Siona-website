@@ -272,3 +272,31 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 .platform-disclaimer{font-size:12px;color:#666b60;margin-top:24px}
 .platform-footer{padding:35px 0;border-top:1px solid #d9d1c2;font-size:10px;letter-spacing:.12em}
 @media(max-width:640px){.platform-intro{padding:60px 0 35px}.platform-intro>p:last-child{font-size:15px}.platform-tabs{gap:20px}.platform-tabs button{font-size:12px}.platform-panel{padding:42px 0 65px}.platform-form,.platform-filters{grid-template-columns:1fr}.platform-metrics{gap:8px}.platform-metrics>div{padding:15px}.platform-metrics strong{font-size:30px}.platform-metrics span{font-size:10px}}
+
+/* Homepage evolution: manifesto, connected systems, restrained motion. */
+.hero-manifesto{position:relative;min-height:min(850px,90vh);grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:2%;padding-top:clamp(80px,9vw,145px);background:var(--paper);background-image:none;overflow:hidden}
+.hero-manifesto .hero-copy{position:relative;z-index:2;padding-bottom:85px}
+.hero-manifesto .hero-eyebrow{color:#656b60;margin-bottom:clamp(28px,4vw,65px)}
+.hero-manifesto h1{font-size:clamp(49px,5.8vw,102px);font-weight:400;line-height:1.08;letter-spacing:-.055em;max-width:930px;margin:0 0 35px}
+.hero-manifesto h1 em{font-family:var(--font-serif),Georgia,serif;font-weight:400}
+.hero-introduction{font-size:clamp(16px,1.5vw,23px);line-height:1.55;max-width:560px;color:#5c6259;margin:0}
+.hero-manifesto .explore-link{margin-top:30px;padding:20px 0}
+.hero-network{position:relative;min-height:450px;display:grid;place-items:center;color:#879080}
+.hero-network svg{width:145%;max-width:none;transform:translate(2%, -4%);opacity:.65}
+.network-paths{opacity:.75}
+.network-caption{position:absolute;bottom:17%;right:2%;font-size:10px;letter-spacing:.08em;color:#626a60}
+.hero-manifesto .hero-bottom{padding-top:25px;background:transparent}
+.hero-manifesto .hero-bottom::before{display:none}
+.horizon-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:48px}
+.horizon-steps>div{border-top:1px solid #72786d;padding-top:16px}
+.horizon-steps span{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#c6cabd}
+.horizon-steps p{font-size:13px;line-height:1.65;color:#e4e5dd}
+.site-footer-editorial{display:block;min-height:0;padding-top:85px;padding-bottom:35px}
+.footer-main{padding-bottom:90px}
+.footer-main .footer-wordmark{font-size:20px;letter-spacing:.14em}
+.footer-philosophy{font-family:var(--font-serif),Georgia,serif;font-size:clamp(40px,5vw,80px);font-style:italic;letter-spacing:-.035em;margin:70px 0 18px}
+.footer-context{font-size:14px;color:#c2c7bb;max-width:460px;line-height:1.7}
+.footer-bottom{border-top:1px solid #555b52;padding-top:24px;display:flex;justify-content:space-between;align-items:center;gap:20px;color:#bfc4b9;font-size:10px}
+@media(max-width:1000px){.hero-manifesto{min-height:0;grid-template-columns:1.2fr .8fr;padding-top:90px}.hero-manifesto h1{font-size:clamp(48px,6.2vw,80px)}.hero-network{min-height:360px}.hero-network svg{width:180%}}
+@media(max-width:640px){.hero-manifesto{display:grid;grid-template-columns:1fr;padding-top:70px;background:var(--paper)}.hero-manifesto .hero-copy{padding-bottom:0}.hero-manifesto h1{font-size:clamp(48px,11vw,76px);line-height:1.09;margin:0 0 26px}.hero-manifesto .hero-eyebrow{margin-bottom:34px}.hero-introduction{font-size:17px}.hero-network{min-height:260px;margin-top:10px;overflow:hidden}.hero-network svg{width:115%;transform:none}.network-caption{bottom:5%;right:3%}.hero-manifesto .hero-bottom{padding-block:25px}.horizon-steps{grid-template-columns:1fr;gap:15px;margin-top:35px}.horizon-steps p{margin:10px 0 5px}.site-footer-editorial{padding-top:65px;padding-bottom:30px}.footer-main{padding-bottom:55px}.footer-philosophy{margin-top:50px;font-size:46px}.footer-bottom{flex-direction:column;align-items:flex-start;gap:16px}.footer-bottom .back-to-top{margin-left:0}}
+@media(prefers-reduced-motion:no-preference){.hero-network .network-paths{animation:network-breathe 12s ease-in-out infinite alternate;transform-origin:50% 50%}@keyframes network-breathe{from{opacity:.5;transform:scale(.985)}to{opacity:.88;transform:scale(1.015)}}}

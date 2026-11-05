@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BrandSymbol } from "@/components/brand-symbol";
+import { BiologicsVisual } from "@/components/biologics-visual";
 
 export const metadata: Metadata = {
   title: "Siona Biologics | Institutional Research Supply",
@@ -17,7 +19,7 @@ export default function BiologicsPage() {
   return (
     <main style={{ minHeight: "100vh", background: "#f6f2e9", color: "#242625" }}>
       <div style={{ padding: "28px clamp(24px, 6vw, 100px)", borderBottom: "1px solid #d9d1c2", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20 }}>
-        <Link href="/" style={{ fontSize: 20, letterSpacing: ".16em", fontWeight: 600 }}>SIONA</Link>
+        <Link href="/" style={{ display:"inline-flex", alignItems:"center", gap:12, fontSize: 20, letterSpacing: ".16em", fontWeight: 600 }}><BrandSymbol className="header-symbol" /> SIONA</Link>
         <Link href="/" style={{ fontSize: 12, textDecoration: "underline", textUnderlineOffset: 5 }}>Back to Siona Group</Link>
       </div>
       <section style={{ padding: "clamp(70px, 10vw, 150px) clamp(24px, 6vw, 100px) 90px", maxWidth: 1250 }}>
@@ -26,6 +28,7 @@ export default function BiologicsPage() {
         <p style={{ fontSize: "clamp(20px, 2.5vw, 34px)", lineHeight: 1.35, maxWidth: 780, letterSpacing: "-.025em" }}>Advancing research through trusted supply.</p>
         <p style={{ fontSize: 13, color: "#68695f", marginTop: 36, maxWidth: 670, lineHeight: 1.9 }}>Siona Biologics is an emerging life-sciences division of Siona Group, developing a wholesale distribution network connecting qualified research organizations with established manufacturers. This initiative is in development; no products are currently offered for sale.</p>
       </section>
+      <div className="biologics-visual-wrap"><BiologicsVisual /></div>
       <section style={{ background: "#e9e3d7", padding: "70px clamp(24px, 6vw, 100px)" }}>
         <p style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 32 }}>Areas under exploration</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 30 }}>

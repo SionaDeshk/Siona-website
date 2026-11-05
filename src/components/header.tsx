@@ -30,6 +30,7 @@ export function Header() {
         <a href="#about" className="nav-link">About</a>
         <a href="#pathways" className="nav-link">Who we serve</a>
         <a href="#vision" className="nav-link">Vision</a>
+        <a href="/biologics" className="nav-link">Biologics</a>
         <a href="#contact" className="nav-link contact-link">Get in touch <Arrow /></a>
       </nav>
       <button ref={menuButton} type="button" className="menu-toggle" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "Close navigation" : "Open navigation"} onClick={() => setOpen(!open)}>

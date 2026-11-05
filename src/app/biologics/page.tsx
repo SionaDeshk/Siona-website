@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const pillars = [
-  { number: "01", title: "Research supply", body: "Explore sourcing of legitimate laboratory reagents and research consumables for qualified institutional customers." },
+  { number: "01", title: "Research supply", body: "Develop institutional wholesale relationships for eligible laboratory reagents and research consumables, subject to supplier and regulatory review." },
   { number: "02", title: "Quality by design", body: "Build around supplier qualification, lot traceability, fit-for-purpose testing, and transparent documentation." },
   { number: "03", title: "Future pathways", body: "Evaluate peptide research, analytical services, and broader biotechnology partnerships as the business develops." },
 ];
@@ -21,10 +21,10 @@ export default function BiologicsPage() {
         <Link href="/" style={{ fontSize: 12, textDecoration: "underline", textUnderlineOffset: 5 }}>Back to Siona Group</Link>
       </div>
       <section style={{ padding: "clamp(70px, 10vw, 150px) clamp(24px, 6vw, 100px) 90px", maxWidth: 1250 }}>
-        <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: ".2em", color: "#6b7063" }}>Siona Group / Emerging concept</p>
+        <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: ".2em", color: "#6b7063" }}>Siona Group / Emerging life-sciences division</p>
         <h1 style={{ fontSize: "clamp(54px, 9vw, 132px)", fontWeight: 400, letterSpacing: "-.065em", lineHeight: 1.03, margin: "32px 0" }}>Siona <span style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}>Biologics.</span></h1>
-        <p style={{ fontSize: "clamp(20px, 2.5vw, 34px)", lineHeight: 1.35, maxWidth: 780, letterSpacing: "-.025em" }}>A future-facing life-sciences initiative grounded in scientific integrity, transparent supply chains, and responsible innovation.</p>
-        <p style={{ fontSize: 13, color: "#68695f", marginTop: 36, maxWidth: 670, lineHeight: 1.9 }}>This is an exploratory business concept, not an operating pharmaceutical manufacturer, licensed distributor, or currently available product storefront.</p>
+        <p style={{ fontSize: "clamp(20px, 2.5vw, 34px)", lineHeight: 1.35, maxWidth: 780, letterSpacing: "-.025em" }}>Advancing research through trusted supply.</p>
+        <p style={{ fontSize: 13, color: "#68695f", marginTop: 36, maxWidth: 670, lineHeight: 1.9 }}>Siona Biologics is an emerging life-sciences division of Siona Group, developing a wholesale distribution network connecting qualified research organizations with established manufacturers. This initiative is in development; no products are currently offered for sale.</p>
       </section>
       <section style={{ background: "#e9e3d7", padding: "70px clamp(24px, 6vw, 100px)" }}>
         <p style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 32 }}>Areas under exploration</p>

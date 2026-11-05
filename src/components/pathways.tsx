@@ -18,6 +18,7 @@ export function Pathways() {
           <a href="#contact">Start a conversation <Arrow /></a>
         </article>
       </div>
+      <p style={{ marginTop: 28, fontSize: 14, lineHeight: 1.7 }}>Exploring institutional research supply? <a href="/biologics" style={{ textDecoration: "underline", textUnderlineOffset: 4 }}>Discover Siona Biologics <Arrow /></a></p>
     </section>
   );
 }

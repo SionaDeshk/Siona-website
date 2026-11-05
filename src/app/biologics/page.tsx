@@ -1,55 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandSymbol } from "@/components/brand-symbol";
-import { BiologicsVisual } from "@/components/biologics-visual";
 
 export const metadata: Metadata = {
-  title: "Siona Biologics | Institutional Research Supply",
-  description: "An emerging concept exploring responsible life-sciences supply and research partnerships.",
-  robots: { index: false, follow: false },
+ title:"Siona Biologics | Research, Supply & Perspective",
+ description:"Exploring institutional research supply, scientific quality, and the future of life-sciences infrastructure.",
+ robots:{index:false,follow:false}
 };
-
-const pillars = [
-  { number: "01", title: "Research supply", body: "Develop institutional wholesale relationships for eligible laboratory reagents and research consumables, subject to supplier and regulatory review." },
-  { number: "02", title: "Quality by design", body: "Build around supplier qualification, lot traceability, fit-for-purpose testing, and transparent documentation." },
-  { number: "03", title: "Future pathways", body: "Evaluate peptide research, analytical services, and broader biotechnology partnerships as the business develops." },
+const papers=[
+ {no:"01",label:"SIONA PERSPECTIVE / FOUNDING THESIS",title:"From transactions to trusted infrastructure",summary:"Why qualified supply relationships, documentation, and accountability may be as important as the products themselves.",href:"#thesis"},
+ {no:"02",label:"SOURCE BRIEF / MANUFACTURING",title:"What continuous manufacturing changes",summary:"A reading of ICH Q13: process integration, control strategies, and why manufacturing evolution demands operational discipline.",href:"#manufacturing"},
+ {no:"03",label:"SOURCE BRIEF / QUALITY",title:"Quality is a system, not a certificate",summary:"A reading of ICH Q5E: comparability, critical attributes, and why quality must be understood across process changes.",href:"#quality"}
 ];
-
-export default function BiologicsPage() {
-  return (
-    <main style={{ minHeight: "100vh", background: "#f6f2e9", color: "#242625" }}>
-      <div style={{ padding: "28px clamp(24px, 6vw, 100px)", borderBottom: "1px solid #d9d1c2", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20 }}>
-        <Link href="/" style={{ display:"inline-flex", alignItems:"center", gap:12, fontSize: 20, letterSpacing: ".16em", fontWeight: 600 }}><BrandSymbol className="header-symbol" /> SIONA</Link>
-        <Link href="/" style={{ fontSize: 12, textDecoration: "underline", textUnderlineOffset: 5 }}>Back to Siona Group</Link>
-      </div>
-      <section style={{ padding: "clamp(70px, 10vw, 150px) clamp(24px, 6vw, 100px) 90px", maxWidth: 1250 }}>
-        <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: ".2em", color: "#6b7063" }}>Siona Group / Emerging life-sciences division</p>
-        <h1 style={{ fontSize: "clamp(54px, 9vw, 132px)", fontWeight: 400, letterSpacing: "-.065em", lineHeight: 1.03, margin: "32px 0" }}>Siona <span style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}>Biologics.</span></h1>
-        <p style={{ fontSize: "clamp(20px, 2.5vw, 34px)", lineHeight: 1.35, maxWidth: 780, letterSpacing: "-.025em" }}>Advancing research through trusted supply.</p>
-        <p style={{ fontSize: 13, color: "#68695f", marginTop: 36, maxWidth: 670, lineHeight: 1.9 }}>Siona Biologics is an emerging life-sciences division of Siona Group, developing a wholesale distribution network connecting qualified research organizations with established manufacturers. This initiative is in development; no products are currently offered for sale.</p>
-      </section>
-      <div className="biologics-visual-wrap"><BiologicsVisual /></div>
-      <section style={{ background: "#e9e3d7", padding: "70px clamp(24px, 6vw, 100px)" }}>
-        <p style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 32 }}>Areas under exploration</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 30 }}>
-          {pillars.map((p) => <article key={p.number} style={{ borderTop: "1px solid #b6b2a5", paddingTop: 20 }}>
-            <span style={{ fontSize: 11, color: "#68695f" }}>{p.number} /</span>
-            <h2 style={{ fontSize: 27, fontWeight: 400, margin: "24px 0 14px" }}>{p.title}</h2>
-            <p style={{ fontSize: 14, lineHeight: 1.8, color: "#555950" }}>{p.body}</p>
-          </article>)}
-        </div>
-      </section>
-      <section aria-labelledby="biologics-inquiries" style={{ padding: "64px clamp(24px, 6vw, 100px)", borderTop: "1px solid #d9d1c2" }}>
-        <p style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", color: "#6b7063" }}>Institutional relationships</p>
-        <h2 id="biologics-inquiries" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 400, letterSpacing: "-.04em", margin: "20px 0" }}>Let's explore what's possible.</h2>
-        <p style={{ fontSize: 15, lineHeight: 1.9, maxWidth: 680, color: "#555950" }}>We welcome introductory conversations with established manufacturers, accredited laboratories, and qualified research organizations interested in responsible life-sciences supply. This is an expression-of-interest channel only, not an offer to sell or a request for orders.</p>
-        <Link href="/#contact" style={{ display: "inline-block", borderBottom: "1px solid currentColor", marginTop: 20, paddingBottom: 8, fontSize: 13 }}>Introduce your organization ↗</Link>
-      </section>
-      <section style={{ padding: "70px clamp(24px, 6vw, 100px)", maxWidth: 900 }}>
-        <h2 style={{ fontSize: "clamp(32px, 4vw, 55px)", fontWeight: 400, letterSpacing: "-.04em" }}>Built for what comes next.</h2>
-        <p style={{ fontSize: 15, lineHeight: 1.9, color: "#555950" }}>Any commercial offering would be subject to supplier diligence, appropriate regulatory review, and brand clearance. No investigational injectable products are offered for sale.</p>
-        <Link href="/#contact" style={{ display: "inline-block", marginTop: 18, borderBottom: "1px solid currentColor", paddingBottom: 8, fontSize: 13 }}>Contact Siona Group ↗</Link>
-      </section>
-    </main>
-  );
+export default function BiologicsPage(){
+ return <main className="bio-page">
+  <header className="bio-header"><Link href="/" className="bio-brand"><BrandSymbol className="header-symbol"/>SIONA</Link><Link href="/" className="bio-back">Siona Group ↗</Link></header>
+  <section className="bio-hero" aria-labelledby="bio-title">
+   <div className="bio-hero-copy"><p className="bio-kicker">SIONA GROUP / EMERGING LIFE SCIENCES</p><h1 id="bio-title">Biologics, <em>reconsidered.</em></h1><p className="bio-lead">A more connected future for research supply.</p><p className="bio-intro">Siona Biologics is an initiative in development, exploring how trusted relationships, qualified supply, and transparent information can strengthen research infrastructure. No products are currently offered for sale.</p><a href="#perspectives" className="bio-text-link">Explore our thinking ↓</a></div>
+   <div className="bio-emergence" role="img" aria-label="Abstract layered organic forms suggesting emergence, adaptation, and interconnected scientific systems"><div className="bio-orbit bio-orbit-one"/><div className="bio-orbit bio-orbit-two"/><div className="bio-orbit bio-orbit-three"/><div className="bio-core"/></div>
+  </section>
+  <section className="bio-statement"><p className="bio-kicker">OUR WORKING HYPOTHESIS</p><h2>Research advances through more than discovery. <em>It depends on the systems that make discovery possible.</em></h2><p>We are examining the infrastructure between manufacturers and research organizations: qualification, traceability, communication, continuity, and accountability. Our aim is to validate where a new kind of partner can add measurable value.</p></section>
+  <section className="bio-architecture"><p className="bio-kicker">THREE CONNECTED HORIZONS</p><div className="bio-architecture-grid"><article><span>01 / RELATIONSHIPS</span><h3>Build trust.</h3><p>Listen to qualified laboratories, institutions, and manufacturers. Understand friction before proposing solutions.</p></article><article><span>02 / SUPPLY SYSTEMS</span><h3>Design for clarity.</h3><p>Explore supplier diligence, documented quality expectations, product suitability, and reliable institutional fulfillment.</p></article><article><span>03 / FUTURE CAPABILITIES</span><h3>Earn the next step.</h3><p>Investigate analytics, technology, and eventually manufacturing partnerships only as evidence and capabilities justify expansion.</p></article></div></section>
+  <section className="bio-perspectives" id="perspectives"><div className="bio-perspectives-head"><p className="bio-kicker">RESEARCH & PERSPECTIVES</p><h2>Questions worth <em>studying.</em></h2><p>Original Siona perspectives informed by public regulatory sources. These are exploratory essays, not peer-reviewed scientific research, investment forecasts, or claims of operating capabilities.</p></div><div className="bio-paper-grid">{papers.map(p=><a key={p.no} href={p.href} className="bio-paper"><span>{p.no} / {p.label}</span><h3>{p.title}</h3><p>{p.summary}</p><strong>Read perspective ↗</strong></a>)}</div></section>
+  <section className="bio-essays" aria-label="Siona research perspectives">
+   <article id="thesis"><span className="bio-kicker">01 / FOUNDING THESIS</span><h2>From transactions to trusted infrastructure</h2><p>Our hypothesis is that institutional buyers may value reliable qualification, traceability, communication, and responsiveness alongside price. We have not yet validated the size of this opportunity or established customer demand. The next step is structured interviews with research purchasers and manufacturers, followed by documented supplier and product-category diligence.</p><p>We would test this thesis through measurable questions: How often do documentation gaps delay procurement? Which categories experience recurring supply friction? What information must accompany a lot from supplier to end user? These are research questions, not findings.</p></article>
+   <article id="manufacturing"><span className="bio-kicker">02 / MANUFACTURING SYSTEMS</span><h2>What continuous manufacturing changes</h2><p>FDA's ICH Q13 guidance addresses the development, operation, and lifecycle management of continuous manufacturing, including integration of manufacturing steps and associated controls. The implications for Siona are strategic rather than operational today: advanced production requires robust process understanding, quality systems, and disciplined change management.</p><p className="bio-source">Source: <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q13-continuous-manufacturing-drug-substances-and-drug-products" target="_blank" rel="noopener noreferrer">FDA, ICH Q13, March 2023 ↗</a></p></article>
+   <article id="quality"><span className="bio-kicker">03 / QUALITY SYSTEMS</span><h2>Quality is a system, not a certificate</h2><p>ICH Q5E describes how manufacturers evaluate comparability of biological products when manufacturing processes change, emphasizing appropriate evidence concerning quality attributes. This guidance concerns regulated biological products; it should not be treated as a blanket requirement for every research consumable. For Siona, the broader lesson is to match qualification and documentation to the actual product and regulatory context.</p><p className="bio-source">Source: <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q5e-comparability-biotechnologicalbiological-products-subject-changes-their-manufacturing-process" target="_blank" rel="noopener noreferrer">FDA, ICH Q5E, June 2005 ↗</a></p></article>
+  </section>
+  <section className="bio-invitation"><p className="bio-kicker">AN OPEN INVITATION</p><h2>Better systems begin with <em>better conversations.</em></h2><p>We welcome introductory discussions with qualified research institutions, established manufacturers, and potential strategic collaborators. This is an expression-of-interest channel only, not an offer to sell products or solicit investment.</p><Link href="/#contact" className="bio-text-link">Introduce your organization ↗</Link></section>
+  <footer className="bio-footer"><Link href="/" className="bio-brand"><BrandSymbol className="header-symbol"/>SIONA</Link><span>The path is the way.</span><span>© 2026 Siona Group LLC</span></footer>
+ </main>;
 }

@@ -41,6 +41,7 @@ export function Header() {
         <a href="#about" onClick={() => setOpen(false)}>About <Arrow /></a>
         <a href="#pathways" onClick={() => setOpen(false)}>Who we serve <Arrow /></a>
         <a href="#vision" onClick={() => setOpen(false)}>Vision <Arrow /></a>
+        <a href="/biologics" onClick={() => setOpen(false)}>Biologics <Arrow /></a>
         <a href="#contact" onClick={() => setOpen(false)}>Get in touch <Arrow /></a>
       </nav>
     </header>

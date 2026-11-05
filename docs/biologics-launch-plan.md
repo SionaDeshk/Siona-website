@@ -35,3 +35,6 @@ Do not claim a relationship, post a catalog, take orders, or promise fulfillment
 
 ## Decision log
 Siona Biologics is the proposed division name, subject to clearance. Siona Peptides may be a product category rather than a separate legal entity.
+
+## Initial go-to-market decision (2026-11-05)
+Pursue B2B wholesale distribution first, prioritizing manufacturer-direct fulfillment when authorized. Target qualified laboratories and research organizations. Private-label products and inventory ownership are later-stage options, not launch prerequisites. Do not list or sell regulated peptides before product-by-product legal and quality review. Sinopep is a prospective supplier only; no relationship has been established.

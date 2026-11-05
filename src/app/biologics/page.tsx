@@ -36,6 +36,12 @@ export default function BiologicsPage() {
           </article>)}
         </div>
       </section>
+      <section aria-labelledby="biologics-inquiries" style={{ padding: "64px clamp(24px, 6vw, 100px)", borderTop: "1px solid #d9d1c2" }}>
+        <p style={{ fontSize: 11, letterSpacing: ".15em", textTransform: "uppercase", color: "#6b7063" }}>Institutional relationships</p>
+        <h2 id="biologics-inquiries" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 400, letterSpacing: "-.04em", margin: "20px 0" }}>Let's explore what's possible.</h2>
+        <p style={{ fontSize: 15, lineHeight: 1.9, maxWidth: 680, color: "#555950" }}>We welcome introductory conversations with established manufacturers, accredited laboratories, and qualified research organizations interested in responsible life-sciences supply. This is an expression-of-interest channel only, not an offer to sell or a request for orders.</p>
+        <Link href="/#contact" style={{ display: "inline-block", borderBottom: "1px solid currentColor", marginTop: 20, paddingBottom: 8, fontSize: 13 }}>Introduce your organization ↗</Link>
+      </section>
       <section style={{ padding: "70px clamp(24px, 6vw, 100px)", maxWidth: 900 }}>
         <h2 style={{ fontSize: "clamp(32px, 4vw, 55px)", fontWeight: 400, letterSpacing: "-.04em" }}>Built for what comes next.</h2>
         <p style={{ fontSize: 15, lineHeight: 1.9, color: "#555950" }}>Any commercial offering would be subject to supplier diligence, appropriate regulatory review, and brand clearance. No investigational injectable products are offered for sale.</p>

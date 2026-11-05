@@ -300,3 +300,26 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 @media(max-width:1000px){.hero-manifesto{min-height:0;grid-template-columns:1.2fr .8fr;padding-top:90px}.hero-manifesto h1{font-size:clamp(48px,6.2vw,80px)}.hero-network{min-height:360px}.hero-network svg{width:180%}}
 @media(max-width:640px){.hero-manifesto{display:grid;grid-template-columns:1fr;padding-top:70px;background:var(--paper)}.hero-manifesto .hero-copy{padding-bottom:0}.hero-manifesto h1{font-size:clamp(48px,11vw,76px);line-height:1.09;margin:0 0 26px}.hero-manifesto .hero-eyebrow{margin-bottom:34px}.hero-introduction{font-size:17px}.hero-network{min-height:260px;margin-top:10px;overflow:hidden}.hero-network svg{width:115%;transform:none}.network-caption{bottom:5%;right:3%}.hero-manifesto .hero-bottom{padding-block:25px}.horizon-steps{grid-template-columns:1fr;gap:15px;margin-top:35px}.horizon-steps p{margin:10px 0 5px}.site-footer-editorial{padding-top:65px;padding-bottom:30px}.footer-main{padding-bottom:55px}.footer-philosophy{margin-top:50px;font-size:46px}.footer-bottom{flex-direction:column;align-items:flex-start;gap:16px}.footer-bottom .back-to-top{margin-left:0}}
 @media(prefers-reduced-motion:no-preference){.hero-network .network-paths{animation:network-breathe 12s ease-in-out infinite alternate;transform-origin:50% 50%}@keyframes network-breathe{from{opacity:.5;transform:scale(.985)}to{opacity:.88;transform:scale(1.015)}}}
+
+/* Research perspectives and scientific visual system */
+.hero-network-refined svg{width:125%;max-width:none;opacity:.85;transform:translate(0,-2%)}
+.hero-network-refined{color:#738875}
+.hero-network-refined circle{filter:drop-shadow(0 0 4px #9fb19a)}
+.research-preview{display:grid;grid-template-columns:30% 1fr;gap:5%;padding-block:105px;border-top:1px solid var(--rule);background:#e9e5db}
+.research-intro{font-size:clamp(38px,4.4vw,72px);font-weight:400;line-height:1.1;letter-spacing:-.045em;margin:0 0 25px}
+.research-intro em{font-family:var(--font-serif),Georgia,serif;font-weight:400}
+.research-subtitle{max-width:680px;font-size:15px;line-height:1.75;color:#555b53}
+.research-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;margin-top:55px}
+.research-item{border-top:1px solid #aeb4a6;padding-top:17px;display:flex;flex-direction:column;align-items:flex-start}
+.research-item>span{font-size:10px;letter-spacing:.12em;color:#697467}
+.research-item h3{font-size:clamp(21px,2vw,31px);line-height:1.2;letter-spacing:-.025em;font-weight:400;margin:20px 0}
+.research-item p{font-size:13px;line-height:1.7;color:#555b53}
+.research-item small{font-size:10px;line-height:1.7;color:#687166;margin-top:auto;padding-top:12px}
+.research-item a,.research-biologics-link{font-size:12px;border-bottom:1px solid currentColor;padding-bottom:7px;margin-top:23px;display:inline-block}
+.research-biologics-link{margin-top:35px}
+.biologics-visual-wrap{padding:0 clamp(24px,6vw,100px) 75px;max-width:1500px;margin-inline:auto}
+.biologics-visual{margin:0;overflow:hidden}
+.biologics-visual svg{width:100%;height:auto;display:block}
+.biologics-visual figcaption{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:#687166;margin-top:15px}
+@media(max-width:1000px){.research-preview{grid-template-columns:25% 1fr;padding-block:80px}.research-grid{grid-template-columns:1fr;gap:25px}.research-item{max-width:700px}.hero-network-refined svg{width:165%}}
+@media(max-width:640px){.research-preview{grid-template-columns:1fr;gap:30px;padding-block:65px}.research-intro{font-size:44px}.research-grid{margin-top:35px}.hero-network-refined svg{width:115%}.biologics-visual-wrap{padding-bottom:40px}}

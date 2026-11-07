@@ -4,16 +4,16 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 export function configured() {
   return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY,
   );
 }
 export async function supabase() {
   if (!configured()) throw new Error("Passport is not configured.");
   const jar = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll: () => jar.getAll(),

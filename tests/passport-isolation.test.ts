@@ -2,8 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createClient } from "@supabase/supabase-js";
 const names = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "NEXT_PUBLIC_PASSPORT_SUPABASE_URL",
+  "NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY",
   "PASSPORT_TEST_EMAIL_A",
   "PASSPORT_TEST_PASSWORD_A",
   "PASSPORT_TEST_EMAIL_B",
@@ -13,8 +13,8 @@ test(
   "live Supabase prevents second account from accessing rows, links and files",
   { skip: !names.every((n) => process.env[n]) },
   async () => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const url = process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL!,
+      key = process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY!;
     const a = createClient(url, key, { auth: { persistSession: false } }),
       b = createClient(url, key, { auth: { persistSession: false } });
     const authA = await a.auth.signInWithPassword({

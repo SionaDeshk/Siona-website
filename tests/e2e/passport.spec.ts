@@ -24,7 +24,7 @@ test("login is responsive and exposes no private data", async ({ page }) => {
 });
 
 test('configured clinician can sign in and sign out', async ({ page }) => {
-  test.skip(!process.env.PASSPORT_TEST_EMAIL_A || !process.env.PASSPORT_TEST_PASSWORD_A || !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, 'Requires configured synthetic Supabase account');
+  test.skip(!process.env.PASSPORT_TEST_EMAIL_A || !process.env.PASSPORT_TEST_PASSWORD_A || !process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL || !process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY, 'Requires configured synthetic Supabase account');
   await page.goto('/passport/login');
   await page.getByLabel('Email', { exact: true }).fill(process.env.PASSPORT_TEST_EMAIL_A!);
   await page.getByLabel('Password', { exact: true }).fill(process.env.PASSPORT_TEST_PASSWORD_A!);

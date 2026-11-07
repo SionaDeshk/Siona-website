@@ -22,7 +22,7 @@ Do not upload PHI, patient records, SSNs, driver's licenses, or background check
 ## Implementation order
 1. Review and apply `supabase/migrations/20261107_passport_initial.sql` in the intended Supabase project. This step is not automatic.
 2. Add `@supabase/ssr` and `@supabase/supabase-js` to package dependencies and install locally.
-3. Configure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel and local environment. Never commit real values.
+3. Configure `NEXT_PUBLIC_PASSPORT_SUPABASE_URL` and `NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY` in Vercel and local environment. Never commit real values.
 4. Implement SSR auth callbacks and guarded `/passport/app` routes. Confirm no unauthenticated data exposure.
 5. Build license, CE, certification CRUD and private document upload with per-user ownership checks.
 6. Build dashboard aggregations and date-filtered CE totals. Do not imply one state's CE qualifies for another.

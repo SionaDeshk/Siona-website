@@ -532,3 +532,13 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 .ia-subfooter{border-top:1px solid #29394d;border-bottom:0}
 @media(max-width:900px){.ia-thesis,.ia-section-top{grid-template-columns:1fr;gap:30px}.ia-venture{grid-template-columns:9% 1fr 30px}.ia-venture p{grid-column:2}.ia-venture-arrow{grid-column:3;grid-row:1/3}.ia-bio-visual{opacity:.4;width:75%}.ia-bio-cards{grid-template-columns:1fr}}
 @media(max-width:640px){.ia-hero{min-height:85svh}.ia-hero-content{padding-block:80px 110px}.ia-hero h1{font-size:clamp(65px,16vw,105px)}.ia-overline-right{display:none}.ia-actions{gap:10px;flex-wrap:wrap}.ia-thesis,.ia-ventures,.ia-closing,.ia-bio-focus,.ia-bio-analysis,.ia-bio-contact{padding-block:75px}.ia-venture{padding:27px 0}.ia-venture h3{font-size:42px}.ia-venture p{font-size:13px}.ia-bio-hero{min-height:670px}.ia-bio h1{font-size:clamp(55px,12vw,85px)}.ia-bio-visual{width:95%;right:-20%;opacity:.3}}
+
+/* Real-time visualization layer: graphite + restrained spectral light */
+.signal-engine{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:auto}
+.ia-hero .signal-engine{z-index:-1;opacity:1;mask-image:linear-gradient(90deg,transparent 7%,#000 38%,#000 100%)}
+.ia-hero .ia-hero-content{position:relative;z-index:1;pointer-events:none}
+.ia-hero .ia-actions,.ia-hero .ia-actions a{pointer-events:auto}
+.ia-bio-hero .signal-engine{z-index:0;opacity:.95;mask-image:linear-gradient(90deg,transparent 10%,#000 45%,#000 100%)}
+.ia-bio-hero .ia-bio-content{pointer-events:none}
+.ia-bio-hero .ia-bio-content a{pointer-events:auto}
+@media(max-width:750px){.ia-hero .signal-engine,.ia-bio-hero .signal-engine{opacity:.65;mask-image:none}.ia-hero:after{background:linear-gradient(90deg,#090d13c9,#090d1388)}}

@@ -188,3 +188,100 @@ test("editing a credential preserves changed fields across a failed save", async
   ).toBeVisible();
   await expect(form.getByLabel("hours", { exact: true })).toHaveValue("4.5");
 });
+
+test("search hides records without changing CE totals or discarding unfinished edits", async ({
+  page,
+}) => {
+  const section = page.locator("#ce_entries");
+  const record = section.locator("article.record");
+  await record.getByText("Edit record", { exact: true }).click();
+  await record.getByLabel("title", { exact: true }).fill("Unfinished draft");
+  const search = section.getByLabel("Search continuing education", {
+    exact: true,
+  });
+  await search.fill("no-such-course");
+  await expect(record).toBeHidden();
+  await expect(section.getByText(/No matching records/)).toBeVisible();
+  await expect(
+    page.locator(".passport-stats").getByText("2.00", { exact: true }),
+  ).toBeVisible();
+  await section.getByRole("button", { name: "Clear filters" }).click();
+  await expect(record).toBeVisible();
+  await expect(record.getByLabel("title", { exact: true })).toHaveValue(
+    "Unfinished draft",
+  );
+  await search.fill("SYNTHETIC provider");
+  await expect(record).toBeVisible();
+});
+test("document search includes linked credentials and links reveal a hidden destination", async ({
+  page,
+}) => {
+  const vault = page.locator("#documents");
+  const learning = page.locator("#ce_entries");
+  await learning
+    .getByLabel("Search continuing education", { exact: true })
+    .fill("hide everything");
+  await expect(learning.locator("article.record")).toBeHidden();
+  await vault
+    .getByLabel("Search documents", { exact: true })
+    .fill("synthetic course");
+  await expect(vault.locator("article.record")).toBeVisible();
+  await vault
+    .getByRole("link", {
+      name: "CE · Synthetic course · 2026-01-01",
+      exact: true,
+    })
+    .click();
+  await expect(
+    learning.getByLabel("Search continuing education", { exact: true }),
+  ).toHaveValue("");
+  await expect(learning.locator("article.record")).toBeVisible();
+  await vault
+    .getByLabel("Filter by document link", { exact: true })
+    .selectOption("unlinked");
+  await expect(vault.locator("article.record")).toBeHidden();
+  await vault.getByRole("button", { name: "Clear filters" }).click();
+  await expect(vault.locator("article.record")).toBeVisible();
+});
+test("expiry filters distinguish expired, due soon and missing dates", async ({
+  page,
+  request,
+}) => {
+  const soon = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  for (const [jurisdiction, expires_on] of [
+    ["AK", "2020-01-01"],
+    ["WA", soon],
+    ["OR", "2099-01-01"],
+    ["NY", null],
+  ]) {
+    await request.post(`${fixture}/rest/v1/passport_licenses`, {
+      data: {
+        user_id: "11111111-1111-4111-8111-111111111111",
+        jurisdiction,
+        license_type: "RN",
+        license_number: "TEST",
+        expires_on,
+        status: "self_reported",
+      },
+    });
+  }
+  await page.reload();
+  const section = page.locator("#licenses");
+  const filter = section.getByLabel("Filter by expiry", { exact: true });
+  await filter.selectOption("expired");
+  await expect(section.locator("article.record:visible")).toHaveCount(1);
+  await expect(
+    section.getByRole("heading", { name: "AK · RN", exact: true }),
+  ).toBeVisible();
+  await filter.selectOption("due");
+  await expect(
+    section.getByRole("heading", { name: "WA · RN", exact: true }),
+  ).toBeVisible();
+  await expect(section.locator("article.record:visible")).toHaveCount(1);
+  await filter.selectOption("undated");
+  await expect(
+    section.locator("article.record:visible").getByText("No expiry recorded", { exact: true }),
+  ).toBeVisible();
+  await section.getByRole("button", { name: "Clear filters" }).click();
+  await expect(section.locator("article.record:visible")).toHaveCount(4);
+});

@@ -317,3 +317,36 @@
 .passport .document-link {
   font-size: 14px;
 }
+.passport .record-controls {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+}
+.passport .record-controls button {
+  justify-self: start;
+}
+.passport .expiry-badge {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 4px 10px;
+  background: #e6e9df;
+  font-size: 13px;
+}
+.passport .expiry-expired {
+  background: #f5e4df;
+  color: #81372d;
+}
+.passport .expiry-due {
+  background: #f8efd7;
+  color: #694d12;
+}
+.passport .record-browser [hidden] {
+  display: none;
+}
+@media (max-width: 640px) {
+  .passport .record-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

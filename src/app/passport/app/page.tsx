@@ -14,6 +14,8 @@ import {
   documentCredentialKey,
   groupLinkedDocuments,
 } from "@/lib/passport/credential-links";
+import { RecordFilter } from "./record-filter";
+import { expiryState, expiryLabel } from "@/lib/passport/record-filters";
 import { CredentialForm } from "./credential-form";
 type Row = Record<string, string | number | null>;
 export default async function Dashboard({
@@ -47,14 +49,13 @@ export default async function Dashboard({
   const optionsByKey = new Map(options.map((option) => [option.value, option]));
   const linkedDocuments = groupLinkedDocuments(documents || []);
   const errors = results.some((r) => r.error) || docError || profileError;
-  const reminders = [...rows[0], ...rows[2]].filter(
-    (row) =>
-      row.expires_on &&
-      String(row.expires_on) <=
-        new Date(new Date(today).getTime() + 90 * 86400000)
-          .toISOString()
-          .slice(0, 10),
-  );
+  const reminders = [...rows[0], ...rows[2]]
+    .filter((row) =>
+      ["expired", "due"].includes(
+        expiryState(row.expires_on ? String(row.expires_on) : null, today),
+      ),
+    )
+    .sort((a, b) => String(a.expires_on).localeCompare(String(b.expires_on)));
   const total = ceTotal(
     rows[1].map((r) => ({
       hours: Number(r.hours),
@@ -152,8 +153,10 @@ export default async function Dashboard({
           <h2>On the horizon</h2>
           {reminders.map((r) => (
             <p key={r.id}>
-              {r.name || `${r.jurisdiction} ${r.license_type}`} ·{" "}
-              {String(r.expires_on) < today ? "Expired" : "Expires"}{" "}
+              <a href={`#credential-${r.id}`}>
+                {r.name || `${r.jurisdiction} ${r.license_type}`}
+              </a>{" "}
+              · {String(r.expires_on) < today ? "Expired" : "Expires"}{" "}
               {r.expires_on}
             </p>
           ))}
@@ -183,57 +186,94 @@ export default async function Dashboard({
               Your next chapter starts here. Add your first record.
             </p>
           )}
-          {rows[index].map((row) => (
-            <article
-              key={row.id}
-              className="record"
-              id={`credential-${row.id}`}
-            >
-              <h3>
-                {row.title ||
-                  row.name ||
-                  `${row.jurisdiction} · ${row.license_type}`}
-              </h3>
-              <p>
-                {kind === "ce_entries"
-                  ? `${row.provider} · ${row.hours} hours · ${row.completed_on}`
-                  : kind === "licenses"
-                    ? `${row.license_number || "No number"} · ${row.status}`
-                    : row.issuer}
-              </p>
-              {row.expires_on && <p>Expires {row.expires_on}</p>}
-              <small>Self-reported · Not verified by Siona</small>
-              {(linkedDocuments.get(`${kind}:${row.id}`) || []).length > 0 && (
-                <div className="linked-documents">
-                  <p>Attached documents</p>
-                  <ul>
-                    {linkedDocuments.get(`${kind}:${row.id}`)!.map((doc) => (
-                      <li key={doc.id}>
-                        <a href={`#document-${doc.id}`}>
-                          {doc.original_filename}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <details>
-                <summary>Edit record</summary>
-                <CredentialForm kind={kind} row={row} />
-              </details>
-              <form action={deleteCredential}>
-                <input type="hidden" name="kind" value={kind} />
-                <input type="hidden" name="id" value={String(row.id)} />
-                <SubmitButton
-                  className="danger"
-                  pendingLabel="Deleting…"
-                  confirmText="Delete this credential record? Linked documents will stay in your vault."
-                >
-                  Delete record
-                </SubmitButton>
-              </form>
-            </article>
-          ))}
+          <RecordFilter
+            label={
+              ["licenses", "continuing education", "certifications"][index]
+            }
+            mode={kind === "ce_entries" ? "search" : "expiry"}
+            items={rows[index].map((row) => ({
+              id: `credential-${row.id}`,
+              text: [
+                row.title,
+                row.provider,
+                row.accreditation,
+                row.completed_on,
+                row.name,
+                row.issuer,
+                row.jurisdiction,
+                row.license_type,
+                row.license_number,
+              ]
+                .filter(Boolean)
+                .join(" "),
+              expiry: expiryState(
+                row.expires_on ? String(row.expires_on) : null,
+                today,
+              ),
+            }))}
+          >
+            {rows[index].map((row) => (
+              <article
+                key={row.id}
+                className="record"
+                id={`credential-${row.id}`}
+              >
+                <h3>
+                  {row.title ||
+                    row.name ||
+                    `${row.jurisdiction} · ${row.license_type}`}
+                </h3>
+                <p>
+                  {kind === "ce_entries"
+                    ? `${row.provider} · ${row.hours} hours · ${row.completed_on}`
+                    : kind === "licenses"
+                      ? `${row.license_number || "No number"} · ${row.status}`
+                      : row.issuer}
+                </p>
+                {kind !== "ce_entries" && (
+                  <p
+                    className={`expiry-badge expiry-${expiryState(row.expires_on ? String(row.expires_on) : null, today)}`}
+                  >
+                    {expiryLabel(
+                      row.expires_on ? String(row.expires_on) : null,
+                      today,
+                    )}
+                  </p>
+                )}
+                <small>Self-reported · Not verified by Siona</small>
+                {(linkedDocuments.get(`${kind}:${row.id}`) || []).length >
+                  0 && (
+                  <div className="linked-documents">
+                    <p>Attached documents</p>
+                    <ul>
+                      {linkedDocuments.get(`${kind}:${row.id}`)!.map((doc) => (
+                        <li key={doc.id}>
+                          <a href={`#document-${doc.id}`}>
+                            {doc.original_filename}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <details>
+                  <summary>Edit record</summary>
+                  <CredentialForm kind={kind} row={row} />
+                </details>
+                <form action={deleteCredential}>
+                  <input type="hidden" name="kind" value={kind} />
+                  <input type="hidden" name="id" value={String(row.id)} />
+                  <SubmitButton
+                    className="danger"
+                    pendingLabel="Deleting…"
+                    confirmText="Delete this credential record? Linked documents will stay in your vault."
+                  >
+                    Delete record
+                  </SubmitButton>
+                </form>
+              </article>
+            ))}
+          </RecordFilter>
         </section>
       ))}
       <section id="documents" className="passport-card">
@@ -250,44 +290,59 @@ export default async function Dashboard({
             Your private vault is ready for your first certificate.
           </p>
         )}
-        {documents?.map((doc) => (
-          <article className="record" key={doc.id} id={`document-${doc.id}`}>
-            <a href={`/passport/documents/${doc.id}`}>
-              {doc.original_filename} ↗
-            </a>
-            {(() => {
-              const key = documentCredentialKey(doc);
-              const linked = key ? optionsByKey.get(key) : undefined;
-              return (
-                <p className="document-link">
-                  {linked ? (
-                    <>
-                      Linked to: <a href={linked.href}>{linked.label}</a>
-                    </>
-                  ) : key ? (
-                    "Linked credential could not be loaded."
-                  ) : (
-                    "No linked credential"
-                  )}
-                </p>
-              );
-            })()}
-            <small>
-              {(Number(doc.bytes) / 1024).toFixed(0)} KB · Private · Download
-              link expires in 60 seconds
-            </small>
-            <form action={deleteDocument}>
-              <input type="hidden" name="id" value={String(doc.id)} />
-              <SubmitButton
-                className="danger"
-                pendingLabel="Deleting…"
-                confirmText="Permanently delete this document from your private vault?"
-              >
-                Delete document
-              </SubmitButton>
-            </form>
-          </article>
-        ))}
+        <RecordFilter
+          label="documents"
+          mode="documents"
+          items={(documents || []).map((doc) => ({
+            id: `document-${doc.id}`,
+            text: [
+              doc.original_filename,
+              optionsByKey.get(documentCredentialKey(doc) || "")?.label,
+            ]
+              .filter(Boolean)
+              .join(" "),
+            linked: Boolean(documentCredentialKey(doc)),
+          }))}
+        >
+          {(documents || []).map((doc) => (
+            <article className="record" key={doc.id} id={`document-${doc.id}`}>
+              <a href={`/passport/documents/${doc.id}`}>
+                {doc.original_filename} ↗
+              </a>
+              {(() => {
+                const key = documentCredentialKey(doc);
+                const linked = key ? optionsByKey.get(key) : undefined;
+                return (
+                  <p className="document-link">
+                    {linked ? (
+                      <>
+                        Linked to: <a href={linked.href}>{linked.label}</a>
+                      </>
+                    ) : key ? (
+                      "Linked credential could not be loaded."
+                    ) : (
+                      "No linked credential"
+                    )}
+                  </p>
+                );
+              })()}
+              <small>
+                {(Number(doc.bytes) / 1024).toFixed(0)} KB · Private · Download
+                link expires in 60 seconds
+              </small>
+              <form action={deleteDocument}>
+                <input type="hidden" name="id" value={String(doc.id)} />
+                <SubmitButton
+                  className="danger"
+                  pendingLabel="Deleting…"
+                  confirmText="Permanently delete this document from your private vault?"
+                >
+                  Delete document
+                </SubmitButton>
+              </form>
+            </article>
+          ))}
+        </RecordFilter>
       </section>
       <section className="passport-card">
         <h2>Your profile</h2>

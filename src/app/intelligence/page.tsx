@@ -1,3 +1,4 @@
+import { Arrow } from "@/components/arrow";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandSymbol } from "@/components/brand-symbol";
@@ -16,7 +17,7 @@ export default function IntelligencePage() {
           SIONA
         </Link>
         <Link href="/" className="bio-back">
-          Siona Group ↗
+          Siona Group <Arrow />
         </Link>
       </header>
       <section className="intel-hero">
@@ -101,7 +102,7 @@ export default function IntelligencePage() {
             rel="noopener noreferrer"
           >
             FDA, ICH Q13, Continuous Manufacturing of Drug Substances and Drug
-            Products (2023) ↗
+            Products (2023) <Arrow />
           </a>
         </p>
         <p className="intel-note">
@@ -122,7 +123,7 @@ export default function IntelligencePage() {
           partners.
         </p>
         <Link href="/#contact" className="bio-next-link">
-          Join the conversation ↗
+          Join the conversation <Arrow />
         </Link>
       </section>
       <footer className="bio-footer">

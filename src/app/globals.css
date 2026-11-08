@@ -566,3 +566,7 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 .ia-shell .pathway-card h3{font-size:clamp(32px,3.1vw,49px)}
 .ia-shell .pathways-note{font-size:12px;line-height:1.8;margin-top:25px;color:#a6b9ce}
 @media(max-width:900px){.ia-shell .pathways-grid{grid-template-columns:1fr}.ia-shell .pathway-card{min-height:auto}.ia-shell .pathway-card h3{margin-top:25px}}
+/* Use vector arrows rather than glyphs missing from the self-hosted font subset. */
+.ia-actions a{display:inline-flex;align-items:center;gap:10px}
+.ia-actions svg,.ia-venture-arrow svg,.ia-closing a svg,.ia-bio a svg,.intel-page a svg{width:16px;height:16px;display:inline-block;vertical-align:middle;flex-shrink:0}
+.ia-closing a svg,.ia-bio a svg,.intel-page a svg{margin-left:7px}

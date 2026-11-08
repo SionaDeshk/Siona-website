@@ -779,10 +779,10 @@ export function Workspace({
             </p>
             {signOut && (
               <form action={signOut}>
-                <button>Sign out ↗</button>
+                <button>Sign out →</button>
               </form>
             )}
-            <Link href="/">Siona Group ↗</Link>
+            <Link href="/">Siona Group →</Link>
           </div>
         </aside>
         <div className={styles.main}>
@@ -933,7 +933,7 @@ export function Workspace({
                       <div className={styles.panelTitle}>
                         <h2>Priority hypotheses</h2>
                         <button onClick={() => setTab("Opportunities")}>
-                          All opportunities ↗
+                          All opportunities →
                         </button>
                       </div>
                       {[...data.opportunities]
@@ -1124,7 +1124,7 @@ export function Workspace({
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Original source ↗
+                          Original source →
                         </a>
                         <div className={styles.cardActions}>
                           <button onClick={() => setDetail(signal)}>
@@ -1134,7 +1134,7 @@ export function Workspace({
                             Record review
                           </Button>
                           <Button kind="opportunity" row={signal}>
-                            Develop hypothesis ↗
+                            Develop hypothesis →
                           </Button>
                         </div>
                       </article>
@@ -1188,7 +1188,7 @@ export function Workspace({
                             Record decision
                           </Button>
                           <button onClick={() => setDetail(opp)}>
-                            Full hypothesis ↗
+                            Full hypothesis →
                           </button>
                           <button
                             disabled={!writer || busy}
@@ -1325,7 +1325,7 @@ export function Workspace({
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {v(doc, "name")} ↗
+                                {v(doc, "name")} →
                               </a>
                               <span>
                                 {doc.verified_at
@@ -1438,7 +1438,7 @@ export function Workspace({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  {title(s)} ↗
+                                  {title(s)} →
                                 </a>
                               ) : null;
                             })}
@@ -1733,7 +1733,7 @@ export function Workspace({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Original source ↗
+                      Original source →
                     </a>
                   ) : (
                     <p>

@@ -75,7 +75,7 @@ export default async function Login({
             href="/workspace/intelligence/preview"
             className={styles.previewLink}
           >
-            View synthetic design preview ↗
+            View synthetic design preview →
           </Link>
         )}
       </div>

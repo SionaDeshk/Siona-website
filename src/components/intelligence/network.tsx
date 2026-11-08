@@ -186,7 +186,7 @@ export function Network({
           <li key={`${node.kind}-${node.row.id}`}>
             <button onClick={() => onSelect(node.row)}>
               <span>{node.kind}</span>
-              {node.label} ↗
+              {node.label} →
             </button>
           </li>
         ))}

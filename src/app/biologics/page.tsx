@@ -1,3 +1,4 @@
+import { Arrow } from "@/components/arrow";
 import { SignalEngine } from "@/components/signal-engine";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -81,7 +82,7 @@ export default function BiologicsPage() {
           A closer look at the systems connecting research, manufacturing, and
           supply.
         </p>
-        <Link href="/intelligence#analysis">Read the analysis ↗</Link>
+        <Link href="/intelligence#analysis">Read the analysis <Arrow /></Link>
       </section>
       <section className="ia-bio-contact">
         <span className="ia-index">02 / COLLABORATE</span>
@@ -95,7 +96,7 @@ export default function BiologicsPage() {
           exploratory discussions with qualified research organizations and
           established manufacturers. No products are currently offered for sale.
         </p>
-        <Link href="/#contact">Start a conversation ↗</Link>
+        <Link href="/#contact">Start a conversation <Arrow /></Link>
       </section>
       <footer className="ia-subfooter">
         <span>SIONA GROUP LLC</span>

@@ -1,3 +1,4 @@
+import { Arrow } from "@/components/arrow";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Contact } from "@/components/contact";
@@ -56,9 +57,9 @@ export default function Home() {
             <p>Healthcare. Life sciences. Intelligence.</p>
             <div className="ia-actions">
               <a href="#ventures">
-                Explore Siona <span>↘</span>
+                Explore Siona <Arrow direction="down" />
               </a>
-              <a href="#contact">Connect with us ↗</a>
+              <a href="#contact">Connect with us <Arrow /></a>
             </div>
           </div>
           <div className="ia-hero-bottom">
@@ -98,7 +99,7 @@ export default function Home() {
                 </div>
                 <p>{d.description}</p>
                 <span className="ia-venture-arrow" aria-label={d.cta}>
-                  ↗
+                  <Arrow />
                 </span>
               </Link>
             ))}
@@ -113,7 +114,7 @@ export default function Home() {
             <br />
             stand still. <em>Neither do we.</em>
           </h2>
-          <Link href="/intelligence">Explore our thinking ↗</Link>
+          <Link href="/intelligence">Explore our thinking <Arrow /></Link>
         </section>
         <Contact />
       </main>

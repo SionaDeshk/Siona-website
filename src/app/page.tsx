@@ -59,7 +59,9 @@ export default function Home() {
               <a href="#ventures">
                 Explore Siona <Arrow direction="down" />
               </a>
-              <a href="#contact">Connect with us <Arrow /></a>
+              <a href="#contact">
+                Connect with us <Arrow />
+              </a>
             </div>
           </div>
           <div className="ia-hero-bottom">
@@ -67,21 +69,30 @@ export default function Home() {
             <span>SCROLL TO DISCOVER ↓</span>
           </div>
         </section>
-        <section className="ia-thesis" id="about">
+        <section className="ia-thesis ia-approach" id="about">
           <span className="ia-index">00 / THE APPROACH</span>
-          <div>
-            <h2>
-              See further.
-              <br />
-              Connect better.
-              <br />
-              <em>Build deliberately.</em>
-            </h2>
-            <p>
-              We develop ideas at the intersection of people, science, and
-              emerging technology. Each venture begins with a real problem and a
-              reason to solve it.
-            </p>
+          <div className="ia-approach-layout">
+            <div className="ia-approach-copy">
+              <h2>
+                See further.
+                <br />
+                Connect better.
+                <br />
+                <em>Build deliberately.</em>
+              </h2>
+              <p>
+                We develop ideas at the intersection of people, science, and
+                emerging technology. Each venture begins with a real problem and
+                a reason to solve it.
+              </p>
+            </div>
+            <figure
+              className="ia-approach-field"
+              aria-label="Three interconnected flows illustrating the connection between people, science and technology"
+            >
+              <SignalEngine variant="approach" />
+              <figcaption>PEOPLE / SCIENCE / TECHNOLOGY</figcaption>
+            </figure>
           </div>
         </section>
         <section className="ia-ventures" id="ventures">
@@ -114,7 +125,9 @@ export default function Home() {
             <br />
             stand still. <em>Neither do we.</em>
           </h2>
-          <Link href="/intelligence">Explore our thinking <Arrow /></Link>
+          <Link href="/intelligence">
+            Explore our thinking <Arrow />
+          </Link>
         </section>
         <Contact />
       </main>

@@ -570,3 +570,43 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 .ia-actions a{display:inline-flex;align-items:center;gap:10px}
 .ia-actions svg,.ia-venture-arrow svg,.ia-closing a svg,.ia-bio a svg,.intel-page a svg{width:16px;height:16px;display:inline-block;vertical-align:middle;flex-shrink:0}
 .ia-closing a svg,.ia-bio a svg,.intel-page a svg{margin-left:7px}
+
+/* Sharp scientific scenes: one motion system, four distinct ideas. */
+.signal-motion-control{position:absolute;right:clamp(25px,7vw,120px);bottom:77px;z-index:4;display:inline-flex;align-items:center;gap:9px;min-height:37px;padding:9px 12px;border:1px solid #49627d;border-radius:3px;background:#0b1723d9;color:#c4d8eb;font-size:10px;line-height:1.2;letter-spacing:.02em;cursor:pointer;backdrop-filter:blur(8px)}
+.signal-motion-control:hover{background:#172e46;border-color:#9bcdf7;color:#eef9ff}
+.signal-motion-control svg{display:block;width:14px;height:14px;flex-shrink:0}
+.signal-motion-control:focus-visible{outline:2px solid #b2dcff;outline-offset:5px}
+.ia-bio-hero .signal-motion-control{bottom:77px}
+.ia-shell .ia-approach{display:block;overflow:hidden;position:relative;background:radial-gradient(ellipse at 78% 50%,#142338 0%,#090e16 57%);padding-block:95px}
+.ia-approach-layout{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:35px;margin-top:40px}
+.ia-approach-copy{min-width:0;position:relative;z-index:1}
+.ia-approach .ia-approach-copy h2{font-size:clamp(48px,5.5vw,87px)}
+.ia-approach .ia-approach-copy p{font-size:17px;line-height:1.8;max-width:520px;margin-top:28px}
+.ia-approach-field,.vision-neural-field{position:relative;min-width:0;height:530px;margin:0;isolation:isolate}
+.ia-approach-field figcaption,.vision-neural-field figcaption{position:absolute;bottom:0;left:15px;color:#a5c1dd;font-size:9px;letter-spacing:.17em;line-height:1.5}
+.ia-approach-field .signal-motion-control,.vision-neural-field .signal-motion-control{right:10px;bottom:32px}
+.ia-shell .vision-neural{display:block;position:relative;overflow:hidden;padding-block:90px;background:radial-gradient(ellipse at 84% 40%,#14283c 0%,#0a121e 60%)}
+.vision-neural-layout{display:grid;grid-template-columns:1fr 1.08fr;gap:20px;align-items:center;margin-top:30px}
+.vision-neural-copy{position:relative;z-index:1;min-width:0}
+.vision-neural .vision-headline{font-size:clamp(52px,5.9vw,92px);max-width:600px}
+.vision-neural .vision-description{font-size:19px;line-height:1.75;max-width:550px;letter-spacing:-.015em}
+.vision-neural .horizon-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;margin-top:45px}
+.vision-neural .horizon-steps>div{display:block;padding-top:22px;border-top:1px solid #3c5269}
+.vision-neural .horizon-steps span{font-size:10px;letter-spacing:.14em;color:#a7caed;text-transform:uppercase}
+.vision-neural .horizon-steps p{font-size:14px;line-height:1.8;margin-top:14px}
+.vision-neural .vision-note{margin-top:26px}
+@media(max-width:1000px) and (min-width:751px){.ia-approach-layout,.vision-neural-layout{gap:14px}.ia-approach-field,.vision-neural-field{height:440px}.vision-neural .vision-description{font-size:17px}}
+@media(max-width:750px){
+ .signal-motion-control{bottom:74px;right:25px;min-height:40px;font-size:10px}
+ .ia-shell .ia-approach,.ia-shell .vision-neural{padding-block:65px}
+ .ia-approach-layout,.vision-neural-layout{grid-template-columns:1fr;gap:12px;margin-top:33px}
+ .ia-approach .ia-approach-copy h2{font-size:clamp(49px,12.7vw,78px)}
+ .ia-approach .ia-approach-copy p{font-size:17px;margin-top:25px}
+ .ia-approach-field,.vision-neural-field{height:390px;margin-inline:-10px}
+ .vision-neural .vision-headline{font-size:clamp(50px,12.7vw,76px);margin-bottom:27px}
+ .vision-neural .vision-description{font-size:17px;line-height:1.8}
+ .vision-neural .horizon-steps{grid-template-columns:1fr;gap:23px;margin-top:33px}
+ .vision-neural .horizon-steps>div{padding-top:18px}.vision-neural .horizon-steps p{margin-bottom:0}
+ .ia-approach-field .signal-motion-control,.vision-neural-field .signal-motion-control{right:10px;bottom:30px}
+}
+@media(prefers-reduced-motion:reduce){.signal-motion-control{display:none}}

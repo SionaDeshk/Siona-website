@@ -39,53 +39,96 @@ test("public navigation reaches substantive audience and vision sections", async
   ).toBeInViewport();
 });
 
-test("scientific forms animate and respect reduced-motion preferences", async ({
+const scientificScenes = [
+  { path: "/", selector: ".signal-engine-group", name: "globe" },
+  { path: "/", selector: ".signal-engine-approach", name: "connection" },
+  { path: "/", selector: ".signal-engine-vision", name: "neuron" },
+  { path: "/biologics", selector: ".signal-engine-bio", name: "DNA" },
+];
+
+async function waitForFrames(
+  page: import("@playwright/test").Page,
+  count = 12,
+) {
+  await page.evaluate(
+    (count) =>
+      new Promise<void>((resolve) => {
+        let frames = 0;
+        const step = () =>
+          ++frames === count ? resolve() : requestAnimationFrame(step);
+        requestAnimationFrame(step);
+      }),
+    count,
+  );
+}
+
+test("all four scientific illustrations animate and can be paused independently", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  for (const path of ["/", "/biologics"]) {
-    await page.goto(path, { waitUntil: "networkidle" });
-    const first = await page
-      .locator("canvas.signal-engine")
-      .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
-    await page.evaluate(
-      () =>
-        new Promise<void>((resolve) => {
-          let n = 0;
-          const step = () => {
-            if (++n === 12) resolve();
-            else requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-        }),
-    );
-    expect(
-      await page
-        .locator("canvas.signal-engine")
-        .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL()),
-    ).not.toBe(first);
-  }
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/biologics", { waitUntil: "networkidle" });
-  const still = await page
-    .locator("canvas.signal-engine")
-    .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        let n = 0;
-        const step = () => {
-          if (++n === 12) resolve();
-          else requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      }),
-  );
-  expect(
+  let currentPath = "";
+  for (const scene of scientificScenes) {
+    if (scene.path !== currentPath) {
+      await page.goto(scene.path, { waitUntil: "networkidle" });
+      currentPath = scene.path;
+    }
+    const canvas = page.locator(scene.selector);
+    await canvas.scrollIntoViewIfNeeded();
+    await waitForFrames(page);
+    const snapshot = () =>
+      canvas.evaluate((el: HTMLCanvasElement) => el.toDataURL());
+    const first = await snapshot();
+    await waitForFrames(page);
+    expect(await snapshot()).not.toBe(first);
     await page
-      .locator("canvas.signal-engine")
-      .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL()),
-  ).toBe(still);
+      .getByRole("button", { name: `Pause ${scene.name} motion`, exact: true })
+      .click();
+    const resume = page.getByRole("button", {
+      name: `Resume ${scene.name} motion`,
+      exact: true,
+    });
+    await expect(resume).toHaveAttribute("aria-pressed", "true");
+    const paused = await snapshot();
+    await waitForFrames(page);
+    expect(await snapshot()).toBe(paused);
+    await resume.click();
+    await waitForFrames(page);
+    expect(await snapshot()).not.toBe(paused);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+
+test("reduced motion keeps every illustration static during scrolling and pointer movement", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let currentPath = "";
+  for (const scene of scientificScenes) {
+    if (scene.path !== currentPath) {
+      await page.goto(scene.path, { waitUntil: "networkidle" });
+      currentPath = scene.path;
+    }
+    const canvas = page.locator(scene.selector);
+    await canvas.scrollIntoViewIfNeeded();
+    await waitForFrames(page);
+    const snapshot = () =>
+      canvas.evaluate((el: HTMLCanvasElement) => el.toDataURL());
+    const still = await snapshot();
+    await page.mouse.move(230, 320);
+    await page.evaluate(() => window.scrollBy(0, 70));
+    await waitForFrames(page);
+    expect(await snapshot()).toBe(still);
+    await expect(
+      page.getByRole("button", {
+        name: `Pause ${scene.name} motion`,
+        exact: true,
+      }),
+    ).toBeHidden();
+  }
 });
 
 test("private workspace fails closed and the development preview is explicitly synthetic", async ({

@@ -162,6 +162,76 @@ function seeded(seed: number) {
   };
 }
 
+/** A moving, tapered electrical front, with a fine white core and blue corona. */
+function impulse(
+  ctx: CanvasRenderingContext2D,
+  path: ScreenPoint[],
+  progress: number,
+  strength = 1,
+  tail = 0.32,
+) {
+  const count = path.length - 1;
+  if (progress <= 0 || progress > 1 + tail) return;
+  const from = Math.max(1, Math.floor((progress - tail) * count));
+  const to = Math.min(count, Math.ceil(progress * count));
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  for (const [width, opacity, rgb] of [
+    [9, 0.1, BLUE],
+    [2.5, 0.65, BLUE],
+    [0.85, 0.95, ICE],
+  ] as const) {
+    for (let i = from; i <= to; i++) {
+      const age = progress - i / count;
+      if (age < 0 || age > tail) continue;
+      const a = path[i - 1],
+        b = path[i];
+      const depth = 0.08 + 0.92 * Math.pow(clamp(((a.z + b.z) / 2 + 1) / 2), 2);
+      line(
+        ctx,
+        a,
+        b,
+        rgb,
+        (1 - age / tail) * depth * opacity * strength,
+        width,
+      );
+    }
+  }
+  if (progress < 1) {
+    const index = progress * count,
+      i = Math.floor(index);
+    const p = interpolate(path[i], path[Math.min(i + 1, count)], index - i);
+    const depth = clamp((p.z + 1) / 2);
+    point(
+      ctx,
+      p,
+      1.6 + depth * 1.5,
+      ICE,
+      depth * strength,
+      depth * 0.85 * strength,
+    );
+  }
+  ctx.restore();
+}
+
+function activation(
+  ctx: CanvasRenderingContext2D,
+  p: ScreenPoint,
+  age: number,
+  strength = 1,
+) {
+  if (age < 0 || age > 0.8) return;
+  const energy = Math.min(age / 0.06, 1) * Math.exp(-age * 5) * strength;
+  const depth = Math.pow(clamp((p.z + 1) / 2), 2);
+  point(ctx, p, 1.8 + energy * 2.3, ICE, energy * depth, energy * depth);
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 3 + age * 15, 0, TAU);
+  ctx.strokeStyle = color(BLUE, energy * depth * 0.5);
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+}
+
 function globeScene() {
   const nodes: Vec[] = Array.from({ length: 380 }, (_, i) => {
     const y = 1 - ((i + 0.5) / 380) * 2,
@@ -194,6 +264,70 @@ function globeScene() {
       };
     });
   });
+  // Precompute connected branching cascades once; each arrival triggers the next links.
+  const adjacent: number[][] = nodes.map(() => []);
+  edges.forEach(([a, b]) => {
+    adjacent[a].push(b);
+    adjacent[b].push(a);
+  });
+  // Opposite pairs keep a visible firing front as the globe turns.
+  const origins: Vec[] = [
+    { x: 0.25, y: -0.45, z: 0.86 },
+    { x: -0.55, y: 0.45, z: 0.7 },
+    { x: 0.85, y: 0.25, z: 0.45 },
+    { x: -0.65, y: -0.4, z: 0.65 },
+  ];
+  const targets = origins.flatMap((p) => [p, { x: -p.x, y: -p.y, z: -p.z }]);
+  const cascades = targets.map((target, wave) => {
+    const root = nodes.reduce(
+      (best, node, i) =>
+        Math.hypot(node.x - target.x, node.y - target.y, node.z - target.z) <
+        Math.hypot(
+          nodes[best].x - target.x,
+          nodes[best].y - target.y,
+          nodes[best].z - target.z,
+        )
+          ? i
+          : best,
+      0,
+    );
+    const random = seeded(910 + wave),
+      visited = new Set([root]);
+    const queue = [{ node: root, at: 0, level: 0 }];
+    const links: { points: Vec[]; at: number; duration: number }[] = [];
+    for (let cursor = 0; cursor < queue.length; cursor++) {
+      const parent = queue[cursor];
+      if (parent.level === 4) continue;
+      const candidates = adjacent[parent.node]
+        .map((node) => ({ node, rank: random() }))
+        .filter(({ node }) => !visited.has(node))
+        .sort((a, b) => a.rank - b.rank)
+        .slice(0, parent.level === 0 ? 3 : 2);
+      for (const { node } of candidates) {
+        if (visited.has(node)) continue;
+        visited.add(node);
+        const a = nodes[parent.node],
+          b = nodes[node],
+          duration = 0.17 + random() * 0.08;
+        const points = Array.from({ length: 13 }, (_, i) => {
+          const t = i / 12,
+            p = interpolate(a, b, t),
+            length = Math.hypot(p.x, p.y, p.z);
+          const lift =
+            1.015 +
+            Math.sin(t * Math.PI) * (0.008 + Math.sin(i * 2.3 + wave) * 0.004);
+          return {
+            x: (p.x / length) * lift,
+            y: (p.y / length) * lift,
+            z: (p.z / length) * lift,
+          };
+        });
+        links.push({ points, at: parent.at, duration });
+        queue.push({ node, at: parent.at + duration, level: parent.level + 1 });
+      }
+    }
+    return { links, arrivals: queue };
+  });
   return ({
     ctx,
     width: w,
@@ -202,6 +336,7 @@ function globeScene() {
     scroll,
     pointerX,
     pointerY,
+    reduced,
   }: SceneFrame) => {
     const mobile = w < 750,
       cx = w * (mobile ? 0.52 : 0.74),
@@ -238,36 +373,36 @@ function globeScene() {
       line(ctx, a, b, BLUE, 0.045 + depth * depth * 0.49, 0.35 + depth * 0.65);
     }
     routes.forEach((route, index) => {
-      const p = route.map(project),
-        t = ((time * 0.12 + index * 0.127) % 1) * 44;
+      const p = route.map(project);
       for (let i = 1; i < p.length; i++) {
-        const depth = clamp((p[i].z + 1) / 2),
-          trail = Math.exp(-Math.pow((i - t) / 4, 2));
-        line(
-          ctx,
-          p[i - 1],
-          p[i],
-          index % 3 === 0 ? ICE : BLUE,
-          0.02 + depth * 0.15 + trail * depth * 0.65,
-          0.7 + trail * 0.8,
-        );
+        const depth = clamp((p[i].z + 1) / 2);
+        line(ctx, p[i - 1], p[i], BLUE, 0.025 + depth * 0.1, 0.7);
       }
-      const i = Math.floor(t);
-      if (p[i].z > -0.1) point(ctx, p[i], 1.6 + p[i].z * 0.5, ICE, 0.8, 0.8);
+      if (!reduced && index % 2 === 0)
+        impulse(ctx, p, (time * 0.32 + index * 0.19) % 1.5, 1.25);
     });
+    if (!reduced) {
+      cascades.forEach((cascade, index) => {
+        const age = (time + Math.floor(index / 2) * 0.9) % 3.6;
+        for (const link of cascade.links) {
+          const progress = (age - link.at) / link.duration;
+          if (progress > 0 && progress < 1.8)
+            impulse(ctx, link.points.map(project), progress, 1.05, 0.8);
+        }
+        for (const arrival of cascade.arrivals)
+          activation(ctx, projected[arrival.node], age - arrival.at);
+      });
+    }
     projected.forEach((p, i) => {
       const depth = clamp((p.z + 1) / 2),
-        hub = i % 19 === 0,
-        charge = hub
-          ? Math.pow((Math.sin(time * 0.8 + i * 0.83) + 1) / 2, 7)
-          : 0;
+        hub = i % 19 === 0;
       point(
         ctx,
         p,
         (hub ? 2 : 0.85) + depth * 0.6,
         hub ? ICE : SILVER,
         0.12 + depth * 0.8,
-        hub ? charge * depth : 0,
+        0,
       );
     });
     const rim = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
@@ -424,6 +559,7 @@ type Branch = {
   width: number;
   neuron: number;
   phase: number;
+  level: number;
 };
 function neuronsScene() {
   const random = seeded(7013);
@@ -467,6 +603,7 @@ function neuronsScene() {
         width,
         neuron: index,
         phase: random(),
+        level: 2 - depth,
       });
       if (depth > 0) {
         grow(
@@ -494,25 +631,27 @@ function neuronsScene() {
         1.9,
       );
   });
-  const connections: [number, number][] = [
-    [1, 0],
-    [3, 0],
-    [0, 2],
-    [0, 4],
+  // Inputs converge before the central cell sends its outgoing signals.
+  const firingTimes = [2.5, 0.7, 3.6, 1, 3.82];
+  const connections = [
+    { a: 1, b: 0, launch: 0.7, duration: 1.05 },
+    { a: 3, b: 0, launch: 1, duration: 1.05 },
+    { a: 0, b: 2, launch: 2.5, duration: 1.1 },
+    { a: 0, b: 4, launch: 2.72, duration: 1.1 },
   ];
-  const axons = connections.map(([a, b], i) => {
-    const p = cells[a],
-      q = cells[b];
+  const axons = connections.map((connection) => {
+    const p = cells[connection.a],
+      q = cells[connection.b];
+    const curve: [Vec, Vec, Vec, Vec] = [
+      p,
+      { x: mix(p.x, q.x, 0.3), y: p.y - 0.12, z: p.z + 0.1 },
+      { x: mix(p.x, q.x, 0.65), y: q.y + 0.13, z: q.z - 0.08 },
+      q,
+    ];
     return {
-      a,
-      b,
-      phase: i * 0.23,
-      curve: [
-        p,
-        { x: mix(p.x, q.x, 0.3), y: p.y - 0.12, z: p.z + 0.1 },
-        { x: mix(p.x, q.x, 0.65), y: q.y + 0.13, z: q.z - 0.08 },
-        q,
-      ] as [Vec, Vec, Vec, Vec],
+      ...connection,
+      curve,
+      points: Array.from({ length: 45 }, (_, i) => cubic(curve, i / 44)),
     };
   });
   return ({
@@ -538,10 +677,13 @@ function neuronsScene() {
       5,
     );
     wash(ctx, cx, cy, radius * 1.6, BLUE, 0.11);
-    const charge = cells.map(
-      (_, i) =>
-        0.2 + Math.pow((Math.sin(time * 1.05 - i * 0.75) + 1) / 2, 9) * 0.8,
-    );
+    const cycle = (time + 0.65) % 6.6;
+    const charge = cells.map((_, i) => {
+      const age = cycle - firingTimes[i];
+      return reduced
+        ? 0.25
+        : 0.15 + (age >= 0 ? Math.exp(-age * 3.2) * 0.85 : 0);
+    });
     for (const branch of [...branches].sort(
       (a, b) => a.curve[0].z - b.curve[0].z,
     )) {
@@ -558,37 +700,42 @@ function neuronsScene() {
       ctx.lineWidth = branch.width * (0.6 + depth * 0.6);
       ctx.stroke();
       if (branch.width < 0.8) point(ctx, p[3], 0.8, SILVER, 0.28 + depth * 0.3);
+      if (!reduced) {
+        const onset =
+          firingTimes[branch.neuron] -
+          0.64 +
+          (2 - branch.level) * 0.17 +
+          branch.phase * 0.035;
+        const progress = (cycle - onset) / 0.23;
+        if (progress > 0 && progress < 1.32) {
+          const path = Array.from({ length: 12 }, (_, i) =>
+            project(cubic(branch.curve, 1 - i / 11)),
+          );
+          impulse(ctx, path, progress, branch.width > 1 ? 1.45 : 0.85);
+        }
+      }
     }
-    axons.forEach((axon, i) => {
-      const p = axon.curve.map(project),
-        phase = reduced ? 0.4 : (time * 0.16 + axon.phase) % 1;
+    axons.forEach((axon) => {
+      const p = axon.curve.map(project);
       ctx.beginPath();
       ctx.moveTo(p[0].x, p[0].y);
       ctx.bezierCurveTo(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
-      ctx.strokeStyle = color(BLUE, 0.24);
+      ctx.strokeStyle = color(BLUE, 0.32);
       ctx.lineWidth = 2.2;
       ctx.stroke();
       if (!reduced) {
-        for (let j = 0; j < 10; j++) {
-          const t = phase - j * 0.009;
-          if (t < 0) continue;
-          const pos = project(cubic(axon.curve, t));
-          point(
-            ctx,
-            pos,
-            (1 - j / 12) * 2.8,
-            ICE,
-            (1 - j / 10) * 0.95,
-            j === 0 ? 0.8 : 0,
-          );
+        impulse(
+          ctx,
+          axon.points.map(project),
+          (cycle - axon.launch) / axon.duration,
+          1.8,
+        );
+        const arrivalAge = cycle - axon.launch - axon.duration;
+        if (arrivalAge >= 0 && arrivalAge < 0.8) {
+          charge[axon.b] = Math.max(charge[axon.b], Math.exp(-arrivalAge * 3));
+          activation(ctx, project(cells[axon.b]), arrivalAge, 1.3);
         }
-        if (phase > 0.8)
-          charge[axon.b] = Math.max(charge[axon.b], (phase - 0.8) * 5);
-        if (phase < 0.12)
-          charge[axon.a] = Math.max(charge[axon.a], 1 - phase / 0.12);
       }
-      const midpoint = project(cubic(axon.curve, 0.48));
-      point(ctx, midpoint, 1.4, i % 2 ? TEAL : BLUE, 0.4);
     });
     cells
       .map((cell, i) => ({ p: project(cell), i }))

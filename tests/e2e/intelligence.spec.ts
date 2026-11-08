@@ -69,7 +69,7 @@ test("all four scientific illustrations animate and can be paused independently"
   let currentPath = "";
   for (const scene of scientificScenes) {
     if (scene.path !== currentPath) {
-      await page.goto(scene.path, { waitUntil: "networkidle" });
+      await page.goto(scene.path, { waitUntil: "load" });
       currentPath = scene.path;
     }
     const canvas = page.locator(scene.selector);
@@ -109,7 +109,7 @@ test("reduced motion keeps every illustration static during scrolling and pointe
   let currentPath = "";
   for (const scene of scientificScenes) {
     if (scene.path !== currentPath) {
-      await page.goto(scene.path, { waitUntil: "networkidle" });
+      await page.goto(scene.path, { waitUntil: "load" });
       currentPath = scene.path;
     }
     const canvas = page.locator(scene.selector);

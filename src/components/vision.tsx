@@ -25,10 +25,10 @@ export function Vision() {
         </div>
         <figure
           className="vision-neural-field"
-          aria-label="Illustrative branching neurons transmitting signals between connected cells"
+          aria-label="Illustrative neuron network with converging dendritic inputs, axonal signals and connected cell activation"
         >
           <SignalEngine variant="vision" />
-          <figcaption>FIG. 03 / NEURAL CONNECTIONS</figcaption>
+          <figcaption>FIG. 03 / SIGNAL PROPAGATION</figcaption>
         </figure>
       </div>
       <div className="vision-neural-lower">

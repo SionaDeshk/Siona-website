@@ -1,3 +1,6 @@
+"use client";
+import { useActionState, useId } from "react";
+import { FormFeedback } from "./form-feedback";
 import { SubmitButton } from "../submit-button";
 import { saveCredential } from "./actions";
 type Row = Record<string, string | number | null>;
@@ -8,6 +11,8 @@ export function CredentialForm({
   kind: "licenses" | "ce_entries" | "certifications";
   row?: Row;
 }) {
+  const [state, action] = useActionState(saveCredential, {});
+  const formId = useId();
   const fields =
     kind === "licenses"
       ? [
@@ -21,16 +26,28 @@ export function CredentialForm({
         ? ["title", "provider", "hours", "completed_on", "accreditation"]
         : ["name", "issuer", "issued_on", "expires_on"];
   return (
-    <form action={saveCredential} className="credential-form">
+    <form key={state.key} action={action} className="credential-form">
+      <FormFeedback state={state} successMessage="Record saved." />
       <input type="hidden" name="kind" value={kind} />
       {row && <input type="hidden" name="id" value={String(row.id)} />}
       {fields.map((field) => (
-        <label key={field}>
-          {field.replaceAll("_", " ")}
+        <div key={field}>
+          <label htmlFor={`${formId}-${field}`}>
+            {field.replaceAll("_", " ")}
+          </label>
           <input
+            id={`${formId}-${field}`}
             name={field}
+            aria-invalid={Boolean(state.fieldErrors?.[field])}
+            aria-describedby={
+              state.fieldErrors?.[field]
+                ? `${formId}-${field}-error`
+                : undefined
+            }
             defaultValue={
-              row?.[field] ?? (field === "license_type" ? "RN" : "")
+              state.values?.[field] ??
+              row?.[field] ??
+              (field === "license_type" ? "RN" : "")
             }
             type={
               field.endsWith("_on")
@@ -53,12 +70,22 @@ export function CredentialForm({
             max={field === "hours" ? "1000" : undefined}
             step={field === "hours" ? "0.01" : undefined}
           />
-        </label>
+          {state.fieldErrors?.[field] && (
+            <span className="field-error" id={`${formId}-${field}-error`}>
+              {state.fieldErrors[field]}
+            </span>
+          )}
+        </div>
       ))}
       {kind === "licenses" && (
         <label>
           Status
-          <select name="status" defaultValue={row?.status ?? "self_reported"}>
+          <select
+            name="status"
+            defaultValue={
+              state.values?.status ?? row?.status ?? "self_reported"
+            }
+          >
             <option value="self_reported">Self reported</option>
             <option value="pending">Pending</option>
             <option value="expired">Expired</option>

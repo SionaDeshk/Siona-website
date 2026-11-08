@@ -6,12 +6,14 @@ import { authenticated } from "@/lib/passport/server";
 import { ceTotal } from "@/lib/passport/validation";
 import { z } from "zod";
 import { logout } from "../login/actions";
+import { deleteCredential, deleteDocument } from "./actions";
+import { ProfileForm } from "./profile-form";
+import { UploadForm } from "./upload-form";
 import {
-  deleteCredential,
-  deleteDocument,
-  saveProfile,
-  uploadDocument,
-} from "./actions";
+  credentialOptions,
+  documentCredentialKey,
+  groupLinkedDocuments,
+} from "@/lib/passport/credential-links";
 import { CredentialForm } from "./credential-form";
 type Row = Record<string, string | number | null>;
 export default async function Dashboard({
@@ -41,6 +43,9 @@ export default async function Dashboard({
     .eq("user_id", user.id)
     .maybeSingle();
   const rows = results.map((r) => (r.data || []) as Row[]);
+  const options = credentialOptions(rows);
+  const optionsByKey = new Map(options.map((option) => [option.value, option]));
+  const linkedDocuments = groupLinkedDocuments(documents || []);
   const errors = results.some((r) => r.error) || docError || profileError;
   const reminders = [...rows[0], ...rows[2]].filter(
     (row) =>
@@ -65,7 +70,9 @@ export default async function Dashboard({
           SIONA <span>/ Passport</span>
         </Link>
         <form action={logout}>
-          <SubmitButton className="secondary" pendingLabel="Signing out…">Sign out</SubmitButton>
+          <SubmitButton className="secondary" pendingLabel="Signing out…">
+            Sign out
+          </SubmitButton>
         </form>
       </header>
       <nav aria-label="Passport sections">
@@ -177,7 +184,11 @@ export default async function Dashboard({
             </p>
           )}
           {rows[index].map((row) => (
-            <article key={row.id} className="record">
+            <article
+              key={row.id}
+              className="record"
+              id={`credential-${row.id}`}
+            >
               <h3>
                 {row.title ||
                   row.name ||
@@ -192,6 +203,20 @@ export default async function Dashboard({
               </p>
               {row.expires_on && <p>Expires {row.expires_on}</p>}
               <small>Self-reported · Not verified by Siona</small>
+              {(linkedDocuments.get(`${kind}:${row.id}`) || []).length > 0 && (
+                <div className="linked-documents">
+                  <p>Attached documents</p>
+                  <ul>
+                    {linkedDocuments.get(`${kind}:${row.id}`)!.map((doc) => (
+                      <li key={doc.id}>
+                        <a href={`#document-${doc.id}`}>
+                          {doc.original_filename}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <details>
                 <summary>Edit record</summary>
                 <CredentialForm kind={kind} row={row} />
@@ -219,45 +244,34 @@ export default async function Dashboard({
           records, SSNs, driver’s licenses, or background checks. Uploads are
           not verified by Siona.
         </p>
-        <form action={uploadDocument} className="credential-form">
-          <label>
-            Document (PDF, PNG, JPEG · up to 4 MB)
-            <input
-              type="file"
-              name="file"
-              accept="application/pdf,image/png,image/jpeg"
-              required
-            />
-          </label>
-          <label>
-            Link to a credential
-            <select name="credential">
-              <option value="">No linked credential</option>
-              {kinds.flatMap((kind, index) =>
-                rows[index].map((row) => (
-                  <option key={row.id} value={`${kind}:${row.id}`}>
-                    {row.title ||
-                      row.name ||
-                      `${row.jurisdiction} ${row.license_type}`}
-                  </option>
-                )),
-              )}
-            </select>
-          </label>
-          <SubmitButton pendingLabel="Uploading…">
-            Upload privately
-          </SubmitButton>
-        </form>
+        <UploadForm options={options} />
         {!documents?.length && (
           <p className="empty">
             Your private vault is ready for your first certificate.
           </p>
         )}
         {documents?.map((doc) => (
-          <article className="record" key={doc.id}>
+          <article className="record" key={doc.id} id={`document-${doc.id}`}>
             <a href={`/passport/documents/${doc.id}`}>
               {doc.original_filename} ↗
             </a>
+            {(() => {
+              const key = documentCredentialKey(doc);
+              const linked = key ? optionsByKey.get(key) : undefined;
+              return (
+                <p className="document-link">
+                  {linked ? (
+                    <>
+                      Linked to: <a href={linked.href}>{linked.label}</a>
+                    </>
+                  ) : key ? (
+                    "Linked credential could not be loaded."
+                  ) : (
+                    "No linked credential"
+                  )}
+                </p>
+              );
+            })()}
             <small>
               {(Number(doc.bytes) / 1024).toFixed(0)} KB · Private · Download
               link expires in 60 seconds
@@ -277,18 +291,7 @@ export default async function Dashboard({
       </section>
       <section className="passport-card">
         <h2>Your profile</h2>
-        <form action={saveProfile} className="filter">
-          <label>
-            Display name
-            <input
-              name="display_name"
-              maxLength={120}
-              required
-              defaultValue={profile?.display_name || ""}
-            />
-          </label>
-          <SubmitButton>Save profile</SubmitButton>
-        </form>
+        <ProfileForm displayName={profile?.display_name || ""} />
       </section>
       <footer>
         Self-reported. Always yours. <Link href="/">Back to Siona ↗</Link>

@@ -1,0 +1,36 @@
+-- DESTRUCTIVE: back up/export intelligence data and private objects first.
+begin;
+drop function if exists public.intel_log_relationship(jsonb);
+drop policy if exists intel_docs_read on storage.objects;
+drop policy if exists intel_docs_upload on storage.objects;
+drop policy if exists intel_docs_delete on storage.objects;
+drop function if exists public.intel_create_opportunity(jsonb,uuid[]);
+drop function if exists public.intel_record_decision(jsonb,uuid[]);
+drop function if exists public.intel_review_supplier(uuid,text,text,text[],boolean);
+drop function if exists public.intel_save_evaluation(uuid,jsonb);
+drop function if exists public.intel_save_weights(jsonb);
+drop function if exists public.intel_seed_demo();
+drop function if exists public.intel_clear_demo();
+drop table if exists public.intel_decision_evidence;
+drop table if exists public.intel_decisions;
+drop table if exists public.intel_evaluations;
+drop table if exists public.intel_tasks;
+drop table if exists public.intel_notes;
+drop table if exists public.intel_links;
+drop table if exists public.intel_supplier_reviews;
+drop table if exists public.intel_documents;
+drop table if exists public.intel_suppliers;
+drop table if exists public.intel_evidence;
+drop table if exists public.intel_opportunities;
+drop table if exists public.intel_categories;
+drop table if exists public.intel_contacts;
+drop table if exists public.intel_organizations;
+drop table if exists public.intel_signals;
+drop table if exists public.intel_sources;
+drop table public.intel_activity;
+drop table public.intel_weights;
+drop schema intel_private cascade;
+drop table public.intel_members;
+-- Delete storage objects via the Storage API before removing the empty bucket.
+delete from storage.buckets where id='intel-supplier-documents' and not exists(select 1 from storage.objects where bucket_id='intel-supplier-documents');
+commit;

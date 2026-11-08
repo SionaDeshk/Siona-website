@@ -542,3 +542,31 @@ input:focus-visible, textarea:focus-visible { outline-offset: 3px; }
 .ia-bio-hero .ia-bio-content{pointer-events:none}
 .ia-bio-hero .ia-bio-content a{pointer-events:auto}
 @media(max-width:750px){.ia-hero .signal-engine,.ia-bio-hero .signal-engine{opacity:.65;mask-image:none}.ia-hero:after{background:linear-gradient(90deg,#090d13c9,#090d1388)}}
+
+/* Public scientific forms and substantive navigation destinations. */
+.ia-hero .signal-engine,.ia-bio-hero .signal-engine{mask-image:none;opacity:1}
+.ia-hero:after{background:linear-gradient(90deg,#090d13 0%,#090d13db 29%,#090d1330 59%,transparent 76%)}
+.ia-bio-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#090d13ef 0%,#090d13cc 28%,transparent 69%);pointer-events:none;z-index:1}
+.ia-shell .pathways-section{background:#101722;border-color:#293747}
+.ia-shell .pathway-card{background:transparent;border-color:#38485c}
+.ia-shell .pathway-card p,.ia-shell .pathways-section>p{color:#bdcadb}
+.ia-shell .pathway-index,.ia-shell .section-number{color:#9eb5cf}
+.ia-shell .vision-section{background:#0d1521;border-color:#2d3d53}
+.ia-shell .vision-description,.ia-shell .vision-note,.ia-shell .horizon-steps p{color:#bdcadb}
+.ia-shell .horizon-steps>div{border-color:#3b4c61}
+.ia-shell .pathway-card a{color:#c7e5ff}
+@media(max-width:750px){
+ .ia-hero{min-height:910px}.ia-hero .ia-hero-content{padding-top:60px;padding-bottom:380px}
+ .ia-hero:after{background:linear-gradient(180deg,#090d1300,#090d1300 45%,#090d131a)}
+ .ia-bio-hero{min-height:930px;align-items:flex-start;padding-top:60px}
+ .ia-bio-hero:after{background:linear-gradient(180deg,#090d13bc,#090d1355 45%,transparent 60%)}
+}
+.ia-shell .pathways-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.ia-shell .pathway-card{padding:26px 0;min-height:330px}
+.ia-shell .pathway-card h3{font-size:clamp(32px,3.1vw,49px)}
+.ia-shell .pathways-note{font-size:12px;line-height:1.8;margin-top:25px;color:#a6b9ce}
+@media(max-width:900px){.ia-shell .pathways-grid{grid-template-columns:1fr}.ia-shell .pathway-card{min-height:auto}.ia-shell .pathway-card h3{margin-top:25px}}
+/* Use vector arrows rather than glyphs missing from the self-hosted font subset. */
+.ia-actions a{display:inline-flex;align-items:center;gap:10px}
+.ia-actions svg,.ia-venture-arrow svg,.ia-closing a svg,.ia-bio a svg,.intel-page a svg{width:16px;height:16px;display:inline-block;vertical-align:middle;flex-shrink:0}
+.ia-closing a svg,.ia-bio a svg,.intel-page a svg{margin-left:7px}

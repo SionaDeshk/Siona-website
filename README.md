@@ -93,3 +93,9 @@ tests/e2e/                  Desktop/mobile browser tests
 Design tokens and responsive layouts live in `src/app/globals.css`; `BrandSymbol` shares the metallic symbol across the homepage and navigation. The refreshed assets are reconstructed from the supplied LinkedIn screenshot; see `public/brand/README.md` for provenance and replacement guidance. The same symbol is used in the favicon, app/Apple icons, and generated social image. The charcoal, ivory, sandstone, champagne, and sage treatment preserves the existing copy and contact functionality. Footer copyright text follows the supplied 2026 brand copy.
 
 Font licenses are retained in `public/licenses/`.
+
+## Internal intelligence workspace
+
+The Siona Evolution Engine is at `/workspace/intelligence` (invitation-only Supabase Auth plus active internal membership). See [setup and workflow](docs/evolution-engine.md) and [architecture/security](docs/evolution-engine-architecture.md). SQL migrations and explicit rollback scripts are under `supabase/`. The public Passport demonstration remains at `/platform`.
+
+The new homepage neural globe and Biologics DNA helix are local procedural Canvas graphics. They respond to scrolling, pause drawing off-screen/in background tabs, cap pixel ratio/frame rate, and render statically when reduced motion is requested. Who we serve and Vision now render their actual homepage sections.

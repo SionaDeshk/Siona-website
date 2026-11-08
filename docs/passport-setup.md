@@ -20,9 +20,14 @@ Uploads are **not malware scanned** or verified. Do not upload PHI, patient data
 
 - `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`.
 - `npx playwright test tests/e2e/passport.spec.ts`: desktop/mobile anonymous guards and login layout.
-- `npm test` includes a live RLS/storage isolation test, skipped unless the two synthetic test account pairs below and public Supabase environment variables are set. Use two distinct, confirmed accounts in a test/preview project. It creates synthetic CE/file fixtures and removes them afterward. Never supply production personal credentials.
-  - `PASSPORT_TEST_EMAIL_A`, `PASSPORT_TEST_PASSWORD_A`
-  - `PASSPORT_TEST_EMAIL_B`, `PASSPORT_TEST_PASSWORD_B`
+- `npm test` runs local tests. The live isolation test runs only with `PASSPORT_RUN_LIVE_TESTS=1`, even if credentials are present. It delegates to the reviewed standalone script so cleanup and secret redaction stay consistent.
+- The standalone command is `node --env-file=.env.passport-test scripts/test-passport-isolation.mjs` (Node 22+). Run only against the confirmed non-production **siona-passport** project with disposable records and two dedicated confirmed test users. An explicit standalone invocation runs immediately; there is no interactive confirmation. Store these six values in the ignored `.env.passport-test` file, never chat or Git:
+  - `PASSPORT_TEST_SUPABASE_URL`
+  - `PASSPORT_TEST_PUBLISHABLE_KEY`
+  - `PASSPORT_TEST_USER_A_EMAIL`, `PASSPORT_TEST_USER_A_PASSWORD`
+  - `PASSPORT_TEST_USER_B_EMAIL`, `PASSPORT_TEST_USER_B_PASSWORD`
+- The expanded script checks both account directions, owner row access/updates, forged ownership, cross-account credential links, anonymous denial, private file downloads/signing/overwriting/deletion, and fixture deletion. It tracks IDs before writes, attempts every cleanup, verifies removal, and signs out only its local test sessions. It never creates/deletes accounts or changes policies. Network outages can still leave fixtures; any cleanup failure must be resolved before calling the run successful. These checks do not cover every table or policy (profile writes are deliberately excluded to preserve existing profiles).
+- The configured browser sign-in/sign-out test also requires `PASSPORT_RUN_LIVE_TESTS=1`, account A credentials, and a `PASSPORT_TEST_SUPABASE_URL` exactly matching the app's `NEXT_PUBLIC_PASSPORT_SUPABASE_URL`. Passport browser tests disable traces, screenshots, and video so authentication artifacts are not retained. Use synthetic credentials only.
 - Before real data: sign up/confirm/sign in; refresh session; add/edit/delete each credential type; test inclusive CE range totals; upload/download/delete a synthetic PDF; test second-account row/file denial; export and inspect the PDF; sign out and confirm protected routes redirect. Live project tests require the configured project and network access to its exact Supabase hostname.
 
 PDF summaries clearly label all data self-reported and unverified. CE date filters apply to CE entries; license and certification sections export all owned records. Standard PDF font substitutes unsupported non-ASCII characters with `?`. Expiry reminders use UTC dates and include expired records plus the next 90 days. CE totals do not determine jurisdiction eligibility.
@@ -30,3 +35,9 @@ PDF summaries clearly label all data self-reported and unverified. CE date filte
 ## Implementation verification (2026-11-07)
 
 Production build and TypeScript check passed. All 16 local unit tests passed; the live Supabase isolation test was skipped because no project credentials/test accounts were configured. Four desktop/mobile browser assertions passed using `/usr/bin/chromium`; the configured sign-in/sign-out browser scenarios require the same test account settings. Passport-specific ESLint checks passed. Repository-wide lint reports nine pre-existing errors in `src/app/page.tsx`, `src/app/biologics/page.tsx`, `src/app/intelligence/page.tsx`, and `src/components/intelligence-field.tsx`; those existing website files were left unchanged. No migrations or production deployments were performed.
+
+## Follow-up review (2026-11-08)
+
+Document listing now pages through all owned metadata rows rather than stopping at Supabase's default row cap. License/certification date ordering is validated by the shared schema. PDF text wraps using actual font measurements so long identifiers and wide characters fit within the page margins. Live tests are explicitly opt-in and share the hardened standalone runner. No live project policies or migrations were changed during this review; live isolation remains unverified until credentials and project connectivity are available.
+
+Follow-up check results: production build and TypeScript passed; 18 local tests passed, with the live isolation test skipped. Six desktop/mobile browser checks passed, including anonymous route guards, responsive login, and automated WCAG checks; two configured-login cases were skipped. Targeted Passport lint passed. Repository-wide lint still reports the same nine pre-existing website errors. The build still warns that missing website metadataBase configuration defaults to localhost. No live Supabase security result is claimed.

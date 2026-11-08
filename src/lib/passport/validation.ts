@@ -6,15 +6,25 @@ const optional = z
   .max(200)
   .transform((v) => v || null);
 const date = z.union([z.literal(""), z.iso.date()]).transform((v) => v || null);
+const orderedDates = (value: {
+  issued_on: string | null;
+  expires_on: string | null;
+}) =>
+  !value.issued_on || !value.expires_on || value.issued_on <= value.expires_on;
 export const schemas = {
-  licenses: z.object({
-    jurisdiction: text,
-    license_type: text,
-    license_number: optional,
-    issued_on: date,
-    expires_on: date,
-    status: z.enum(["self_reported", "pending", "expired"]),
-  }),
+  licenses: z
+    .object({
+      jurisdiction: text,
+      license_type: text,
+      license_number: optional,
+      issued_on: date,
+      expires_on: date,
+      status: z.enum(["self_reported", "pending", "expired"]),
+    })
+    .refine(orderedDates, {
+      message: "Expiry must be on or after issue date",
+      path: ["expires_on"],
+    }),
   ce_entries: z.object({
     title: text,
     provider: text,
@@ -22,12 +32,17 @@ export const schemas = {
     completed_on: z.iso.date(),
     accreditation: optional,
   }),
-  certifications: z.object({
-    name: text,
-    issuer: optional,
-    issued_on: date,
-    expires_on: date,
-  }),
+  certifications: z
+    .object({
+      name: text,
+      issuer: optional,
+      issued_on: date,
+      expires_on: date,
+    })
+    .refine(orderedDates, {
+      message: "Expiry must be on or after issue date",
+      path: ["expires_on"],
+    }),
 };
 export const kindSchema = z.enum(["licenses", "ce_entries", "certifications"]);
 export const idSchema = z.uuid();

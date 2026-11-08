@@ -29,11 +29,11 @@ export default async function Dashboard({
   const results = await Promise.all(
     kinds.map((kind) => allRecords(db, `passport_${kind}`, user.id)),
   );
-  const { data: documents, error: docError } = await db
-    .from("passport_documents")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const { data: documents, error: docError } = await allRecords(
+    db,
+    "passport_documents",
+    user.id,
+  );
   const { data: profile, error: profileError } = await db
     .from("passport_profiles")
     .select("display_name")
@@ -248,11 +248,11 @@ export default async function Dashboard({
               {doc.original_filename} ↗
             </a>
             <small>
-              {(doc.bytes / 1024).toFixed(0)} KB · Private · Download link
-              expires in 60 seconds
+              {(Number(doc.bytes) / 1024).toFixed(0)} KB · Private · Download
+              link expires in 60 seconds
             </small>
             <form action={deleteDocument}>
-              <input type="hidden" name="id" value={doc.id} />
+              <input type="hidden" name="id" value={String(doc.id)} />
               <button className="danger">Delete document</button>
             </form>
           </article>

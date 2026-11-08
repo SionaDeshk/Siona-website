@@ -19,13 +19,6 @@ export async function saveCredential(form: FormData) {
   if (!kind.success) finish(false);
   const parsed = schemas[kind.data].safeParse(Object.fromEntries(form));
   if (!parsed.success) finish(false);
-  if (
-    "issued_on" in parsed.data &&
-    parsed.data.issued_on &&
-    parsed.data.expires_on &&
-    parsed.data.expires_on < parsed.data.issued_on
-  )
-    finish(false);
   const id = form.get("id");
   if (id && !idSchema.safeParse(id).success) finish(false);
   const query = id
@@ -101,18 +94,14 @@ export async function uploadDocument(form: FormData) {
     .from("passport-private")
     .upload(path, bytes, { contentType: file.type, upsert: false });
   if (error) finish(false);
-  const { error: metadataError } = await db
-    .from("passport_documents")
-    .insert({
-      user_id: user.id,
-      storage_path: path,
-      original_filename: file.name
-        .replace(/[\x00-\x1f\x7f]/g, "")
-        .slice(0, 200),
-      mime_type: file.type,
-      bytes: file.size,
-      ...links,
-    });
+  const { error: metadataError } = await db.from("passport_documents").insert({
+    user_id: user.id,
+    storage_path: path,
+    original_filename: file.name.replace(/[\x00-\x1f\x7f]/g, "").slice(0, 200),
+    mime_type: file.type,
+    bytes: file.size,
+    ...links,
+  });
   if (metadataError) {
     await db.storage.from("passport-private").remove([path]);
     finish(false);

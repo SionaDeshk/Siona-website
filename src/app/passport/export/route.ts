@@ -2,6 +2,7 @@ import { allRecords } from "@/lib/passport/records";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { z } from "zod";
 import { authenticated } from "@/lib/passport/server";
+import { wrapPdfText } from "@/lib/passport/pdf-text";
 import { ceTotal } from "@/lib/passport/validation";
 export async function GET(request: Request) {
   const { db, user } = await authenticated();
@@ -31,14 +32,14 @@ export async function GET(request: Request) {
   let page = pdf.addPage();
   let y = page.getHeight() - 50;
   const line = (value: string) => {
-    // Standard PDF font supports ASCII; wrap all user content to avoid clipping.
-    const safe = value.replace(/[^\x20-\x7e]/g, "?");
-    for (let i = 0; i < Math.max(1, safe.length); i += 88) {
+    for (const text of wrapPdfText(value, page.getWidth() - 90, (part) =>
+      font.widthOfTextAtSize(part, 11),
+    )) {
       if (y < 45) {
         page = pdf.addPage();
         y = page.getHeight() - 50;
       }
-      page.drawText(safe.slice(i, i + 88), {
+      page.drawText(text, {
         x: 45,
         y,
         size: 11,

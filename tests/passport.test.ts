@@ -61,3 +61,40 @@ test("CE rejects invalid dates and out-of-range hours; strips ownership input", 
   );
   assert.equal("user_id" in schemas.ce_entries.parse(entry), false);
 });
+
+test("licenses and certifications reject reversed validity dates", () => {
+  const dates = { issued_on: "2026-11-08", expires_on: "2026-11-07" };
+  assert.equal(
+    schemas.licenses.safeParse({
+      ...dates,
+      jurisdiction: "AK",
+      license_type: "RN",
+      license_number: "",
+      status: "self_reported",
+    }).success,
+    false,
+  );
+  assert.equal(
+    schemas.certifications.safeParse({ ...dates, name: "BLS", issuer: "" })
+      .success,
+    false,
+  );
+  assert.equal(
+    schemas.certifications.safeParse({
+      ...dates,
+      expires_on: dates.issued_on,
+      name: "BLS",
+      issuer: "",
+    }).success,
+    true,
+  );
+  assert.equal(
+    schemas.certifications.safeParse({
+      ...dates,
+      expires_on: "",
+      name: "BLS",
+      issuer: "",
+    }).success,
+    true,
+  );
+});

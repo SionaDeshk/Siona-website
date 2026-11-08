@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+// Never retain auth form/password or session data in browser artifacts.
+test.use({ trace: "off", screenshot: "off", video: "off" });
 test("private routes send anonymous visitors to sign in", async ({ page }) => {
   for (const path of [
     "/passport/app",
@@ -23,16 +26,38 @@ test("login is responsive and exposes no private data", async ({ page }) => {
   ).toBe(true);
 });
 
-test('configured clinician can sign in and sign out', async ({ page }) => {
-  test.skip(!process.env.PASSPORT_TEST_EMAIL_A || !process.env.PASSPORT_TEST_PASSWORD_A || !process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL || !process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY, 'Requires configured synthetic Supabase account');
-  await page.goto('/passport/login');
-  await page.getByLabel('Email', { exact: true }).fill(process.env.PASSPORT_TEST_EMAIL_A!);
-  await page.getByLabel('Password', { exact: true }).fill(process.env.PASSPORT_TEST_PASSWORD_A!);
-  await page.getByRole('button', { name: 'Sign in →' }).click();
+test("configured clinician can sign in and sign out", async ({ page }) => {
+  test.skip(
+    process.env.PASSPORT_RUN_LIVE_TESTS !== "1" ||
+      !process.env.PASSPORT_TEST_SUPABASE_URL ||
+      process.env.PASSPORT_TEST_SUPABASE_URL !==
+        process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL ||
+      !process.env.PASSPORT_TEST_USER_A_EMAIL ||
+      !process.env.PASSPORT_TEST_USER_A_PASSWORD ||
+      !process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_PASSPORT_SUPABASE_PUBLISHABLE_KEY,
+    "Requires configured synthetic Supabase account",
+  );
+  await page.goto("/passport/login");
+  await page
+    .getByLabel("Email", { exact: true })
+    .fill(process.env.PASSPORT_TEST_USER_A_EMAIL!);
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill(process.env.PASSPORT_TEST_USER_A_PASSWORD!);
+  await page.getByRole("button", { name: "Sign in →" }).click();
   await expect(page).toHaveURL(/\/passport\/app/);
-  await expect(page.getByRole('heading', { name: 'Credential vault' })).toBeVisible();
-  await page.getByRole('button', { name: 'Sign out' }).click();
+  await expect(
+    page.getByRole("heading", { name: "Credential vault" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/passport\/login/);
-  await page.goto('/passport/app');
+  await page.goto("/passport/app");
   await expect(page).toHaveURL(/\/passport\/login/);
+});
+
+test("Passport login meets automated accessibility checks", async ({ page }) => {
+  await page.goto("/passport/login");
+  const result = await new AxeBuilder({page}).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  expect(result.violations).toEqual([]);
 });

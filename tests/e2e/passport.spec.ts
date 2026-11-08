@@ -6,6 +6,7 @@ test("private routes send anonymous visitors to sign in", async ({ page }) => {
   for (const path of [
     "/passport/app",
     "/passport/export",
+    "/passport/reset-password",
     "/passport/documents/00000000-0000-4000-8000-000000000000",
   ]) {
     await page.goto(path);
@@ -56,8 +57,33 @@ test("configured clinician can sign in and sign out", async ({ page }) => {
   await expect(page).toHaveURL(/\/passport\/login/);
 });
 
-test("Passport login meets automated accessibility checks", async ({ page }) => {
+test("Passport login meets automated accessibility checks", async ({
+  page,
+}) => {
   await page.goto("/passport/login");
-  const result = await new AxeBuilder({page}).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  const result = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .analyze();
   expect(result.violations).toEqual([]);
+});
+
+test("password recovery is reachable and accessible", async ({ page }) => {
+  await page.goto("/passport/login");
+  await page.getByRole("link", { name: "Forgot your password?" }).click();
+  await expect(page).toHaveURL(/\/passport\/forgot-password/);
+  await expect(
+    page.getByRole("heading", { name: "Let’s get you back in." }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  const result = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(result.violations).toEqual([]);
+  await page.getByRole("link", { name: "Back to sign in" }).click();
+  await expect(page).toHaveURL(/\/passport\/login/);
 });

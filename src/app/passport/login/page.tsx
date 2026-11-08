@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { configured } from "@/lib/passport/server";
+import { SubmitButton } from "../submit-button";
 import { login } from "./actions";
 const messages: Record<string, string> = {
   configuration: "Passport setup is required before signing in.",
@@ -59,18 +60,27 @@ export default async function Login({
             maxLength={128}
           />
         </label>
-        <button name="mode" value="login" disabled={!configured()}>
+        <SubmitButton
+          name="mode"
+          value="login"
+          disabled={!configured()}
+          pendingLabel="Signing in…"
+        >
           Sign in →
-        </button>
-        <button
+        </SubmitButton>
+        <SubmitButton
           className="secondary"
           name="mode"
           value="signup"
+          pendingLabel="Creating account…"
           disabled={!configured()}
         >
           Create an account
-        </button>
+        </SubmitButton>
       </form>
+      <Link className="passport-link" href="/passport/forgot-password">
+        Forgot your password?
+      </Link>
       <small>
         Self-reported credentials. Documents are not verified by Siona.
       </small>

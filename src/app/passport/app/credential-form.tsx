@@ -1,3 +1,4 @@
+import { SubmitButton } from "../submit-button";
 import { saveCredential } from "./actions";
 type Row = Record<string, string | number | null>;
 export function CredentialForm({
@@ -64,14 +65,14 @@ export function CredentialForm({
           </select>
         </label>
       )}
-      <button>
+      <SubmitButton>
         Save{" "}
         {kind === "ce_entries"
           ? "learning"
           : kind === "licenses"
             ? "license"
             : "certification"}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

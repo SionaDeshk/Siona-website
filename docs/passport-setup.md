@@ -41,3 +41,19 @@ Production build and TypeScript check passed. All 16 local unit tests passed; th
 Document listing now pages through all owned metadata rows rather than stopping at Supabase's default row cap. License/certification date ordering is validated by the shared schema. PDF text wraps using actual font measurements so long identifiers and wide characters fit within the page margins. Live tests are explicitly opt-in and share the hardened standalone runner. No live project policies or migrations were changed during this review; live isolation remains unverified until credentials and project connectivity are available.
 
 Follow-up check results: production build and TypeScript passed; 18 local tests passed, with the live isolation test skipped. Six desktop/mobile browser checks passed, including anonymous route guards, responsive login, and automated WCAG checks; two configured-login cases were skipped. Targeted Passport lint passed. Repository-wide lint still reports the same nine pre-existing website errors. The build still warns that missing website metadataBase configuration defaults to localhost. No live Supabase security result is claimed.
+
+## Password recovery and form feedback
+
+`/passport/login` links to `/passport/forgot-password`. Recovery requires the existing Passport Supabase variables and a valid `NEXT_PUBLIC_SITE_URL` (HTTPS for hosted previews; HTTP is allowed only for localhost/127.0.0.1 development). Add this complete recovery URL to Supabase Auth's redirect allowlist, replacing the host with the intended preview host:
+
+```text
+https://your-preview-host/passport/auth/callback?next=%2Fpassport%2Freset-password
+```
+
+Keep the existing sign-up callback allowlisted too. Supabase's recovery email template should preserve its standard confirmation link and the requested redirect. Open the email in the same browser that requested it so the PKCE verifier cookie is available. The callback exchanges the code server-side and allows only the dashboard or reset-password page as destinations. `/passport/reset-password` requires an authenticated session; password changes are performed with that user's client, never administrative credentials. Invalid/expired links return to sign-in. Signed-in users can also use this page to change their own password, subject to Supabase's recent-authentication and password policies.
+
+The recovery response does not reveal whether an account exists or whether the provider rejected a particular email/rate-limited request. Delivery must be validated with a dedicated synthetic mailbox after configuring SMTP and redirect URLs. No email-delivery success is claimed by local checks. Reset forms validate matching passwords of 8–128 characters; Supabase may impose stronger requirements. Password values are never included in returned action state, logs, or URLs.
+
+Forms show pending labels and disable submit buttons during Server Actions. Deleting records/documents asks for confirmation when JavaScript is available; cancel leaves the item untouched. These confirmations are a user-interface safeguard, not an authorization boundary—server ownership checks still protect every mutation. Credential deletion retains linked documents; document deletion removes the private file.
+
+Recovery follow-up verification: production build, TypeScript, targeted Passport lint, and 21 local tests passed. Eight desktop/mobile browser checks passed, including the recovery page's navigation, responsive layout, accessibility, and signed-out reset-page guard. One live isolation test and two configured sign-in browser cases remain skipped. Recovery email delivery and an authenticated password update have not been exercised against Supabase. The existing metadataBase build warning remains; no website configuration was changed.

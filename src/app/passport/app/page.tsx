@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
+import { SubmitButton } from "../submit-button";
 import { allRecords } from "@/lib/passport/records";
 import { authenticated } from "@/lib/passport/server";
 import { ceTotal } from "@/lib/passport/validation";
@@ -64,7 +65,7 @@ export default async function Dashboard({
           SIONA <span>/ Passport</span>
         </Link>
         <form action={logout}>
-          <button className="secondary">Sign out</button>
+          <SubmitButton className="secondary" pendingLabel="Signing out…">Sign out</SubmitButton>
         </form>
       </header>
       <nav aria-label="Passport sections">
@@ -87,7 +88,9 @@ export default async function Dashboard({
         <p role="status" className="notice">
           {params.message === "saved"
             ? "Your changes have been saved."
-            : "Unable to save. Check your inputs and try again; your session or project configuration may need attention."}
+            : params.message === "password-updated"
+              ? "Your password has been updated."
+              : "Unable to save. Check your inputs and try again; your session or project configuration may need attention."}
         </p>
       )}
       {errors && (
@@ -196,7 +199,13 @@ export default async function Dashboard({
               <form action={deleteCredential}>
                 <input type="hidden" name="kind" value={kind} />
                 <input type="hidden" name="id" value={String(row.id)} />
-                <button className="danger">Delete record</button>
+                <SubmitButton
+                  className="danger"
+                  pendingLabel="Deleting…"
+                  confirmText="Delete this credential record? Linked documents will stay in your vault."
+                >
+                  Delete record
+                </SubmitButton>
               </form>
             </article>
           ))}
@@ -235,7 +244,9 @@ export default async function Dashboard({
               )}
             </select>
           </label>
-          <button>Upload privately</button>
+          <SubmitButton pendingLabel="Uploading…">
+            Upload privately
+          </SubmitButton>
         </form>
         {!documents?.length && (
           <p className="empty">
@@ -253,7 +264,13 @@ export default async function Dashboard({
             </small>
             <form action={deleteDocument}>
               <input type="hidden" name="id" value={String(doc.id)} />
-              <button className="danger">Delete document</button>
+              <SubmitButton
+                className="danger"
+                pendingLabel="Deleting…"
+                confirmText="Permanently delete this document from your private vault?"
+              >
+                Delete document
+              </SubmitButton>
             </form>
           </article>
         ))}
@@ -270,7 +287,7 @@ export default async function Dashboard({
               defaultValue={profile?.display_name || ""}
             />
           </label>
-          <button>Save profile</button>
+          <SubmitButton>Save profile</SubmitButton>
         </form>
       </section>
       <footer>

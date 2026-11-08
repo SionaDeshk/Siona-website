@@ -13,7 +13,7 @@ export function IntelligenceField(){
   function resize(){if(!canvas||!ctx)return;const r=canvas.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw();}
   function draw(){if(!ctx||!w||!h)return;ctx.clearRect(0,0,w,h);
    const t=reduce?0:frame*.002;const pts=nodes.map((n,i)=>({x:(.08+n.x*.84)*w+Math.sin(t+i*.7)*3+(mouse.x-.5)*(n.z-3)*5,y:(.1+n.y*.8)*h+Math.cos(t*.8+i)*3+(mouse.y-.5)*(n.z-3)*5+scroll*14}));
-   for(let i=0;i<pts.length;i++){let near=[];for(let j=0;j<pts.length;j++){if(i===j)continue;const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<Math.min(w,h)*.22)near.push({j,d})}near.sort((a,b)=>a.d-b.d);
+   for(let i=0;i<pts.length;i++){const near=[];for(let j=0;j<pts.length;j++){if(i===j)continue;const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<Math.min(w,h)*.22)near.push({j,d})}near.sort((a,b)=>a.d-b.d);
     near.slice(0,2).forEach(({j,d})=>{if(j<i)return;ctx.strokeStyle=`rgba(94,153,233,${Math.max(.035,.22-d/Math.min(w,h)*.5)})`;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();});}
    pts.forEach((p,i)=>{const active=i%11===0;ctx.beginPath();ctx.arc(p.x,p.y,active?2.5:1.1,0,Math.PI*2);ctx.fillStyle=active?"rgba(153,198,255,.9)":"rgba(151,169,199,.55)";ctx.fill();if(active){ctx.beginPath();ctx.arc(p.x,p.y,11,0,Math.PI*2);ctx.strokeStyle="rgba(91,153,244,.12)";ctx.stroke();}});
   }

@@ -12,8 +12,8 @@ test("homepage is complete, responsive, and keyboard accessible", async ({ page,
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
   await expect(page).toHaveTitle("SIONA — The path is the way.");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("SIONA.");
-  await expect(page.getByText("Siona Group is focused on", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Building\s*what[’']s next\./);
+  await expect(page.getByRole("heading", { name: "Connected by design." })).toBeVisible();
   await expect(page.getByText("© 2026 Siona Group LLC. All rights reserved.")).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   if (isMobile) {

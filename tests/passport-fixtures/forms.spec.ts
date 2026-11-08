@@ -280,8 +280,243 @@ test("expiry filters distinguish expired, due soon and missing dates", async ({
   await expect(section.locator("article.record:visible")).toHaveCount(1);
   await filter.selectOption("undated");
   await expect(
-    section.locator("article.record:visible").getByText("No expiry recorded", { exact: true }),
+    section
+      .locator("article.record:visible")
+      .getByText("No expiry recorded", { exact: true }),
   ).toBeVisible();
   await section.getByRole("button", { name: "Clear filters" }).click();
   await expect(section.locator("article.record:visible")).toHaveCount(4);
+});
+
+test("personal CE goals preserve failures, track their own period and support editing/deletion", async ({
+  page,
+  request,
+}) => {
+  const section = page
+    .locator("#planning")
+    .locator("section")
+    .filter({
+      has: page.getByRole("heading", {
+        name: "Personal CE goals",
+        exact: true,
+      }),
+    });
+  await section.getByText("Add a personal CE goal +", { exact: true }).click();
+  const form = section.locator("form.credential-form").first();
+  await form.getByLabel("Title", { exact: true }).fill("Annual target");
+  await form.getByLabel("Personal target hours", { exact: true }).fill("4");
+  await form.getByLabel("Period start", { exact: true }).fill("2026-01-01");
+  await form.getByLabel("Period end", { exact: true }).fill("2026-12-31");
+  await request.post(`${fixture}/control/fail-next`, {
+    data: { operation: "passport_ce_goals" },
+  });
+  await form.getByRole("button", { name: "Save personal goal" }).click();
+  await expect(form.getByRole("alert")).toContainText(
+    "Your entries are still here",
+  );
+  await expect(form.getByLabel("Title", { exact: true })).toHaveValue(
+    "Annual target",
+  );
+  await form.getByRole("button", { name: "Save personal goal" }).click();
+  const card = section.locator("article.record");
+  await expect(
+    card.getByRole("progressbar", { name: "Progress for Annual target" }),
+  ).toHaveAttribute("value", "2");
+  await expect(card.getByRole("progressbar")).toHaveAttribute("max", "4");
+  await card.getByText("Edit goal", { exact: true }).click();
+  await card.getByLabel("Personal target hours", { exact: true }).fill("1");
+  await card.getByRole("button", { name: "Save personal goal" }).click();
+  await expect(
+    card.getByText(/2.00 of 1.00 personal hours · Goal reached/),
+  ).toBeVisible();
+  page.once("dialog", (dialog) => dialog.accept());
+  await card.getByRole("button", { name: "Delete goal" }).click();
+  await expect(card).toHaveCount(0);
+});
+test("renewal tasks support manual fees, completion, reopening and deletion", async ({
+  page,
+  request,
+}) => {
+  const id = "44444444-4444-4444-8444-444444444444";
+  await request.post(`${fixture}/rest/v1/passport_licenses`, {
+    data: {
+      id,
+      user_id: "11111111-1111-4111-8111-111111111111",
+      jurisdiction: "AK",
+      license_type: "RN",
+      license_number: "TEST",
+      status: "self_reported",
+    },
+  });
+  await page.reload();
+  const section = page
+    .locator("#planning")
+    .locator("section")
+    .filter({
+      has: page.getByRole("heading", { name: "Renewal planner", exact: true }),
+    });
+  await section.getByText("Add a renewal task +", { exact: true }).click();
+  const form = section.locator("form.credential-form").first();
+  await form
+    .getByLabel("Title", { exact: true })
+    .fill("Check renewal requirements");
+  await form
+    .getByLabel("Renewal credential", { exact: true })
+    .selectOption(`licenses:${id}`);
+  await form.getByLabel("Task due date", { exact: true }).fill("2026-12-01");
+  await form.getByLabel("Estimated fee", { exact: true }).fill("25.50");
+  await form
+    .getByLabel("My renewal notes", { exact: true })
+    .fill("Ask issuing authority for current instructions.");
+  await form.getByRole("button", { name: "Save renewal task" }).click();
+  const card = section.locator("article.record");
+  await expect(card.getByText(/Estimated fee: 25.50 USD/)).toBeVisible();
+  await card.getByRole("button", { name: "Mark complete" }).click();
+  await expect(
+    card.getByText("Complete · Due 2026-12-01", { exact: true }),
+  ).toBeVisible();
+  await card.getByRole("button", { name: "Reopen task" }).click();
+  await expect(
+    card.getByRole("button", { name: "Mark complete" }),
+  ).toBeVisible();
+  page.once("dialog", (dialog) => dialog.accept());
+  await card.getByRole("button", { name: "Delete task" }).click();
+  await expect(card).toHaveCount(0);
+});
+test("private PDF preview uses a temporary URL and owner metadata lookup", async ({
+  page,
+  request,
+}) => {
+  await page
+    .locator("#documents")
+    .getByRole("link", { name: "Preview document", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Document preview", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.locator('iframe[title="PDF preview: synthetic-certificate.pdf"]'),
+  ).toHaveAttribute(
+    "src",
+    /\/storage\/v1\/object\/sign\/passport-private\/.+token=/,
+  );
+  await expect(
+    page.getByRole("link", { name: "Download privately", exact: true }),
+  ).toBeVisible();
+  const foreignId = "55555555-5555-4555-8555-555555555555";
+  await request.post(`${fixture}/rest/v1/passport_documents`, {
+    data: {
+      id: foreignId,
+      user_id: "66666666-6666-4666-8666-666666666666",
+      storage_path: "66666666-6666-4666-8666-666666666666/foreign.pdf",
+      original_filename: "foreign.pdf",
+      mime_type: "application/pdf",
+      bytes: 100,
+    },
+  });
+  await page.goto(`/passport/documents/${foreignId}/view`);
+  await expect(
+    page.getByRole("heading", { name: "Document preview", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByText("foreign.pdf", { exact: true })).toHaveCount(0);
+});
+test("unapplied planning migration shows setup guidance without breaking the vault", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${fixture}/control/missing-planning`);
+  await page.reload();
+  await expect(
+    page.getByText(/Personal CE goals are unavailable right now/),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Renewal planning is unavailable right now/),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator("#ce_entries")
+      .getByRole("heading", { name: "Synthetic course", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator("#documents")
+      .getByRole("link", { name: "synthetic-certificate.pdf ↗", exact: true }),
+  ).toBeVisible();
+});
+
+test("private image preview renders a temporary image without the shared optimizer", async ({
+  page,
+  request,
+}) => {
+  const id = "77777777-7777-4777-8777-777777777777";
+  await request.post(`${fixture}/rest/v1/passport_documents`, {
+    data: {
+      id,
+      user_id: "11111111-1111-4111-8111-111111111111",
+      storage_path: "11111111-1111-4111-8111-111111111111/image.png",
+      original_filename: "synthetic-image.png",
+      mime_type: "image/png",
+      bytes: 100,
+    },
+  });
+  await page.goto(`/passport/documents/${id}/view`);
+  const image = page.getByRole("img", {
+    name: "Preview of synthetic-image.png",
+    exact: true,
+  });
+  await expect(image).toHaveAttribute("src", /\/storage\/v1\/object\/sign\//);
+  await expect(image).toHaveAttribute("referrerpolicy", "no-referrer");
+  await expect
+    .poll(() =>
+      image.evaluate((element: HTMLImageElement) => element.naturalWidth),
+    )
+    .toBeGreaterThan(0);
+});
+test("renewal edits preserve failed changes and update the saved estimate", async ({
+  page,
+  request,
+}) => {
+  const license = "88888888-8888-4888-8888-888888888888";
+  const task = "99999999-9999-4999-8999-999999999999";
+  await request.post(`${fixture}/rest/v1/passport_licenses`, {
+    data: {
+      id: license,
+      user_id: "11111111-1111-4111-8111-111111111111",
+      jurisdiction: "AK",
+      license_type: "RN",
+      status: "self_reported",
+    },
+  });
+  await request.post(`${fixture}/rest/v1/passport_renewal_tasks`, {
+    data: {
+      id: task,
+      user_id: "11111111-1111-4111-8111-111111111111",
+      title: "Update estimate",
+      license_id: license,
+      notes: "",
+      due_on: null,
+      estimated_fee: 10,
+      currency: "USD",
+    },
+  });
+  await page.reload();
+  const card = page
+    .locator("#planning article.record")
+    .filter({
+      has: page.getByRole("heading", { name: "Update estimate", exact: true }),
+    });
+  await card.getByText("Edit renewal task", { exact: true }).click();
+  await card.getByLabel("Estimated fee", { exact: true }).fill("20");
+  await request.post(`${fixture}/control/fail-next`, {
+    data: { operation: "passport_renewal_tasks" },
+  });
+  await card.getByRole("button", { name: "Save renewal task" }).click();
+  await expect(card.getByRole("alert")).toContainText(
+    "Your entries are still here",
+  );
+  await expect(card.getByLabel("Estimated fee", { exact: true })).toHaveValue(
+    "20",
+  );
+  await card.getByRole("button", { name: "Save renewal task" }).click();
+  await expect(card.getByText(/Estimated fee: 20.00 USD/)).toBeVisible();
 });

@@ -1,5 +1,6 @@
 // Loopback-only fake provider for UI regressions. No hosted projects or real credentials.
 import { createServer } from "node:http";
+import { PDFDocument } from "pdf-lib";
 import { randomUUID } from "node:crypto";
 const userId = "11111111-1111-4111-8111-111111111111";
 const ceId = "22222222-2222-4222-8222-222222222222";
@@ -15,11 +16,16 @@ const user = {
   created_at: "2026-01-01T00:00:00Z",
 };
 const jwt = `${Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url")}.${Buffer.from(JSON.stringify({ sub: userId, role: "authenticated", aud: "authenticated", exp: 4102444800, iat: 1700000000 })).toString("base64url")}.fixture-signature`;
-let tables, failNext;
+const previewPDF = await PDFDocument.create();
+previewPDF.addPage().drawText("Synthetic certificate preview");
+const previewPDFBytes = Buffer.from(await previewPDF.save());
+let tables, failNext, missingPlanning;
 function reset() {
   tables = {
     passport_profiles: [{ user_id: userId, display_name: "Test Nurse" }],
     passport_licenses: [],
+    passport_ce_goals: [],
+    passport_renewal_tasks: [],
     passport_ce_entries: [
       {
         id: ceId,
@@ -49,6 +55,7 @@ function reset() {
     ],
   };
   failNext = null;
+  missingPlanning = false;
 }
 reset();
 createServer(async (request, response) => {
@@ -67,6 +74,10 @@ createServer(async (request, response) => {
     if (url.pathname === "/health") return send(200, { ok: true });
     if (url.pathname === "/control/reset") {
       reset();
+      return send(200, { ok: true });
+    }
+    if (url.pathname === "/control/missing-planning") {
+      missingPlanning = true;
       return send(200, { ok: true });
     }
     if (url.pathname === "/control/fail-next") {
@@ -88,6 +99,14 @@ createServer(async (request, response) => {
     if (url.pathname === "/auth/v1/logout") return send(200, {});
     if (url.pathname.startsWith("/rest/v1/")) {
       const table = url.pathname.split("/").pop();
+      if (
+        missingPlanning &&
+        ["passport_ce_goals", "passport_renewal_tasks"].includes(table)
+      )
+        return send(404, {
+          code: "42P01",
+          message: "Planning migration unavailable",
+        });
       if (!(table in tables))
         return send(404, { message: "Unknown fixture table" });
       const matches = (row) =>
@@ -114,6 +133,7 @@ createServer(async (request, response) => {
           tables[table] = tables[table].filter(
             (existing) => existing.user_id !== row.user_id,
           );
+        if (table === "passport_renewal_tasks") row.completed ??= false;
         tables[table].push(row);
         rows = [row];
       } else if (request.method === "PATCH") {
@@ -126,6 +146,10 @@ createServer(async (request, response) => {
           passport_licenses: "license_id",
           passport_certifications: "certification_id",
         }[table];
+        if (field && field !== "ce_entry_id")
+          tables.passport_renewal_tasks = tables.passport_renewal_tasks.filter(
+            (task) => !rows.some((row) => row.id === task[field]),
+          );
         if (field)
           for (const doc of tables.passport_documents)
             if (rows.some((row) => row.id === doc[field])) doc[field] = null;
@@ -134,6 +158,35 @@ createServer(async (request, response) => {
         "application/vnd.pgrst.object+json",
       );
       return send(200, single ? rows[0] : rows);
+    }
+    if (
+      url.pathname.startsWith("/storage/v1/object/sign/") &&
+      request.method === "POST"
+    )
+      return send(200, {
+        signedURL: `${url.pathname.replace("/storage/v1", "")}?token=fixture-temporary`,
+      });
+    if (
+      url.pathname.startsWith("/storage/v1/object/sign/") &&
+      request.method === "GET"
+    ) {
+      if (url.pathname.endsWith(".png")) {
+        response.writeHead(200, {
+          "Content-Type": "image/png",
+          "Cache-Control": "no-store",
+        });
+        return response.end(
+          Buffer.from(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aT2UAAAAASUVORK5CYII=",
+            "base64",
+          ),
+        );
+      }
+      response.writeHead(200, {
+        "Content-Type": "application/pdf",
+        "Cache-Control": "no-store",
+      });
+      return response.end(previewPDFBytes);
     }
     if (url.pathname.startsWith("/storage/v1/object/")) {
       if (failNext === "storage") {

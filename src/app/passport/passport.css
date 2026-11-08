@@ -350,3 +350,49 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.passport textarea {
+  width: 100%;
+  border: 1px solid #bac6b9;
+  border-radius: 6px;
+  padding: 12px;
+  color: #203e35;
+  background: #fffefb;
+  font: inherit;
+  resize: vertical;
+}
+.passport progress {
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 12px 0;
+  accent-color: #244f40;
+}
+.passport .planning-notes {
+  white-space: pre-wrap;
+}
+.passport .document-preview {
+  display: block;
+  width: 100%;
+  height: 70vh;
+  min-height: 320px;
+  border: 1px solid #bac6b9;
+  background: #fff;
+}
+.passport .document-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  background: #fff;
+}
+.passport .preview-actions {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 20px 0;
+}
+.passport .preview-card {
+  margin-top: 24px;
+  overflow-wrap: anywhere;
+}

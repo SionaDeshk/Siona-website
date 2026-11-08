@@ -7,6 +7,7 @@ import { ceTotal } from "@/lib/passport/validation";
 import { z } from "zod";
 import { logout } from "../login/actions";
 import { deleteCredential, deleteDocument } from "./actions";
+import { PlanningPanel } from "./planning-panel";
 import { ProfileForm } from "./profile-form";
 import { UploadForm } from "./upload-form";
 import {
@@ -82,6 +83,7 @@ export default async function Dashboard({
         <a href="#ce_entries">Learning</a>
         <a href="#certifications">Certifications</a>
         <a href="#documents">Documents</a>
+        <a href="#planning">Planning</a>
       </nav>
       <section id="overview">
         <p className="eyebrow">YOUR CAREER, IN YOUR HANDS</p>
@@ -266,7 +268,7 @@ export default async function Dashboard({
                   <SubmitButton
                     className="danger"
                     pendingLabel="Deleting…"
-                    confirmText="Delete this credential record? Linked documents will stay in your vault."
+                    confirmText="Delete this credential record? Linked documents will stay in your vault; its renewal tasks will be deleted."
                   >
                     Delete record
                   </SubmitButton>
@@ -326,6 +328,13 @@ export default async function Dashboard({
                   </p>
                 );
               })()}
+              <Link
+                className="passport-link"
+                href={`/passport/documents/${doc.id}/view`}
+                prefetch={false}
+              >
+                Preview document
+              </Link>
               <small>
                 {(Number(doc.bytes) / 1024).toFixed(0)} KB · Private · Download
                 link expires in 60 seconds
@@ -344,6 +353,20 @@ export default async function Dashboard({
           ))}
         </RecordFilter>
       </section>
+      <PlanningPanel
+        db={db}
+        userId={user.id}
+        options={options}
+        entries={
+          results[1].error
+            ? null
+            : rows[1].map((row) => ({
+                hours: Number(row.hours),
+                completed_on: String(row.completed_on),
+              }))
+        }
+        today={today}
+      />
       <section className="passport-card">
         <h2>Your profile</h2>
         <ProfileForm displayName={profile?.display_name || ""} />

@@ -89,22 +89,16 @@ async function insert(c, userId, table, values) {
   check(await c.from(table).insert(row.values).select("id").single());
   return row.fixture.id;
 }
+function noVisibleRows(result) {
+  // Explicit privilege denial is secure too; reject network/schema errors so
+  // broken configuration cannot masquerade as successful isolation.
+  if (result.error) assert.equal(result.error.code, '42501');
+  else assert.equal(result.data.length, 0);
+}
 async function hidden(c, table, id) {
-  assert.equal(check(await c.from(table).select("id").eq("id", id)).length, 0);
-  assert.equal(
-    check(
-      await c
-        .from(table)
-        .update({ created_at: "2000-01-01T00:00:00Z" })
-        .eq("id", id)
-        .select("id"),
-    ).length,
-    0,
-  );
-  assert.equal(
-    check(await c.from(table).delete().eq("id", id).select("id")).length,
-    0,
-  );
+  noVisibleRows(await c.from(table).select('id').eq('id',id));
+  noVisibleRows(await c.from(table).update({created_at:'2000-01-01T00:00:00Z'}).eq('id',id).select('id'));
+  noVisibleRows(await c.from(table).delete().eq('id',id).select('id'));
 }
 async function deniedWrite(c, owner, userId, table, values) {
   const row = trackRow(owner, userId, table, values);
@@ -184,6 +178,64 @@ try {
       await deniedWrite(anonymous, owner, ownerId, table, values);
       console.log(`PASS: ${stage}`);
     }
+    if (process.env.PASSPORT_TEST_INCLUDE_PLANNING === "1") {
+      const planningFixtures = [
+        [
+          "passport_ce_goals",
+          {
+            title: `TEST-${suffix}`,
+            target_hours: 2,
+            starts_on: "2026-01-01",
+            ends_on: "2026-12-31",
+          },
+        ],
+        [
+          "passport_renewal_tasks",
+          {
+            title: `TEST-${suffix}`,
+            license_id: ids.passport_licenses,
+            currency: "USD",
+          },
+        ],
+      ];
+      for (const [table, values] of planningFixtures) {
+        stage = `${label}: planning ownership for ${table}`;
+        const id = await insert(owner, ownerId, table, values);
+        assert.equal(
+          check(await owner.from(table).select("id").eq("id", id)).length,
+          1,
+        );
+        assert.equal(
+          check(
+            await owner
+              .from(table)
+              .update({ title: `TEST-updated-${suffix}` })
+              .eq("id", id)
+              .select("id"),
+          ).length,
+          1,
+        );
+        await hidden(other, table, id);
+        await hidden(anonymous, table, id);
+        await deniedWrite(other, owner, ownerId, table, values);
+        await deniedWrite(anonymous, owner, ownerId, table, values);
+        console.log(`PASS: ${stage}`);
+      }
+      stage = `${label}: renewal cross-account credential ownership`;
+      for (const field of ["license_id", "certification_id"]) {
+        await deniedWrite(other, other, otherId, "passport_renewal_tasks", {
+          title: `TEST-${suffix}`,
+          currency: "USD",
+          [field]:
+            ids[
+              field === "license_id"
+                ? "passport_licenses"
+                : "passport_certifications"
+            ],
+        });
+      }
+      console.log(`PASS: ${stage}`);
+    }
     stage = `${label}: private file and document metadata`;
     const path = `${ownerId}/isolation-${randomUUID()}.pdf`;
     owned.push({ c: owner, userId: ownerId, path });
@@ -246,12 +298,10 @@ try {
       owned.push({ c: owner, userId: ownerId, path: forbiddenPath });
       assert.ok(
         (
-          await c.storage
-            .from("passport-private")
-            .upload(forbiddenPath, pdf, {
-              contentType: "application/pdf",
-              upsert: false,
-            })
+          await c.storage.from("passport-private").upload(forbiddenPath, pdf, {
+            contentType: "application/pdf",
+            upsert: false,
+          })
         ).error,
       );
     }

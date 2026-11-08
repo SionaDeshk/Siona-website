@@ -7,6 +7,7 @@ test("private routes send anonymous visitors to sign in", async ({ page }) => {
     "/passport/app",
     "/passport/export",
     "/passport/reset-password",
+    "/passport/documents/33333333-3333-4333-8333-333333333333/view",
     "/passport/documents/00000000-0000-4000-8000-000000000000",
   ]) {
     await page.goto(path);

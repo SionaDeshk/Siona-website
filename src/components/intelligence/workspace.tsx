@@ -755,6 +755,9 @@ export function Workspace({
             SIONA<span>EVOLUTION ENGINE</span>
           </Link>
           <div className={styles.systemLabel}>INTELLIGENCE / BIOLOGICS</div>
+          <Link className={styles.workspaceSwitch} href="/workspace/operations">
+            Operations workspace →
+          </Link>
           <nav aria-label="Intelligence workspace">
             {tabs.map((name, i) => (
               <button

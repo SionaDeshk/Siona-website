@@ -4,6 +4,8 @@ import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { Pool, type PoolClient } from "pg";
+import { operationsDatabaseTests } from "../operations/database-cases";
+import { practiceDatabaseTests } from "../practice/database-cases";
 let pool: Pool;
 const container = `siona-intel-test-${process.pid}`;
 const admin = "00000000-0000-4000-8000-000000000001",
@@ -93,6 +95,8 @@ before(
         "utf8",
       ),
     );
+    await pool.query(readFileSync("supabase/migrations/202611100001_operations.sql", "utf8"));
+    await pool.query(readFileSync("supabase/migrations/202611100002_practice_portal.sql", "utf8"));
     await pool.query("grant select on all tables in schema public to anon");
     await pool.query("insert into auth.users(id) values($1),($2),($3),($4)", [
       admin,
@@ -486,12 +490,18 @@ test("source approval, document attribution, and follow-up transactions are enfo
     db.release();
   }
 });
+operationsDatabaseTests({ pool: () => pool, asUser, admin, analyst, viewer, outsider });
+practiceDatabaseTests({ pool: () => pool, asUser, admin, analyst, viewer, outsider });
 test("migration and rollback preserve pre-existing application tables", async () => {
   assert.equal(
     (await pool.query("select note from passport_preservation_marker")).rows[0]
       .note,
     "Existing application data must remain untouched",
   );
+  await pool.query(readFileSync("supabase/rollback/202611100002_practice_portal.sql", "utf8"));
+  assert.ok(Number((await pool.query("select count(*) from ops_requests")).rows[0].count)>0);
+  await pool.query(readFileSync("supabase/rollback/202611100001_operations.sql", "utf8"));
+  assert.equal((await pool.query("select count(*) from intel_members")).rows[0].count, "3");
   await pool.query(
     readFileSync("supabase/rollback/202611080001_evolution_engine.sql", "utf8"),
   );

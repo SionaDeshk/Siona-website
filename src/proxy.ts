@@ -38,5 +38,6 @@ export const config = {
     "/api/operations/:path*",
     "/practice/:path*",
     "/api/practice/:path*",
+    "/api/commerce/:path*",
   ],
 };

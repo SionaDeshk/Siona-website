@@ -23,50 +23,122 @@ export function practiceDemo(): PracticeData[] {
       role: "viewer" as const,
     },
   ];
-  return practices.map((p, i) => ({
-    practices,
-    practice_id: p.id,
-    role: p.role,
-    offers: [
-      {
-        id: id(10 + i),
-        title: i
-          ? "Example west supply kit · fictional"
-          : "Example sample container · fictional",
-        summary:
-          "Fictional practice supply for exploring catalog requests. No actual stock, price, or commercial relationship is represented.",
-        unit: "case of 100",
-        valid_until: future,
-      },
-    ],
-    requests: [
-      {
-        id: id(20 + i),
-        title: i
-          ? "Example west supply kit · fictional"
-          : "Example sample container · fictional",
-        unit: "case of 100",
-        quantity: 2,
-        needed_on: future,
-        stage: i ? "Hold" : "Coordinating",
-        version: 3,
-        reference: "DEMO-REF",
-        message: "Fictional business supply coordination.",
-        created_at: new Date().toISOString(),
-      },
-    ],
-    updates: [
-      {
-        id: id(30 + i),
-        request_id: id(20 + i),
-        body: i
-          ? "Coordination is on hold."
-          : "Coordination with the external partner is in progress.",
-        kind: "status",
-        created_at: new Date().toISOString(),
-      },
-    ],
-  }));
+  const datasets = practices.map(
+    (p, i): PracticeData => ({
+      practices,
+      practice_id: p.id,
+      role: p.role,
+      offers: [
+        {
+          id: id(10 + i),
+          title: i
+            ? "Example west supply kit · fictional"
+            : "Example sample container · fictional",
+          summary:
+            "Fictional practice supply for exploring catalog requests. No actual stock, price, or commercial relationship is represented.",
+          unit: "case of 100",
+          valid_until: future,
+        },
+      ],
+      requests: [
+        {
+          id: id(20 + i),
+          title: i
+            ? "Example west supply kit · fictional"
+            : "Example sample container · fictional",
+          unit: "case of 100",
+          quantity: 2,
+          needed_on: future,
+          stage: i ? "Hold" : "Coordinating",
+          version: 3,
+          reference: "DEMO-REF",
+          message: "Fictional business supply coordination.",
+          created_at: new Date().toISOString(),
+        },
+      ],
+      updates: [
+        {
+          id: id(30 + i),
+          request_id: id(20 + i),
+          body: i
+            ? "Coordination is on hold."
+            : "Coordination with the external partner is in progress.",
+          kind: "status",
+          created_at: new Date().toISOString(),
+        },
+      ],
+    }),
+  );
+  const first = datasets[0];
+  first.commerce_ready = true;
+  first.requests[0] = {
+    ...first.requests[0],
+    quote_required: true,
+    accepted_quote_id: id(51),
+    cancellable: false,
+  };
+  first.requests.push({
+    id: id(40),
+    title: "Example supply quote · fictional",
+    unit: "case of 100",
+    quantity: 2,
+    needed_on: future,
+    stage: "Review",
+    version: 2,
+    reference: "DEMO-QUOTE",
+    message: "Fictional request awaiting a commercial decision.",
+    created_at: new Date().toISOString(),
+    quote_required: true,
+    accepted_quote_id: null,
+    cancellable: true,
+  });
+  const terms = {
+    quantity: 2,
+    unit: "case of 100",
+    currency: "USD" as const,
+    unit_minor: 1250,
+    shipping_minor: 500,
+    tax_minor: 0,
+    total_minor: 3000,
+    lead_days: 3,
+    valid_until: future,
+    delivery_terms:
+      "Fictional delivery terms for the business supply rehearsal.",
+    practice_summary:
+      "Fictional reviewed quote. No actual price or supplier offer is represented.",
+  };
+  first.quotes = [
+    { ...terms, id: id(50), request_id: id(40), status: "Shared", version: 2 },
+    {
+      ...terms,
+      id: id(51),
+      request_id: id(20),
+      status: "Accepted",
+      version: 3,
+    },
+  ];
+  first.shipments = [
+    {
+      id: id(60),
+      request_id: id(20),
+      quantity: 2,
+      carrier: "Fictional carrier",
+      tracking_reference: "DEMO-TRACK",
+      expected_on: future,
+      status: "Dispatched",
+    },
+  ];
+  first.lots = [
+    {
+      id: id(61),
+      shipment_id: id(60),
+      lot_code: "DEMO-LOT",
+      expires_on: future,
+      quantity: 2,
+    },
+  ];
+  first.issues = [];
+  return datasets;
 }
 export function rehearsePractice(
   data: PracticeData,
@@ -76,6 +148,38 @@ export function rehearsePractice(
     throw new Error("This account has view-only access.");
   const next = structuredClone(data),
     target = crypto.randomUUID();
+  if (operation.action === "quote_decision") {
+    const quote = next.quotes?.find((q) => q.id === operation.quote_id);
+    const request = next.requests.find((r) => r.id === quote?.request_id);
+    if (
+      !quote ||
+      !request ||
+      quote.status !== "Shared" ||
+      quote.version !== operation.quote_version ||
+      request.version !== operation.request_version ||
+      request.accepted_quote_id
+    )
+      throw new Error("Quote or request changed. Refresh before deciding.");
+    if (operation.decision === "Accept" && !operation.confirmed)
+      throw new Error("Confirm the quoted terms before accepting.");
+    quote.status = operation.decision === "Accept" ? "Accepted" : "Declined";
+    quote.version++;
+    if (operation.decision === "Accept") {
+      request.accepted_quote_id = quote.id;
+      request.version++;
+    }
+    next.updates.unshift({
+      id: target,
+      request_id: request.id,
+      body:
+        operation.decision === "Accept"
+          ? "Quoted terms accepted for coordination."
+          : "The quoted terms were declined.",
+      kind: "message",
+      created_at: new Date().toISOString(),
+    });
+    return { data: next, id: request.id };
+  }
   if (operation.action === "submit") {
     const offer = data.offers.find((o) => o.id === operation.offer_id);
     if (!offer || operation.practice_id !== data.practice_id)

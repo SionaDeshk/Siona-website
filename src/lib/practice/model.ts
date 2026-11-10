@@ -1,6 +1,22 @@
 import { z } from "zod";
 import type { Stage } from "@/lib/operations/model";
+import type { Currency } from "@/lib/commerce/model";
 export const practiceOperationSchema = z.discriminatedUnion("action", [
+  z
+    .object({
+      action: z.literal("quote_decision"),
+      quote_id: z.uuid(),
+      quote_version: z.number().int().positive(),
+      request_version: z.number().int().positive(),
+      decision: z.enum(["Accept", "Decline"]),
+      confirmed: z.boolean(),
+      notes: z.string().trim().min(10).max(1000),
+    })
+    .strict()
+    .refine((v) => v.decision !== "Accept" || v.confirmed, {
+      message: "Confirm the quoted terms before accepting.",
+      path: ["confirmed"],
+    }),
   z
     .object({
       action: z.literal("submit"),
@@ -49,6 +65,9 @@ export type PracticeRequest = {
   reference: string;
   message: string;
   created_at: string;
+  quote_required?: boolean;
+  accepted_quote_id?: string | null;
+  cancellable?: boolean;
 };
 export type PracticeUpdate = {
   id: string;
@@ -65,6 +84,51 @@ export type PracticeData = {
   requests: PracticeRequest[];
   updates: PracticeUpdate[];
   truncated?: boolean;
+  commerce_ready?: boolean;
+  quotes?: PracticeQuote[];
+  shipments?: PracticeShipment[];
+  lots?: PracticeLot[];
+  issues?: PracticeIssue[];
+};
+export type PracticeQuote = {
+  id: string;
+  request_id: string;
+  quantity: number;
+  unit: string;
+  currency: Currency;
+  unit_minor: number;
+  shipping_minor: number;
+  tax_minor: number;
+  total_minor: number;
+  lead_days: number;
+  valid_until: string;
+  delivery_terms: string;
+  practice_summary: string;
+  status: string;
+  version: number;
+};
+export type PracticeShipment = {
+  id: string;
+  request_id: string;
+  quantity: number;
+  carrier: string;
+  tracking_reference: string;
+  expected_on: string;
+  status: string;
+};
+export type PracticeLot = {
+  id: string;
+  shipment_id: string;
+  lot_code: string;
+  expires_on: string;
+  quantity: number;
+};
+export type PracticeIssue = {
+  id: string;
+  request_id: string;
+  kind: string;
+  practice_message: string;
+  status: string;
 };
 export const stageLabel: Record<Stage, string> = {
   Draft: "Draft",
@@ -76,5 +140,9 @@ export const stageLabel: Record<Stage, string> = {
   Cancelled: "Cancelled",
 };
 export function canCancel(request: PracticeRequest, role: string) {
-  return role === "requester" && ["Review", "Hold"].includes(request.stage);
+  return (
+    role === "requester" &&
+    request.cancellable !== false &&
+    ["Review", "Hold"].includes(request.stage)
+  );
 }

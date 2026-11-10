@@ -430,6 +430,12 @@
   font-size: 12px;
   margin: 20px 0;
 }
+.commercial { margin:30px 0; }
+.quote { padding:20px 0; border-top:1px solid #ccd6c1; }
+.quoteTotal { display:block; font-size:30px; font-weight:400; letter-spacing:-.04em; margin:18px 0; }
+.quote small { color:#53664a; font-size:10px; }
+.root label.confirmation { display:flex;align-items:center;gap:12px; }
+.root label.confirmation input {width:18px;height:18px;min-height:18px;margin:0;accent-color:#456535;}
 .notice p {
   margin-bottom: 10px;
 }

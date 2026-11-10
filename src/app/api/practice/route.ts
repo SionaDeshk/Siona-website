@@ -34,9 +34,17 @@ export async function GET(request: Request) {
     const selected = new URL(request.url).searchParams.get("practice_id");
     if (selected && !z.uuid().safeParse(selected).success)
       throw new AccessError(400, "Choose a valid practice.");
-    const { data, error } = await db.rpc("ops_practice_snapshot", {
+    let { data, error } = await db.rpc("ops_commerce_snapshot", {
       target_practice: selected || null,
     });
+    if (error?.code === "PGRST202") {
+      const legacy = await db.rpc("ops_practice_snapshot", {
+        target_practice: selected || null,
+      });
+      data = legacy.data;
+      error = legacy.error;
+      if (data) data = { ...data, commerce_ready: false };
+    }
     if (error) throw error;
     return Response.json(data, { headers });
   } catch (error) {
@@ -73,7 +81,11 @@ export async function POST(request: Request) {
       );
     const { action, ...payload } = parsed.data;
     const { data, error } = await db.rpc(
-      action === "submit" ? "ops_practice_submit" : "ops_practice_cancel",
+      action === "quote_decision"
+        ? "ops_practice_quote_decide"
+        : action === "submit"
+          ? "ops_practice_submit"
+          : "ops_practice_cancel",
       { payload },
     );
     if (error) throw error;

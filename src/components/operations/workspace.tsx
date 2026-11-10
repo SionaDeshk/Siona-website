@@ -285,6 +285,9 @@ export function OperationsWorkspace({
           </div>
         </dl>
         <p>{request.notes}</p>
+        <Link href={`/workspace/commerce?request=${request.id}`}>
+          Quotes and fulfillment →
+        </Link>
         {request.portal_offer_id && (
           <div className={styles.ready}>
             <strong>Submitted through the practice portal</strong>
@@ -363,6 +366,7 @@ export function OperationsWorkspace({
           ))}
         </nav>
         <div className={styles.sidebarBottom}>
+          <Link href="/workspace/commerce">Quotes and fulfillment →</Link>
           <Link href="/workspace/intelligence">
             Evolution Engine <Arrow className={styles.external} />
           </Link>

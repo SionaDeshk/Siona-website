@@ -13,6 +13,7 @@ import {
   type PracticeRequest,
 } from "@/lib/practice/model";
 import { rehearsePractice } from "@/lib/practice/demo";
+import { PracticeCommerceDetails } from "./commerce-details";
 import styles from "./workspace.module.css";
 
 type Editor =
@@ -278,6 +279,24 @@ export function PracticeWorkspace({
           </div>
         </dl>
         {request.message && <p>{request.message}</p>}
+        {data && (
+          <PracticeCommerceDetails
+            data={data}
+            request={request}
+            preview={preview}
+            onSaved={refresh}
+            onPreview={(operation) => {
+              const result = rehearsePractice(data, operation);
+              setData(result.data);
+              setRehearsals((all) =>
+                all?.map((r) =>
+                  r.practice_id === result.data.practice_id ? result.data : r,
+                ),
+              );
+              setNotice("Preview updated. Changes stay in this tab.");
+            }}
+          />
+        )}
         <h3>Progress & updates</h3>
         <ol className={styles.timeline}>
           {data?.updates

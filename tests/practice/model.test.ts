@@ -35,7 +35,14 @@ test("practice requests accept only coordination fields and a valid idempotency 
 test("practice cancellation respects role and the coordination stage", () => {
   const request = practiceDemo()[0].requests[0];
   assert.equal(canCancel(request, "requester"), false);
-  assert.equal(canCancel({ ...request, stage: "Review" }, "requester"), true);
+  assert.equal(
+    canCancel({ ...request, stage: "Review", cancellable: true }, "requester"),
+    true,
+  );
+  assert.equal(
+    canCancel({ ...request, stage: "Review", cancellable: false }, "requester"),
+    false,
+  );
   assert.equal(canCancel({ ...request, stage: "Review" }, "viewer"), false);
   assert.equal(
     canCancel({ ...request, stage: "Completed" }, "requester"),

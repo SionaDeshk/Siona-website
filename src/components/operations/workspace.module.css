@@ -126,6 +126,11 @@
   padding: 60px 12px 0;
   font-size: 12px;
 }
+.sidebarBottom > a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
 .sidebarBottom p {
   color: #d6dece;
   margin: 25px 0 12px;

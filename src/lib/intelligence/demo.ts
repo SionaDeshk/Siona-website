@@ -1,4 +1,5 @@
 import type { WorkspaceData } from "./model";
+import { planningCases, planningCaseRow } from "./planning-cases";
 const uid = "00000000-0000-4000-8000-000000000001",
   batch = "00000000-0000-4000-8000-000000000002";
 const base = {
@@ -176,3 +177,40 @@ export const previewData = {
   activity: [],
 } as WorkspaceData;
 export const previewUserId = uid;
+
+// Development-only review cases. These are never seeded into a hosted database.
+for (const [index, item] of planningCases.entries()) {
+  const signalId = `b0000000-0000-4000-8000-00000000000${index + 1}`;
+  previewData.opportunities.push(planningCaseRow(item));
+  previewData.signals.push({
+    id: signalId,
+    title: item.source_title,
+    summary: item.source_summary,
+    source_url: item.source_url,
+    publisher: "Federal Register · FDA",
+    published_on: item.published_on,
+    evidence_type: "third_party_claim",
+    reliability: "primary",
+    reliability_notes:
+      "Source reference from saved project research; not independently reverified in this preview.",
+    confidence: "low",
+    review_status: "unreviewed",
+  });
+  previewData.evidence.push({
+    id: `c0000000-0000-4000-8000-00000000000${index + 1}`,
+    opportunity_id: item.id,
+    signal_id: signalId,
+    interpretation:
+      "Context only. Does not validate demand, economics or regulatory eligibility. Recheck the source and actively seek contradicting evidence.",
+  });
+  previewData.tasks.push({
+    id: `d0000000-0000-4000-8000-00000000000${index + 1}`,
+    opportunity_id: item.id,
+    title: item.experiment,
+    details: item.experiment_details,
+    success_criteria: item.success_criteria,
+    kind: "Validation",
+    status: "Open",
+    // Owner and due date intentionally unassigned: planning is not a commitment.
+  });
+}

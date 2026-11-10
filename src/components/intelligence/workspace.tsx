@@ -22,6 +22,11 @@ import {
   type WorkspaceData,
 } from "@/lib/intelligence/model";
 import { Network } from "./network";
+import { OpportunityReview } from "./opportunity-review";
+import {
+  planningCases,
+  planningCaseRow,
+} from "@/lib/intelligence/planning-cases";
 import styles from "./workspace.module.css";
 
 type FormKind =
@@ -807,9 +812,11 @@ export function Workspace({
             <div className={styles.notice}>
               <strong>Synthetic design preview · no live business data</strong>
               <p>
-                Interactions explore fictional records. Writing is disabled
-                here. Configure Supabase and sign in to use the real workflow.
-                This preview route is unavailable in production.
+                Interactions explore fictional records and unvalidated planning
+                cases. Source references are context, not validated business
+                evidence. Writing is disabled here. Configure Supabase and sign
+                in to use the real workflow. This preview route is unavailable
+                in production.
               </p>
             </div>
           )}
@@ -1147,12 +1154,62 @@ export function Workspace({
               )}
               {tab === "Opportunities" && (
                 <>
+                  <section
+                    className={styles.planningCases}
+                    aria-label="Unvalidated starting cases"
+                  >
+                    <div>
+                      <p className={styles.eyebrow}>
+                        STARTING HYPOTHESES / UNVALIDATED
+                      </p>
+                      <h2>Two questions worth testing.</h2>
+                      <p className={styles.small}>
+                        Planning cases, not established ventures.{" "}
+                        {preview
+                          ? "Explore locally; nothing is saved."
+                          : "Draft a hypothesis, link relevant workspace evidence, then explicitly save. No records are created automatically."}
+                      </p>
+                    </div>
+                    <div className={styles.planningCaseGrid}>
+                      {planningCases.map((item) => (
+                        <article key={item.id}>
+                          <span className={styles.synthetic}>UNVALIDATED</span>
+                          <h3>{item.name}</h3>
+                          <p>
+                            {item.key === "device-information"
+                              ? "Can exact-model information solve a meaningful problem, and who would pay?"
+                              : "Can one authorized research-supply route meet buyer demand at a defensible margin?"}
+                          </p>
+                          <button
+                            disabled={
+                              preview
+                                ? !data.opportunities.some(
+                                    (o) => o.id === item.id,
+                                  )
+                                : !writer || busy
+                            }
+                            onClick={() => {
+                              if (preview) {
+                                setSelected(item.id);
+                                setQuery("");
+                              } else open("opportunity", planningCaseRow(item));
+                            }}
+                          >
+                            {preview
+                              ? `Explore ${item.name} case`
+                              : `Draft ${item.name} hypothesis`}
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
                   <div className={styles.opportunityLayout}>
                     <section className={styles.opportunityList}>
                       {filtered(data.opportunities).map((o) => (
                         <button
                           className={`${styles.opportunityRow} ${opp?.id === o.id ? styles.selected : ""}`}
                           key={o.id}
+                          aria-pressed={opp?.id === o.id}
                           onClick={() => setSelected(o.id)}
                         >
                           <div>
@@ -1167,75 +1224,65 @@ export function Workspace({
                       ))}
                     </section>
                     {opp && (
-                      <section className={styles.panel}>
-                        <div className={styles.cardTop}>
-                          <Badge row={opp} />
-                          <span>
-                            {metric(opp.id).coverage}% weighted evidence
-                            coverage
-                          </span>
-                        </div>
-                        <h2>{title(opp)}</h2>
-                        <p>{v(opp, "problem")}</p>
-                        <div className={styles.cardActions}>
-                          <Button kind="evaluation" row={opp}>
-                            Evaluate scorecard
+                      <OpportunityReview
+                        key={opp.id}
+                        opportunity={opp}
+                        data={data}
+                        inspect={setDetail}
+                        taskAction={(row) => (
+                          <Button kind="task_status" row={row}>
+                            Record outcome
                           </Button>
-                          <Button kind="evidence" row={opp}>
-                            Link evidence
+                        )}
+                        evidenceAction={(row) => (
+                          <Button kind="review_signal" row={row}>
+                            Record source review
                           </Button>
-                          <Button kind="task" row={opp}>
-                            Assign validation
-                          </Button>
-                          <Button kind="decision" row={opp}>
-                            Record decision
-                          </Button>
-                          <button onClick={() => setDetail(opp)}>
-                            Full hypothesis →
-                          </button>
-                          <button
-                            disabled={!writer || busy}
-                            onClick={() => void analyze(opp)}
-                          >
-                            AI draft assistance
-                          </button>
-                        </div>
-                        <div className={styles.scorecard}>
-                          {criteria.map(([key, label]) => {
-                            const e = evaluations(opp.id).find(
-                              (e) => e.criterion === key,
-                            );
-                            return (
-                              <div key={key}>
-                                <span>{label}</span>
-                                <b>
-                                  {e?.score ?? "Unknown"}
-                                  {e?.score != null ? " / 5" : ""}
-                                </b>
-                                <p>
-                                  {e?.rationale ||
-                                    "Missing information. This does not improve the score."}
-                                </p>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <p className={styles.small}>
-                          Higher scores indicate stronger evidence under the
-                          selected rubric, not predicted success. Regulatory
-                          manageability and capital efficiency: 5 means lower
-                          burden. Unknowns contribute zero and reduce
-                          confidence.
-                        </p>
-                        <div className={styles.cardActions}>
-                          <button
-                            disabled={!writer || role !== "admin"}
-                            onClick={() => open("weights")}
-                          >
-                            Configure weights
-                          </button>
-                        </div>
-                      </section>
+                        )}
+                        actions={{
+                          hypothesis: (
+                            <>
+                              <button onClick={() => setDetail(opp)}>
+                                Full hypothesis →
+                              </button>
+                              <button
+                                disabled={!writer || busy}
+                                onClick={() => void analyze(opp)}
+                              >
+                                AI draft assistance
+                              </button>
+                            </>
+                          ),
+                          evidence: (
+                            <Button kind="evidence" row={opp}>
+                              Link evidence
+                            </Button>
+                          ),
+                          evaluation: (
+                            <Button kind="evaluation" row={opp}>
+                              Evaluate scorecard
+                            </Button>
+                          ),
+                          weights: (
+                            <button
+                              disabled={!writer || role !== "admin" || busy}
+                              onClick={() => open("weights")}
+                            >
+                              Configure weights
+                            </button>
+                          ),
+                          experiment: (
+                            <Button kind="task" row={opp}>
+                              Assign validation
+                            </Button>
+                          ),
+                          decision: (
+                            <Button kind="decision" row={opp}>
+                              Record decision
+                            </Button>
+                          ),
+                        }}
+                      />
                     )}
                   </div>
                   {opp && (
@@ -1606,6 +1653,15 @@ export function Workspace({
                 </>
               ) : (
                 <>
+                  {form.kind === "opportunity" && !!form.row?.planning_case && (
+                    <p className={styles.notice}>
+                      Unvalidated planning case. Review the hypothesis and
+                      select relevant source-backed signals from this workspace.
+                      Template text does not establish demand, supplier
+                      authorization or regulatory eligibility. Saving creates a
+                      new hypothesis through the existing audited workflow.
+                    </p>
+                  )}
                   {form.kind === "supplier_stage" && (
                     <p className={styles.small}>
                       Qualified / Approved require all six human-reviewed gates,
@@ -1616,7 +1672,8 @@ export function Workspace({
                   )}
                   {forms().map((field) => {
                     let defaultValue =
-                      form.kind === "supplier"
+                      form.kind === "supplier" ||
+                      (form.kind === "opportunity" && form.row?.planning_case)
                         ? v(form.row, field.key)
                         : (field.value ?? "");
                     if (field.key === "owner_id") defaultValue = userId;

@@ -98,6 +98,8 @@ Font licenses are retained in `public/licenses/`.
 
 The Siona Evolution Engine is at `/workspace/intelligence` (invitation-only Supabase Auth plus active internal membership). See [setup and workflow](docs/evolution-engine.md) and [architecture/security](docs/evolution-engine-architecture.md). SQL migrations and explicit rollback scripts are under `supabase/`. The public Passport demonstration remains at `/platform`.
 
+The Opportunities view connects hypotheses, evidence, the existing nine-criterion scorecard, risks, experiments and decisions. See [opportunity validation Phase 1](docs/opportunity-validation-phase1.md) for the unvalidated device-information and supplier-direct Biologics cases, local preview and limits. This UI upgrade requires no migration and never creates starting-case records automatically.
+
 ## Practice and supply operations
 
 `/workspace/operations` adds practice onboarding, a supplier-linked catalog, state/channel eligibility reviews and business coordination requests to the same application and Supabase project. Open it from Evo's **Operations workspace** link. It needs the additional `202611100001_operations.sql` migration; do not repeat the installed Evo setup. See [activation, workflow, preview and limits](docs/operations.md). The interactive fictional rehearsal at `/workspace/operations/preview` is available only during development.

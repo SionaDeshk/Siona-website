@@ -587,6 +587,241 @@
 .opportunityList {
   padding: 0 15px 10px 0;
 }
+.planningCases {
+  border-top: 1px solid var(--line);
+  padding: 25px 0 30px;
+}
+.planningCaseGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.planningCaseGrid article {
+  padding: 22px;
+  border: 1px solid #36475b;
+  border-radius: 6px;
+  background: linear-gradient(130deg, #172331, #101720);
+}
+.planningCaseGrid h3 {
+  font-size: 19px;
+  font-weight: 500;
+  margin: 10px 0;
+}
+.planningCaseGrid p {
+  font-size: 12px;
+}
+.planningCaseGrid button {
+  font-size: 12px;
+  min-height: 44px;
+}
+.review {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+}
+.reviewHero {
+  padding: 28px;
+  background: linear-gradient(145deg, #182638, #101720 75%);
+}
+.reviewHero h2 {
+  font-size: clamp(25px, 2.6vw, 37px);
+  line-height: 1.2;
+  margin: 22px 0 16px;
+  font-weight: 400;
+}
+.reviewHero > p {
+  font-size: 12px;
+}
+.reviewMetrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 25px 0;
+}
+.reviewMetrics dt {
+  font-size: 11px;
+  color: #afc2d9;
+}
+.reviewMetrics dd {
+  font-size: 32px;
+  margin: 4px 0 0;
+  color: #cee5ff;
+}
+.reviewMetrics small {
+  font-size: 12px;
+  color: #afc2d9;
+}
+.reviewNext {
+  border-left: 2px solid #9bc6ef;
+  padding: 4px 0 4px 18px;
+  margin-top: 25px;
+}
+.reviewNext > span,
+.reviewNext > strong {
+  display: block;
+}
+.reviewNext p {
+  font-size: 12px;
+  margin-top: 9px;
+}
+.reviewNext button {
+  min-height: 44px;
+  font-size: 12px;
+}
+.reviewNav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 16px 24px;
+  background: #0c131e;
+  border-block: 1px solid var(--line);
+}
+.reviewNav a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 5px;
+  min-height: 44px;
+  font-size: 12px;
+  text-decoration: none;
+  border-radius: 3px;
+}
+.reviewNav a:hover {
+  background: #1b304d;
+}
+.reviewNav span {
+  font-size: 10px;
+  color: #a3b8cf;
+}
+.reviewSection {
+  padding: 28px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 20px;
+}
+.reviewSection:last-child {
+  border-bottom: 0;
+}
+.reviewSection:focus-visible {
+  outline: 2px solid #9acbff;
+  outline-offset: -3px;
+}
+.reviewSectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.reviewSectionHead h3 {
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin: 7px 0 0;
+}
+.reviewSectionHead .cardActions {
+  margin: 0;
+}
+.review .cardActions {
+  align-items: center;
+}
+.review .cardActions button,
+.review .cardActions a {
+  min-height: 44px;
+  font-size: 11px;
+}
+.review .cardActions a {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 5px;
+}
+.reviewFacts {
+  margin: 0;
+}
+.reviewFacts > div {
+  margin-bottom: 20px;
+}
+.reviewFacts dt {
+  font-size: 11px;
+  color: #b9d2ed;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.reviewFacts dd {
+  margin: 0;
+  color: #b3c3d6;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.reviewRecords > article {
+  padding: 21px 0;
+  border-top: 1px solid var(--line);
+}
+.reviewRecords > article:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.reviewRecords h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+.reviewRecords p {
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.reviewRecords strong {
+  color: #d9e6f6;
+  font-weight: 500;
+}
+.reviewInterpretation {
+  padding-left: 13px;
+  border-left: 2px solid #496a8b;
+}
+.reviewCaution {
+  border: 1px solid #786744;
+  background: #242115;
+  padding: 18px;
+  margin-bottom: 22px;
+  border-radius: 4px;
+}
+.reviewCaution strong {
+  color: #e9d3a8;
+  font-size: 12px;
+  font-weight: 500;
+}
+.reviewCaution p {
+  color: #dfd0b1;
+  font-size: 12px;
+  margin: 10px 0 0;
+  white-space: pre-wrap;
+}
+.review .scorecard {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.review .scorecard p {
+  font-size: 12px;
+}
+@media (max-width: 740px) {
+  .planningCaseGrid {
+    grid-template-columns: 1fr;
+  }
+  .reviewHero,
+  .reviewSection {
+    padding: 22px 18px;
+  }
+  .reviewNav {
+    padding: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .review .scorecard {
+    grid-template-columns: 1fr;
+  }
+}
 .scorecard {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

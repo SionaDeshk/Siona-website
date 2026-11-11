@@ -100,6 +100,8 @@ The Siona Evolution Engine is at `/workspace/intelligence` (invitation-only Supa
 
 The Opportunities view connects hypotheses, evidence, the existing nine-criterion scorecard, risks, experiments and decisions. See [opportunity validation Phase 1](docs/opportunity-validation-phase1.md) for the unvalidated device-information and supplier-direct Biologics cases, local preview and limits. This UI upgrade requires no migration and never creates starting-case records automatically.
 
+A small [device-information prototype](docs/device-information-prototype.md) is available at `/workspace/intelligence/preview/device-information` during development. It explains a knee system's main parts, one researched component identifier and the remaining evidence gaps, with a local-only comprehension check. It returns 404 in production.
+
 ## Practice and supply operations
 
 `/workspace/operations` adds practice onboarding, a supplier-linked catalog, state/channel eligibility reviews and business coordination requests to the same application and Supabase project. Open it from Evo's **Operations workspace** link. It needs the additional `202611100001_operations.sql` migration; do not repeat the installed Evo setup. See [activation, workflow, preview and limits](docs/operations.md). The interactive fictional rehearsal at `/workspace/operations/preview` is available only during development.

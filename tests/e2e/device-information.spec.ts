@@ -392,3 +392,85 @@ test("reduced motion turns the model one step without starting continuous spin",
   );
   expect((await canvas.screenshot()).equals(stopped)).toBe(true);
 });
+
+test("Persona guide separates family options, evidence and unconfirmed configuration", async ({
+  page,
+}) => {
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (!["GET", "HEAD"].includes(request.method())) writes.push(request.url());
+  });
+  await page.goto(path);
+  const guide = page.getByRole("region", {
+    name: "One family. Different choices.",
+  });
+  await expect(guide).toBeVisible();
+  await guide.getByRole("link", { name: "Materials", exact: true }).click();
+  await expect(page.locator("#persona-materials")).toBeFocused();
+  const femur = guide
+    .getByRole("article")
+    .filter({
+      has: page.getByRole("heading", { name: "Femoral options", exact: true }),
+    });
+  await femur
+    .getByText("Applicability & remaining gap", { exact: true })
+    .click();
+  await expect(femur).toContainText("exact materials remain unverified");
+  const iq = guide
+    .getByRole("article")
+    .filter({
+      has: page.getByRole("heading", { name: "Persona IQ", exact: true }),
+    });
+  const disclosure = iq.getByText("Claim, evidence & limits", { exact: true });
+  await disclosure.focus();
+  await page.keyboard.press("Enter");
+  await expect(iq).toContainText(
+    "not intended to support clinical decision-making",
+  );
+  await expect(iq).toContainText("not included in every Persona implant");
+  await expect(iq.getByRole("link")).toHaveAttribute(
+    "href",
+    "https://www.accessdata.fda.gov/cdrh_docs/pdf20/DEN200064.pdf",
+  );
+  await expect(guide).toContainText("whether any are included", {
+    ignoreCase: true,
+  });
+  await guide
+    .getByText("Study scope, funding & limitations", { exact: true })
+    .click();
+  await expect(guide).toContainText("Zimmer Biomet funding");
+  await guide
+    .getByText("Historical safety notice: scope matters", { exact: true })
+    .click();
+  await expect(guide).toContainText("not an assessment of our femoral example");
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("group", { name: "Choose manufacturer example" })
+    .getByRole("button", { name: /Stryker/ })
+    .click();
+  await expect(guide).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Persona options", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("region", { name: "Exact component identity" }),
+  ).toContainText("5510-F-401");
+  await page
+    .getByRole("group", { name: "Choose manufacturer example" })
+    .getByRole("button", { name: /Zimmer Biomet/ })
+    .click();
+  await expect(guide).toBeVisible();
+  await expect(iq.locator("details")).not.toHaveAttribute("open", "");
+  expect(writes.filter((url) => !url.includes("__nextjs"))).toEqual([]);
+});

@@ -5,7 +5,7 @@ import { AccessError, requireMember } from "@/lib/intelligence/auth";
 import { devicePreviewMode } from "@/lib/intelligence/device-preview";
 
 export const metadata: Metadata = {
-  title: "Knee replacement, explained — Siona Device Notes",
+  title: "Knee replacement, explained — Siona Device Guide",
 };
 
 export default async function DeviceInformationPreview() {

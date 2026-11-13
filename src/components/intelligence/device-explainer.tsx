@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { PersonaGuide } from "./persona-guide";
 import { KneeViewer } from "./knee-viewer";
 import { deviceProfiles } from "@/lib/intelligence/device-profiles";
 import styles from "./device-explainer.module.css";
@@ -205,7 +206,7 @@ export function DeviceExplainer({
     <main id="main" className={styles.root}>
       <header className={styles.header}>
         <Link href="/" className={styles.wordmark}>
-          SIONA<span>DEVICE NOTES</span>
+          SIONA<span>DEVICE GUIDE</span>
         </Link>
         <span className={styles.preview}>
           {hostedPreview
@@ -224,16 +225,18 @@ export function DeviceExplainer({
       </header>
       <div className={styles.page}>
         <section className={styles.hero}>
-          <p className={styles.eyebrow}>A CLOSER LOOK / KNEE REPLACEMENT</p>
+          <p className={styles.eyebrow}>
+            SIONA DEVICE INTELLIGENCE / KNEE REPLACEMENT
+          </p>
           <h1>
             Understand the parts.
             <br />
             <em>Know what to ask.</em>
           </h1>
           <p className={styles.intro}>
-            An implant name is a starting point. Understanding the individual
-            parts—and their exact identifiers—helps you ask more useful
-            questions.
+            Understand the device. Know your options. Ask better questions.
+            Start with the parts and identifiers, then explore the choices and
+            evidence behind the product name.
           </p>
           <div className={styles.context}>
             <span>Selected example · {profile.manufacturer}</span>
@@ -251,6 +254,9 @@ export function DeviceExplainer({
         >
           <a href="#device-parts">01 The parts</a>
           <a href="#device-identity">02 Exact identity</a>
+          {profile.id === "persona" && (
+            <a href="#persona-options">Persona options</a>
+          )}
           <a href="#device-comparison">03 Compare records</a>
           <a href="#device-evidence">04 Evidence gaps</a>
           <a href="#device-questions">05 Questions to ask</a>
@@ -463,6 +469,7 @@ export function DeviceExplainer({
           </div>
         </section>
 
+        {profile.id === "persona" && <PersonaGuide />}
         <section
           id="device-comparison"
           tabIndex={-1}
@@ -539,7 +546,7 @@ export function DeviceExplainer({
                     "Not completed",
                   ],
                   [
-                    "Applicable clinical outcomes",
+                    "Exact-model clinical applicability",
                     "Not yet reviewed",
                     "Not yet reviewed",
                   ],
@@ -706,8 +713,8 @@ export function DeviceExplainer({
             SIONA <em>The path is the way.</em>
           </strong>
           <p>
-            Private product-research prototype · Source gaps remain visible · No
-            suitability assessment or comparative rating.
+            Siona Group · Siona Device Intelligence · Private research preview ·
+            No suitability assessment or comparative rating.
           </p>
           <Link
             href={

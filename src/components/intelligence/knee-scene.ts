@@ -6,7 +6,11 @@ import {
   disposeKneeParts,
 } from "@/lib/intelligence/knee-geometry";
 
-export function mountKneeScene(host: HTMLElement, onContextLost: () => void) {
+export function mountKneeScene(
+  host: HTMLElement,
+  onContextLost: () => void,
+  onSpinChange: (spinning: boolean) => void,
+) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x000000, 0);
@@ -34,7 +38,95 @@ export function mountKneeScene(host: HTMLElement, onContextLost: () => void) {
     isolated = false,
     distance = 9;
   const draw = () => renderer.render(scene, camera);
+  let spinning = false,
+    frame = 0,
+    lastTime = 0;
+  const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const rotate = (angle: number) => {
+    const offset = camera.position.clone().sub(controls.target);
+    offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+    camera.position.copy(controls.target).add(offset);
+    controls.update();
+    draw();
+  };
+  const stopSpin = () => {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    if (spinning) {
+      spinning = false;
+      onSpinChange(false);
+    }
+  };
+  const animate = (time: number) => {
+    if (!spinning) return;
+    rotate(Math.min((time - lastTime) / 1000, 0.05) * 0.45);
+    lastTime = time;
+    frame = requestAnimationFrame(animate);
+  };
+  const toggleSpin = () => {
+    if (spinning) {
+      stopSpin();
+      return;
+    }
+    if (motion.matches) {
+      rotate(Math.PI / 8);
+      return;
+    }
+    if (document.hidden) return;
+    spinning = true;
+    onSpinChange(true);
+    lastTime = performance.now();
+    frame = requestAnimationFrame(animate);
+  };
+  let pointer: { id: number; x: number; y: number; moved: boolean } | null =
+    null;
+  const down = (event: PointerEvent) => {
+    if (pointer) {
+      pointer = null;
+      stopSpin();
+      return;
+    }
+    if (event.button === 0)
+      pointer = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        moved: false,
+      };
+  };
+  const move = (event: PointerEvent) => {
+    if (
+      pointer &&
+      pointer.id === event.pointerId &&
+      Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) > 5
+    ) {
+      pointer.moved = true;
+      stopSpin();
+    }
+  };
+  const up = (event: PointerEvent) => {
+    if (
+      pointer?.id === event.pointerId &&
+      !pointer.moved &&
+      Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) <= 5
+    )
+      toggleSpin();
+    pointer = null;
+  };
+  const cancel = () => {
+    pointer = null;
+  };
+  const visibility = () => {
+    if (document.hidden) stopSpin();
+  };
+  renderer.domElement.addEventListener("pointerdown", down);
+  renderer.domElement.addEventListener("pointermove", move);
+  renderer.domElement.addEventListener("pointerup", up);
+  renderer.domElement.addEventListener("pointercancel", cancel);
+  document.addEventListener("visibilitychange", visibility);
+  motion.addEventListener("change", stopSpin);
   const reset = () => {
+    stopSpin();
     distance = isolated ? 6.6 : 9;
     controls.target.set(0, isolated ? 0 : 0.25, 0);
     camera.position
@@ -46,6 +138,7 @@ export function mountKneeScene(host: HTMLElement, onContextLost: () => void) {
     draw();
   };
   const update = (index: number, only: boolean) => {
+    stopSpin();
     const changedMode = isolated !== only;
     selected = index;
     isolated = only;
@@ -78,17 +171,13 @@ export function mountKneeScene(host: HTMLElement, onContextLost: () => void) {
   return {
     update,
     reset,
+    toggleSpin,
     rotate: (direction: number) => {
-      const offset = camera.position.clone().sub(controls.target);
-      offset.applyAxisAngle(
-        new THREE.Vector3(0, 1, 0),
-        (direction * Math.PI) / 8,
-      );
-      camera.position.copy(controls.target).add(offset);
-      controls.update();
-      draw();
+      stopSpin();
+      rotate((direction * Math.PI) / 8);
     },
     zoom: (factor: number) => {
+      stopSpin();
       distance = THREE.MathUtils.clamp(
         camera.position.distanceTo(controls.target) * factor,
         4.5,
@@ -123,6 +212,14 @@ export function mountKneeScene(host: HTMLElement, onContextLost: () => void) {
       }
     },
     dispose: () => {
+      cancelAnimationFrame(frame);
+      spinning = false;
+      renderer.domElement.removeEventListener("pointerdown", down);
+      renderer.domElement.removeEventListener("pointermove", move);
+      renderer.domElement.removeEventListener("pointerup", up);
+      renderer.domElement.removeEventListener("pointercancel", cancel);
+      document.removeEventListener("visibilitychange", visibility);
+      motion.removeEventListener("change", stopSpin);
       observer.disconnect();
       controls.removeEventListener("change", draw);
       controls.dispose();

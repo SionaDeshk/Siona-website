@@ -15,6 +15,7 @@ export function KneeViewer({
 }) {
   const [enabled, setEnabled] = useState(false);
   const [ready, setReady] = useState(false);
+  const [spinning, setSpinning] = useState(false);
   const [failed, setFailed] = useState(false);
   const [isolated, setIsolated] = useState(true);
   const [exportState, setExportState] = useState("");
@@ -27,10 +28,15 @@ export function KneeViewer({
     import("./knee-scene")
       .then(({ mountKneeScene }) => {
         if (cancelled || !host.current) return;
-        scene.current = mountKneeScene(host.current, () => {
-          setFailed(true);
-          setReady(false);
-        });
+        scene.current = mountKneeScene(
+          host.current,
+          () => {
+            setFailed(true);
+            setReady(false);
+            setSpinning(false);
+          },
+          setSpinning,
+        );
         setReady(true);
       })
       .catch(() => {
@@ -60,6 +66,7 @@ export function KneeViewer({
         <button
           aria-pressed={!enabled}
           onClick={() => {
+            setSpinning(false);
             setEnabled(false);
             setReady(false);
             setExportState("");
@@ -96,6 +103,13 @@ export function KneeViewer({
             role="group"
             aria-label="3D model controls"
           >
+            <button
+              disabled={!ready}
+              aria-pressed={spinning}
+              onClick={() => scene.current?.toggleSpin()}
+            >
+              {spinning ? "Pause spin" : "Spin model"}
+            </button>
             <button disabled={!ready} onClick={() => setIsolated(!isolated)}>
               {isolated ? "Show all parts" : "Isolate selected part"}
             </button>
@@ -124,8 +138,8 @@ export function KneeViewer({
             </button>
           </div>
           <p className={styles.help}>
-            Drag to rotate, or use the buttons. Choose a component to inspect
-            it. No automatic motion.
+            Click or tap the model to start or pause its spin. Drag to rotate.
+            With reduced motion enabled, each click turns the model one step.
           </p>
           <button
             className={styles.download}

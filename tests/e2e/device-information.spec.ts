@@ -215,6 +215,37 @@ test.describe("interactive knee illustrations", () => {
       page.getByRole("button", { name: "Reset view", exact: true }),
     ).toBeEnabled({ timeout: 20000 });
     await expect(page.locator("canvas")).toBeVisible();
+    const canvas = page.locator("canvas");
+    await canvas.click();
+    await expect(
+      page.getByRole("button", { name: "Pause spin", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    const firstFrame = await canvas.screenshot();
+    await expect
+      .poll(async () => !(await canvas.screenshot()).equals(firstFrame))
+      .toBe(true);
+    await canvas.click();
+    await expect(
+      page.getByRole("button", { name: "Spin model", exact: true }),
+    ).toHaveAttribute("aria-pressed", "false");
+    await page.getByRole("button", { name: "Spin model", exact: true }).focus();
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("button", { name: "Pause spin", exact: true }),
+    ).toBeVisible();
+    const box = await canvas.boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(
+      box!.x + box!.width / 2 + 40,
+      box!.y + box!.height / 2,
+      { steps: 4 },
+    );
+    await page.mouse.up();
+    await expect(
+      page.getByRole("button", { name: "Spin model", exact: true }),
+    ).toBeVisible();
+
     await page.getByRole("button", { name: "Rotate model right" }).focus();
     await page.keyboard.press("Enter");
     await page.getByRole("button", { name: "Zoom in", exact: true }).click();
@@ -330,4 +361,34 @@ test.describe("interactive knee illustrations", () => {
       page.getByRole("region", { name: "Selected component" }),
     ).toContainText("No exact bearing model");
   });
+});
+
+test("reduced motion turns the model one step without starting continuous spin", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(path);
+  await page
+    .getByRole("button", { name: "Explore in 3D", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Reset view", exact: true }),
+  ).toBeEnabled({ timeout: 20000 });
+  const canvas = page.locator("canvas");
+  const before = await canvas.screenshot();
+  await canvas.click();
+  await expect(
+    page.getByRole("button", { name: "Spin model", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await expect
+    .poll(async () => !(await canvas.screenshot()).equals(before))
+    .toBe(true);
+  const stopped = await canvas.screenshot();
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+  expect((await canvas.screenshot()).equals(stopped)).toBe(true);
 });

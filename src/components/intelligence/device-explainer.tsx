@@ -193,7 +193,11 @@ function KneeDiagram({ selected }: { selected: number }) {
   );
 }
 
-export function DeviceExplainer() {
+export function DeviceExplainer({
+  hostedPreview = false,
+}: {
+  hostedPreview?: boolean;
+}) {
   const [selected, setSelected] = useState(0);
   const [answer, setAnswer] = useState("");
   const part = parts[selected];
@@ -204,9 +208,17 @@ export function DeviceExplainer() {
           SIONA<span>DEVICE NOTES</span>
         </Link>
         <span className={styles.preview}>
-          DEVELOPMENT PREVIEW · NOT PUBLISHED
+          {hostedPreview
+            ? "PROTECTED PREVIEW · NOT PRODUCTION"
+            : "DEVELOPMENT PREVIEW · NOT PUBLISHED"}
         </span>
-        <Link href="/workspace/intelligence/preview">
+        <Link
+          href={
+            hostedPreview
+              ? "/workspace/intelligence"
+              : "/workspace/intelligence/preview"
+          }
+        >
           Back to Evo <span aria-hidden="true">→</span>
         </Link>
       </header>
@@ -493,7 +505,13 @@ export function DeviceExplainer() {
             Private product-research prototype · Source gaps remain visible · No
             suitability assessment or comparative rating.
           </p>
-          <Link href="/workspace/intelligence/preview">
+          <Link
+            href={
+              hostedPreview
+                ? "/workspace/intelligence"
+                : "/workspace/intelligence/preview"
+            }
+          >
             Return to the Evo workspace →
           </Link>
         </footer>

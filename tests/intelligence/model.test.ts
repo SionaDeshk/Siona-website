@@ -15,6 +15,58 @@ import {
   planningCaseRow,
 } from "../../src/lib/intelligence/planning-cases";
 import { previewData } from "../../src/lib/intelligence/demo";
+import {
+  devicePreviewMode,
+  isDevicePreviewDestination,
+  devicePreviewPath,
+} from "../../src/lib/intelligence/device-preview";
+
+test("device prototype requires the protected gate on hosted previews and is disabled on Production", () => {
+  assert.equal(devicePreviewMode("development", undefined), "development");
+  assert.equal(devicePreviewMode("production", "preview"), "protected");
+  for (const [nodeEnv, vercelEnv] of [
+    ["production", "production"],
+    ["development", "production"],
+    ["production", undefined],
+    ["production", "development"],
+    [undefined, "preview"],
+    ["test", "preview"],
+  ]) {
+    assert.equal(devicePreviewMode(nodeEnv, vercelEnv), "disabled");
+  }
+});
+
+test("preview login uses one fixed destination and rejects arbitrary redirects", () => {
+  assert.equal(
+    devicePreviewPath,
+    "/workspace/intelligence/preview/device-information",
+  );
+  assert.equal(
+    isDevicePreviewDestination("device-preview", "production", "preview"),
+    true,
+  );
+  for (const destination of [
+    null,
+    "",
+    "practice",
+    "https://example.com",
+    "//example.com",
+    "/workspace/intelligence/preview/device-information",
+  ]) {
+    assert.equal(
+      isDevicePreviewDestination(destination, "production", "preview"),
+      false,
+    );
+  }
+  assert.equal(
+    isDevicePreviewDestination("device-preview", "production", "production"),
+    false,
+  );
+  assert.equal(
+    isDevicePreviewDestination("device-preview", "production", undefined),
+    false,
+  );
+});
 const weights = criteria.map(([criterion]) => ({ criterion, weight: 10 }));
 test("planning cases use existing opportunity validation and never assume evidence, scores or decisions", () => {
   for (const item of planningCases) {

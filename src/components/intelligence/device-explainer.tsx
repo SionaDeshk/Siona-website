@@ -257,7 +257,7 @@ export function DeviceExplainer({
           {profile.id === "persona" && (
             <a href="#persona-options">Persona options</a>
           )}
-          <a href="#device-comparison">03 Compare records</a>
+          <a href="#device-comparison">03 Compare options</a>
           <a href="#device-evidence">04 Evidence gaps</a>
           <a href="#device-questions">05 Questions to ask</a>
         </nav>
@@ -480,12 +480,15 @@ export function DeviceExplainer({
             <p className={styles.eyebrow}>03 / COMPARE RECORDS</p>
             <h2 id="comparison-heading">A consistent view of the evidence.</h2>
             <p>
-              Compare identifiers and source coverage. Clinical performance has
-              not been compared, and size numbers are manufacturer-specific.
+              Explore manufacturer-described family features, then check the
+              individual research records. Family options are not confirmed for
+              every component. Clinical performance has not been compared, and
+              sizes are manufacturer-specific.
             </p>
           </div>
           <p className={styles.scrollHint}>
-            Scroll the table horizontally on smaller screens.
+            Each product has its own column. Swipe horizontally on smaller
+            screens; the field labels stay in view.
           </p>
           <div
             className={styles.comparisonScroll}
@@ -495,22 +498,40 @@ export function DeviceExplainer({
           >
             <table className={styles.comparisonTable}>
               <caption>
-                Two researched femoral-component examples — identity and
-                evidence coverage
+                Family features and two femoral research records — scope labeled
+                by row
               </caption>
               <thead>
                 <tr>
                   <th scope="col">Field</th>
                   {deviceProfiles.map((item) => (
                     <th scope="col" key={item.id}>
-                      {item.manufacturer}
+                      <small>
+                        {item.id === "persona"
+                          ? "01 / ZIMMER BIOMET"
+                          : "02 / STRYKER"}
+                      </small>
                       <span>{item.family}</span>
+                      <p className={styles.comparisonModel}>{item.model}</p>
+                      <p className={styles.comparisonScope}>
+                        One femoral-component record
+                      </p>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {[
+                  [
+                    "Design approach · manufacturer description",
+                    "Multiple sizes and profiles aim to match anatomy; several bearing strategies are offered.",
+                    "A single-radius design aims to support natural-like circular motion.",
+                  ],
+                  [
+                    "Fixation · family options",
+                    "Cemented and cementless options. Exact-component instructions still need review.",
+                    "Cemented and cementless options. Exact-component instructions still need review.",
+                  ],
                   [
                     "Listed company",
                     ...deviceProfiles.map((item) => item.labeler),
@@ -536,6 +557,11 @@ export function DeviceExplainer({
                     ...deviceProfiles.map((item) => item.regulatoryStatus),
                   ],
                   [
+                    "Implanted sensing · family context",
+                    "Persona IQ is a separate sensor-stem option; it is not established for this femoral example.",
+                    "Not assessed here. This does not establish that sensing options are absent.",
+                  ],
+                  [
                     "Current labeling / exact materials",
                     "Not yet verified",
                     "Not yet verified",
@@ -559,6 +585,16 @@ export function DeviceExplainer({
                   </tr>
                 ))}
                 <tr>
+                  <th scope="row">Family-feature sources</th>
+                  {deviceProfiles.map((item) => (
+                    <td key={item.id}>
+                      <Source href={item.manufacturerUrl}>
+                        {item.family} manufacturer overview
+                      </Source>
+                    </td>
+                  ))}
+                </tr>
+                <tr>
                   <th scope="row">Original identity source</th>
                   {deviceProfiles.map((item) => (
                     <td key={item.id}>
@@ -571,6 +607,14 @@ export function DeviceExplainer({
               </tbody>
             </table>
           </div>
+          {profile.id === "persona" && (
+            <p className={styles.comparisonFootnote}>
+              <a href="#persona-iq-feature">
+                Explore the Persona IQ sensor, movement metrics and data pathway
+                →
+              </a>
+            </p>
+          )}
         </section>
         <section
           id="device-evidence"

@@ -748,3 +748,111 @@
     gap: 4px 20px;
   }
 }
+/* Product lanes keep adjacent values visually distinct while retaining table semantics. */
+.comparisonScroll {
+  max-height: 720px;
+  border: 0;
+  border-radius: 0;
+}
+.comparisonTable {
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #f6f4ec;
+  table-layout: fixed;
+}
+.comparisonTable caption {
+  background: transparent;
+  padding-left: 0;
+}
+.comparisonTable th,
+.comparisonTable td {
+  width: 36%;
+  padding: 20px 24px;
+  border-bottom: 1px solid #c6d1c0;
+  border-left: 12px solid #f6f4ec;
+  line-height: 1.7;
+}
+.comparisonTable th:first-child {
+  width: 28%;
+  border-left: 0;
+  background: #f6f4ec;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding-left: 0;
+  padding-right: 20px;
+}
+.comparisonTable td:nth-child(2) {
+  background: #fdfcf6;
+}
+.comparisonTable td:nth-child(3) {
+  background: #e8eee2;
+}
+.comparisonTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 3px solid #78927a;
+}
+.comparisonTable thead th:first-child {
+  z-index: 3;
+  vertical-align: bottom;
+}
+.comparisonTable thead th:nth-child(2) {
+  background: #294d3e;
+  color: #fffdf4;
+  border-bottom-color: #294d3e;
+}
+.comparisonTable thead th:nth-child(3) {
+  background: #dce6d5;
+  color: #243e35;
+  border-bottom-color: #79916f;
+}
+.comparisonTable thead small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  margin-bottom: 12px;
+}
+.comparisonTable thead span {
+  font-size: 30px;
+  line-height: 1.2;
+}
+.comparisonModel {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  margin-top: 14px !important;
+  overflow-wrap: anywhere;
+}
+.comparisonScope {
+  font-size: 11px;
+  margin-top: 6px !important;
+  font-weight: 400;
+}
+.comparisonFootnote a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 16px;
+  font-size: 12px;
+}
+@media (max-width: 640px) {
+  .comparisonTable {
+    width: calc(200% - 120px);
+    min-width: 0;
+  }
+  .comparisonTable th,
+  .comparisonTable td {
+    width: calc((100% - 120px) / 2);
+    padding: 16px;
+    border-left-width: 9px;
+  }
+  .comparisonTable th:first-child {
+    width: 120px;
+    font-size: 11px;
+  }
+  .comparisonScroll {
+    max-height: 640px;
+  }
+}

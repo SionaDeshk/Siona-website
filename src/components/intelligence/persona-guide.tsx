@@ -5,6 +5,13 @@ const professional =
 const consumer =
   "https://www.thepersonalizedknee.com/en/personalized-knee-system/overview.html";
 const titanium = "https://www.accessdata.fda.gov/cdrh_docs/pdf19/K193223.pdf";
+const iqProfessional =
+  "https://www.zimmerbiomet.com/en/products-and-solutions/specialties/knee/persona-iq.html";
+const iqPatient =
+  "https://www.zimmerbiomet.com/en/patients-caregivers/knee-replacement-implants-technologies/Persona-IQ-smart-knee.html";
+const iqShort = "https://www.accessdata.fda.gov/cdrh_docs/pdf23/K234056.pdf";
+const iqTechnique =
+  "https://www.zimmerbiomet.com/content/dam/zb-corporate/en/education-resources/surgical-techniques/specialties/knee/persona-iq/K05-STB-300005%20Rev.%20A%20CSE%20Surgical%20Technique.pdf";
 const iq = "https://www.accessdata.fda.gov/cdrh_docs/pdf20/DEN200064.pdf";
 const trial = "https://pmc.ncbi.nlm.nih.gov/articles/PMC11862213/";
 
@@ -104,7 +111,7 @@ const technologies = [
     evidence:
       "FDA’s 2021 Canary/CHIRP authorization describes movement data as adjunct information. It states those data are not intended to support clinical decision-making and have not demonstrated clinical benefit.",
     limitation:
-      "The original indication concerned cemented knee replacement with at least a 58 mm tibial stem extension. Check current exact-system labeling; this is not included in every Persona implant.",
+      "Different sensor-stem versions have different indications: the original Canturio Tibial Extension refers to at least 58 mm; the later Canturio Smart Extension to at least 30 mm. Confirm the proposed version and current labeling. This is not included in every Persona implant.",
     question:
       "Is a sensor actually proposed, why is it appropriate, and what happens to the data and long-term support?",
     href: iq,
@@ -154,11 +161,196 @@ export function PersonaGuide() {
         </p>
       </div>
       <nav className={styles.links} aria-label="Persona guide topics">
+        <a href="#persona-iq-feature">The smart implant</a>
         <a href="#persona-configuration">Configuration</a>
         <a href="#persona-materials">Materials</a>
         <a href="#persona-technology">Supporting technology</a>
         <a href="#persona-findings">Claims & evidence</a>
       </nav>
+      <section
+        id="persona-iq-feature"
+        tabIndex={-1}
+        aria-labelledby="iq-feature-heading"
+        className={styles.smartFeature}
+      >
+        <div className={styles.smartIntro}>
+          <div>
+            <p className={styles.eyebrow}>FEATURE SPOTLIGHT / PERSONA IQ</p>
+            <h3 id="iq-feature-heading">The chip is in the sensor stem.</h3>
+            <p>
+              Zimmer Biomet describes Persona IQ as a Persona knee combined with
+              a sensor-equipped stem beneath the tibial tray. It is a specific
+              smart-implant option, not a chip in every Persona knee or in our
+              identified femoral example.
+            </p>
+            <p className={styles.purpose}>
+              <strong>Why it matters:</strong> the manufacturer’s aim is to give
+              patients and care teams a view of movement trends between visits.
+            </p>
+            <Source href={iqPatient}>
+              Explore Zimmer Biomet’s Persona IQ patient page
+            </Source>
+          </div>
+          <figure className={styles.sensorFigure}>
+            <svg
+              viewBox="0 0 320 250"
+              role="img"
+              aria-labelledby="sensor-title sensor-desc"
+            >
+              <title id="sensor-title">
+                Illustrative location of the sensor stem
+              </title>
+              <desc id="sensor-desc">
+                A schematic tibial tray with a stem beneath it. A highlighted
+                area represents the stem’s sensing electronics. This is not a
+                manufacturer drawing or a representation of the existing 3D
+                model.
+              </desc>
+              <path
+                d="M38 65Q80 35 153 51Q220 34 271 64L269 87Q210 105 155 91Q92 105 41 87Z"
+                fill="#9ab4a7"
+                stroke="#355a48"
+                strokeWidth="2"
+              />
+              <path d="M131 96H175L170 207Q153 225 136 207Z" fill="#426d58" />
+              <rect
+                x="141"
+                y="126"
+                width="24"
+                height="49"
+                rx="6"
+                fill="#dac38d"
+              />
+              <path
+                d="M166 151H221L239 126"
+                fill="none"
+                stroke="#6a582e"
+                strokeWidth="2"
+              />
+              <text x="211" y="115" fill="#35513f" fontSize="12">
+                Sensor stem
+              </text>
+              <path d="M175 48L192 25H260" fill="none" stroke="#35513f" />
+              <text x="205" y="20" fill="#35513f" fontSize="12">
+                Tibial tray
+              </text>
+            </svg>
+            <figcaption>
+              Illustrative location only · not exact geometry, scale or
+              component compatibility.
+            </figcaption>
+          </figure>
+        </div>
+        <div
+          className={styles.metrics}
+          role="group"
+          aria-label="Manufacturer-described Persona IQ movement metrics"
+        >
+          {[
+            "Qualified step count",
+            "Walking speed",
+            "Cadence",
+            "Stride length",
+            "Distance traveled",
+            "Functional range of motion",
+          ].map((metric) => (
+            <div key={metric}>
+              <span aria-hidden="true">→</span>
+              <strong>{metric}</strong>
+            </div>
+          ))}
+        </div>
+        <p className={styles.metricNote}>
+          Manufacturer-described metrics. Qualified steps refer to the device’s
+          sampling criteria; they should not be assumed to equal every step
+          counted by a watch. The patient page states that the implant does not
+          track GPS location.
+        </p>
+        <h4>From the implant to a conversation.</h4>
+        <ol className={styles.dataFlow}>
+          <li>
+            <span>01 / IMPLANT</span>
+            <strong>Collect movement</strong>
+            <p>The sensor stem records activity and motion data.</p>
+          </li>
+          <li>
+            <span>02 / HOME BASE STATION</span>
+            <strong>Transfer overnight</strong>
+            <p>A home receiver sends the data online.</p>
+          </li>
+          <li>
+            <span>03 / MYMOBILITY</span>
+            <strong>Review the trends</strong>
+            <p>Patients and care teams can view the information.</p>
+          </li>
+        </ol>
+        <div className={styles.smartTradeoffs}>
+          <div>
+            <span className={styles.label}>
+              PRACTICAL VALUE / MANUFACTURER PURPOSE
+            </span>
+            <h4>More visibility between appointments.</h4>
+            <p>
+              Movement trends can give you something concrete to discuss with
+              your provider. They complement questions about pain, function and
+              recovery goals.
+            </p>
+            <Source href={iqProfessional}>
+              Read the professional system overview
+            </Source>
+          </div>
+          <div>
+            <span className={styles.label}>UNDERSTAND THE COMMITMENT</span>
+            <h4>A connected implant needs a care workflow.</h4>
+            <p>
+              Confirm home connectivity, who reviews data, response times, costs
+              and long-term support. The patient FAQ describes care-team and
+              authorized administrator access; ask how your data are shared.
+            </p>
+            <Source href={iqPatient}>Read the patient FAQs</Source>
+          </div>
+        </div>
+        <details className={styles.versionNote}>
+          <summary>Which stem version and labeling apply?</summary>
+          <p>
+            <strong>Version matters:</strong> the original Canturio Tibial
+            Extension authorization (2021) refers to patients normally indicated
+            for at least a 58 mm stem extension. FDA K234056, cleared April 24,
+            2024, covers the later Canturio Smart Extension for cemented knee
+            replacement normally indicated for at least a 30 mm stem extension.
+            The manufacturer’s CSE surgical-technique document matches the
+            shorter version. Ask your provider which version is proposed and
+            why.
+          </p>
+          <Source href={iqShort}>
+            FDA K234056 · shorter smart extension · April 24, 2024
+          </Source>
+          <Source href={iqTechnique}>
+            Manufacturer CSE surgical technique · revision A
+          </Source>
+          <p>
+            The patient FAQ also asks people to inform providers about the smart
+            implant before medical procedures. Discuss applicable MRI
+            conditions, procedure restrictions, battery/service life and support
+            with the care team using the exact-system instructions.
+          </p>
+          <Source href={iqProfessional}>
+            Compare the manufacturer’s headline and indications
+          </Source>
+        </details>
+        <p className={styles.regulatoryBoundary}>
+          <strong>Keep the purpose clear:</strong> the professional page states
+          that the movement data are not intended to support clinical
+          decision-making and have not demonstrated clinical benefit. Ask your
+          provider how this information fits into follow-up visits and
+          conversations about symptoms and recovery goals.
+        </p>
+        <p className={styles.metricNote}>
+          Sources checked November 12, 2026 · manufacturer descriptions and
+          stated labeling limitations · no sensor has been selected for this
+          research example.
+        </p>
+      </section>
       <div id="persona-configuration" tabIndex={-1} className={styles.block}>
         <h3>Start with the configuration.</h3>
         <p className={styles.intro}>

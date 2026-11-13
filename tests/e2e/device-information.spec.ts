@@ -405,22 +405,80 @@ test("Persona guide separates family options, evidence and unconfirmed configura
     name: "One family. Different choices.",
   });
   await expect(guide).toBeVisible();
+  const sensor = page.getByRole("region", {
+    name: "The chip is in the sensor stem.",
+  });
+  await expect(sensor).toContainText(
+    "sensor-equipped stem beneath the tibial tray",
+  );
+  await expect(
+    sensor.getByLabel("Manufacturer-described Persona IQ movement metrics"),
+  ).toContainText("Cadence");
+  await expect(sensor).toContainText("Home Base Station", { ignoreCase: true });
+  await expect(sensor).toContainText("does not track GPS location");
+  await sensor
+    .getByText("Which stem version and labeling apply?", { exact: true })
+    .click();
+  await expect(sensor).toContainText("30 mm stem");
+  await expect(sensor).toContainText("58 mm");
+  await expect(sensor).toContainText("cleared April 24, 2024");
+  await expect(
+    sensor.getByRole("link", { name: /FDA K234056/ }),
+  ).toHaveAttribute(
+    "href",
+    "https://www.accessdata.fda.gov/cdrh_docs/pdf23/K234056.pdf",
+  );
+  await expect(
+    sensor.getByRole("link", { name: /Read the patient FAQs/ }),
+  ).toHaveAttribute(
+    "href",
+    "https://www.zimmerbiomet.com/en/patients-caregivers/knee-replacement-implants-technologies/Persona-IQ-smart-knee.html",
+  );
+  const comparison = page.getByRole("region", {
+    name: "Manufacturer record comparison",
+  });
+  const productCells = comparison
+    .getByRole("row", { name: /Listed company/ })
+    .locator("td");
+  const lanes = await productCells.evaluateAll((cells) =>
+    cells.map((cell) => ({
+      color: getComputedStyle(cell).backgroundColor,
+      gutter: parseFloat(getComputedStyle(cell).borderLeftWidth),
+      width: cell.getBoundingClientRect().width,
+    })),
+  );
+  expect(lanes[0].color).not.toBe(lanes[1].color);
+  expect(lanes.every((lane) => lane.gutter >= 8)).toBe(true);
+  const field = comparison
+    .getByRole("row", { name: /Listed company/ })
+    .getByRole("rowheader");
+  await comparison.scrollIntoViewIfNeeded();
+  if ((page.viewportSize()?.width ?? 1000) < 640) {
+    expect(
+      (await field.boundingBox())!.width + lanes[0].width,
+    ).toBeLessThanOrEqual(
+      (await comparison.evaluate((element) => element.clientWidth)) + 1,
+    );
+  }
+  const beforeX = (await field.boundingBox())!.x;
+  await comparison.evaluate((element) => {
+    element.scrollLeft = 180;
+    element.scrollTop = 160;
+  });
+  expect(Math.abs((await field.boundingBox())!.x - beforeX)).toBeLessThan(2);
+
   await guide.getByRole("link", { name: "Materials", exact: true }).click();
   await expect(page.locator("#persona-materials")).toBeFocused();
-  const femur = guide
-    .getByRole("article")
-    .filter({
-      has: page.getByRole("heading", { name: "Femoral options", exact: true }),
-    });
+  const femur = guide.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Femoral options", exact: true }),
+  });
   await femur
     .getByText("Applicability & remaining gap", { exact: true })
     .click();
   await expect(femur).toContainText("exact materials remain unverified");
-  const iq = guide
-    .getByRole("article")
-    .filter({
-      has: page.getByRole("heading", { name: "Persona IQ", exact: true }),
-    });
+  const iq = guide.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Persona IQ", exact: true }),
+  });
   const disclosure = iq.getByText("Claim, evidence & limits", { exact: true });
   await disclosure.focus();
   await page.keyboard.press("Enter");

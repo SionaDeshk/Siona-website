@@ -1,0 +1,79 @@
+.viewer {
+  min-width: 0;
+}
+.topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #526456;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 8px 0 16px;
+}
+.toggle {
+  display: flex;
+  gap: 8px;
+}
+.viewer button {
+  font: inherit;
+  font-size: 12px;
+  min-height: 44px;
+  border: 1px solid #acbeac;
+  border-radius: 4px;
+  background: #f8f8f0;
+  color: #294d3e;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+.viewer button:hover {
+  background: #e0e8d9;
+}
+.viewer button[aria-pressed="true"] {
+  background: #294d3e;
+  color: #fffdf4;
+}
+.viewer button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.stage {
+  width: 100%;
+  height: clamp(300px, 36vw, 440px);
+  cursor: grab;
+}
+.stage:active {
+  cursor: grabbing;
+}
+.stage canvas {
+  display: block;
+  max-width: 100%;
+}
+.current {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 14px !important;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.help,
+.caveat {
+  color: #526456;
+  font-size: 11px;
+  line-height: 1.7;
+  margin: 14px 0 !important;
+}
+.caveat {
+  border-top: 1px solid #bbc9b6;
+  padding-top: 16px;
+}
+.download {
+  margin-top: 2px;
+}
+@media (max-width: 640px) {
+  .stage {
+    height: 340px;
+  }
+}

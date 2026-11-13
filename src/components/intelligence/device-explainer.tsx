@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { KneeViewer } from "./knee-viewer";
 import { deviceProfiles } from "@/lib/intelligence/device-profiles";
 import styles from "./device-explainer.module.css";
 
@@ -307,7 +308,10 @@ export function DeviceExplainer({
           </div>
           <div className={styles.exploreGrid}>
             <figure className={styles.figure}>
-              <KneeDiagram selected={selected} />
+              <KneeViewer
+                selected={selected}
+                fallback={<KneeDiagram selected={selected} />}
+              />
               <figcaption>
                 Illustrative exploded view, not an exact device drawing or
                 verified assembly. Some replacements also include a patellar

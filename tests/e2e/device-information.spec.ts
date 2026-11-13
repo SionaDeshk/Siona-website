@@ -1,6 +1,13 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+test.use({
+  launchOptions: {
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+    args: ["--enable-unsafe-swiftshader"],
+  },
+});
+
 const path = "/workspace/intelligence/preview/device-information";
 
 test("device explainer connects parts to exact identity and preserves evidence gaps without writes", async ({
@@ -183,4 +190,144 @@ test("device explainer switches exact manufacturer records without inherited cle
     .getByRole("link", { name: /Questions to ask/ })
     .click();
   await expect(page.locator("#device-questions")).toBeFocused();
+});
+
+test.describe("interactive knee illustrations", () => {
+  test("each part rotates, isolates and exports a real GLB without server writes", async ({
+    page,
+  }) => {
+    const errors: string[] = [],
+      writes: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("request", (request) => {
+      if (!["GET", "HEAD"].includes(request.method()))
+        writes.push(request.url());
+    });
+    await page.goto(path);
+    await expect(
+      page.getByRole("img", { name: "Three main parts of a knee replacement" }),
+    ).toBeVisible();
+    await expect(page.locator("canvas")).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Explore in 3D", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Reset view", exact: true }),
+    ).toBeEnabled({ timeout: 20000 });
+    await expect(page.locator("canvas")).toBeVisible();
+    await page.getByRole("button", { name: "Rotate model right" }).focus();
+    await page.keyboard.press("Enter");
+    await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+    await page.getByRole("button", { name: "Reset view", exact: true }).click();
+    for (const [name, slug] of [
+      ["Femoral component", "femoral"],
+      ["Bearing insert", "bearing"],
+      ["Tibial baseplate", "tibial"],
+    ]) {
+      await page
+        .getByRole("group", { name: "Explore knee components" })
+        .getByRole("button", { name: new RegExp(name) })
+        .click();
+      await expect(
+        page.getByRole("img", { name: new RegExp(`^${name}, simplified 3D`) }),
+      ).toBeVisible();
+      const downloadEvent = page.waitForEvent("download");
+      await page
+        .getByRole("button", {
+          name: new RegExp(`^Download ${name.toLowerCase()}`),
+        })
+        .click();
+      const download = await downloadEvent;
+      expect(download.suggestedFilename()).toBe(
+        `siona-illustrative-${slug}.glb`,
+      );
+      const stream = await download.createReadStream();
+      const chunks: Buffer[] = [];
+      for await (const chunk of stream!) chunks.push(Buffer.from(chunk));
+      const glb = Buffer.concat(chunks);
+      expect(glb.subarray(0, 4).toString()).toBe("glTF");
+      expect(glb.readUInt32LE(4)).toBe(2);
+      expect(glb.readUInt32LE(8)).toBe(glb.length);
+      const json = JSON.parse(
+        glb.subarray(20, 20 + glb.readUInt32LE(12)).toString(),
+      );
+      expect(json.meshes.length).toBeGreaterThan(0);
+      expect(
+        json.nodes.some(
+          (node: { extras?: { educationalIllustration?: boolean } }) =>
+            node.extras?.educationalIllustration,
+        ),
+      ).toBe(true);
+    }
+    await page
+      .getByRole("button", { name: "Show all parts", exact: true })
+      .click();
+    await expect(
+      page.getByRole("img", { name: /^Exploded three-component/ }),
+    ).toBeVisible();
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.getByRole("button", { name: "2D diagram", exact: true }).click();
+    await expect(page.locator("canvas")).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Explore in 3D", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Reset view", exact: true }),
+    ).toBeEnabled({ timeout: 20000 });
+    await page
+      .locator("canvas")
+      .evaluate((canvas) =>
+        canvas.dispatchEvent(
+          new Event("webglcontextlost", { cancelable: true }),
+        ),
+      );
+    await expect(
+      page.getByText("3D is unavailable in this browser.", { exact: false }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("img", { name: "Three main parts of a knee replacement" }),
+    ).toBeVisible();
+    expect(errors).toEqual([]);
+    expect(writes.filter((url) => !url.includes("__nextjs"))).toEqual([]);
+  });
+
+  test("unsupported WebGL retains the schematic and component explanations", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (
+        this: HTMLCanvasElement,
+        ...args: Parameters<typeof original>
+      ) {
+        if (String(args[0]).startsWith("webgl")) return null;
+        return original.apply(this, args);
+      } as typeof original;
+    });
+    await page.goto(path);
+    await page
+      .getByRole("button", { name: "Explore in 3D", exact: true })
+      .click();
+    await expect(
+      page.getByText("3D is unavailable in this browser.", { exact: false }),
+    ).toBeVisible();
+    await page
+      .getByRole("group", { name: "Explore knee components" })
+      .getByRole("button", { name: /Bearing insert/ })
+      .click();
+    await expect(
+      page.getByRole("region", { name: "Selected component" }),
+    ).toContainText("No exact bearing model");
+  });
 });

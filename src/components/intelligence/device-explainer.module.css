@@ -590,3 +590,161 @@
     margin: 6px 0;
   }
 }
+.pageNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 26px;
+  border-block: 1px solid #cbd3c6;
+  padding: 10px 0;
+}
+.pageNav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 12px;
+  text-decoration: none;
+}
+.profilePicker,
+.questions {
+  padding: 44px 0;
+}
+.profilePicker h2 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin: 10px 0 14px;
+  line-height: 1.2;
+}
+.profilePicker > p {
+  max-width: 740px;
+}
+.profileButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.profileButtons button {
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid #bac9b7;
+  border-radius: 6px;
+  padding: 22px;
+  background: #fdfcf6;
+  color: #294d3e;
+  font: inherit;
+}
+.profileButtons button:hover {
+  background: #e4eadd;
+}
+.profileButtons button[aria-pressed="true"] {
+  background: #294d3e;
+  color: #f8f7ed;
+  border-color: #294d3e;
+}
+.profileButtons span,
+.profileButtons strong,
+.profileButtons small {
+  display: block;
+}
+.profileButtons span {
+  font-size: 12px;
+}
+.profileButtons strong {
+  font-size: 28px;
+  font-weight: 400;
+  margin: 4px 0 8px;
+}
+.profileButtons small {
+  font-size: 11px;
+}
+.selectionSummary {
+  margin-top: 18px !important;
+  font-size: 12px;
+  color: #526456;
+}
+.scrollHint {
+  font-size: 11px;
+  color: #526456;
+  margin-bottom: 10px !important;
+}
+.comparisonScroll {
+  overflow-x: auto;
+  border: 1px solid #bac9b7;
+  border-radius: 6px;
+}
+.comparisonScroll:focus-visible {
+  outline: 3px solid #9c5b35;
+  outline-offset: 4px;
+}
+.comparisonTable {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+  background: #fdfcf6;
+}
+.comparisonTable caption {
+  text-align: left;
+  padding: 18px 20px;
+  background: #e4eadd;
+  font-size: 12px;
+}
+.comparisonTable th,
+.comparisonTable td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #d3d8cc;
+  width: 33.33%;
+  vertical-align: top;
+}
+.comparisonTable thead {
+  background: #eeefe5;
+}
+.comparisonTable th {
+  font-weight: 500;
+}
+.comparisonTable thead span {
+  display: block;
+  font-weight: 400;
+  font-size: 20px;
+}
+.comparisonTable tbody th {
+  font-size: 12px;
+  color: #526456;
+}
+.comparisonTable a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+.questions {
+  border-top: 1px solid #cbd3c6;
+}
+.questions ol {
+  padding-left: 24px;
+  max-width: 850px;
+}
+.questions li {
+  padding: 10px 0 10px 10px;
+  border-bottom: 1px solid #d3d8cc;
+}
+.root section[id] {
+  scroll-margin-top: 20px;
+}
+@media (max-width: 640px) {
+  .profileButtons {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .profileButtons button {
+    padding: 18px 22px;
+  }
+  .profilePicker,
+  .questions {
+    padding: 32px 0;
+  }
+  .pageNav {
+    gap: 4px 20px;
+  }
+}

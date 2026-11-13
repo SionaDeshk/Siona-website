@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { deviceProfiles } from "@/lib/intelligence/device-profiles";
 import styles from "./device-explainer.module.css";
 
 const sources = {
   anatomy: "https://orthoinfo.aaos.org/en/treatment/total-knee-replacement/",
-  manufacturer:
-    "https://www.zimmerbiomet.com/en/products-and-solutions/specialties/knee/persona-knee-system.html",
-  identity: "https://accessgudid.nlm.nih.gov/devices/00889024230408",
-  clearance:
-    "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=K113369",
   reports: "https://open.fda.gov/data/maude/",
 };
 const parts = [
@@ -21,7 +17,7 @@ const parts = [
     description:
       "A shaped metal surface covers the prepared end of the thighbone. It moves against the bearing below.",
     detail:
-      "Our researched example is a Persona femoral component. Its identifier covers this part only; it does not identify a whole replacement knee.",
+      "The selected example identifies one femoral component. Its identifier covers this part only; it does not identify a whole replacement knee.",
     status: "One exact component identified",
     question:
       "What is the exact model of the femoral component you are proposing?",
@@ -33,7 +29,7 @@ const parts = [
     description:
       "A plastic bearing sits between the metal surfaces and provides a surface for movement. Its design is part of the selected configuration.",
     detail:
-      "No exact bearing model has been selected or verified for this example. The Persona family includes different bearing options; a family name alone does not establish compatibility.",
+      "No exact bearing model has been selected or verified for this example. A system family includes different options; its name alone does not establish compatibility.",
     status: "Exact model not established",
     question:
       "Which insert is proposed, and where is its compatibility with the other components documented?",
@@ -45,7 +41,7 @@ const parts = [
     description:
       "A baseplate covers the prepared top of the shinbone and supports the bearing. Its fixation and design depend on the selected implant.",
     detail:
-      "No exact baseplate model or fixation method has been established here. The drawing is a schematic, not a verified compatible Persona assembly.",
+      "No exact baseplate model or fixation method has been established here. The drawing is a schematic, not a verified compatible assembly for either example.",
     status: "Exact model not established",
     question:
       "What baseplate and fixation method are proposed, and why are they suitable for my situation?",
@@ -198,6 +194,9 @@ export function DeviceExplainer({
 }: {
   hostedPreview?: boolean;
 }) {
+  const [profileId, setProfileId] = useState<string>(deviceProfiles[0].id);
+  const profile =
+    deviceProfiles.find((p) => p.id === profileId) ?? deviceProfiles[0];
   const [selected, setSelected] = useState(0);
   const [answer, setAnswer] = useState("");
   const part = parts[selected];
@@ -236,20 +235,71 @@ export function DeviceExplainer({
             questions.
           </p>
           <div className={styles.context}>
-            <span>Our first example</span>
-            <strong>Persona knee system</strong>
-            <p>
-              A Zimmer Biomet product family. One femoral component researched;
-              the other component models remain unspecified. This example is not
-              a recommendation.
-            </p>
-            <Source href={sources.manufacturer}>
+            <span>Selected example · {profile.manufacturer}</span>
+            <strong>{profile.family} knee system</strong>
+            <p>{profile.scope} This example is not a recommendation.</p>
+            <Source href={profile.manufacturerUrl}>
               Manufacturer’s system overview
             </Source>
           </div>
         </section>
 
-        <section className={styles.explore} aria-labelledby="parts-heading">
+        <nav
+          className={styles.pageNav}
+          aria-label="Device information sections"
+        >
+          <a href="#device-parts">01 The parts</a>
+          <a href="#device-identity">02 Exact identity</a>
+          <a href="#device-comparison">03 Compare records</a>
+          <a href="#device-evidence">04 Evidence gaps</a>
+          <a href="#device-questions">05 Questions to ask</a>
+        </nav>
+        <section
+          className={styles.profilePicker}
+          aria-labelledby="examples-heading"
+        >
+          <p className={styles.eyebrow}>CHOOSE AN EXAMPLE</p>
+          <h2 id="examples-heading">Two manufacturers. The same questions.</h2>
+          <p>
+            Explore one identified femoral component from each family. These
+            examples are not equivalent sizes, verified assemblies or a clinical
+            ranking.
+          </p>
+          <div
+            className={styles.profileButtons}
+            role="group"
+            aria-label="Choose manufacturer example"
+          >
+            {deviceProfiles.map((item) => (
+              <button
+                key={item.id}
+                aria-pressed={item.id === profile.id}
+                onClick={() => {
+                  setProfileId(item.id);
+                  setSelected(0);
+                  setAnswer("");
+                }}
+              >
+                <span>{item.manufacturer}</span>
+                <strong>{item.family}</strong>
+                <small>Femoral example · {item.model}</small>
+              </button>
+            ))}
+          </div>
+          <p
+            className={styles.selectionSummary}
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            Viewing {profile.manufacturer} · {profile.family}. {profile.scope}
+          </p>
+        </section>
+        <section
+          id="device-parts"
+          tabIndex={-1}
+          className={styles.explore}
+          aria-labelledby="parts-heading"
+        >
           <div className={styles.sectionHeading}>
             <p className={styles.eyebrow}>01 / UNDERSTAND</p>
             <h2 id="parts-heading">One knee. Several parts.</h2>
@@ -307,25 +357,34 @@ export function DeviceExplainer({
               </div>
               <div className={styles.sourceLine}>
                 <Source href={sources.anatomy}>How the parts work: AAOS</Source>
-                <Source href={sources.manufacturer}>
-                  Persona family options
+                <Source href={profile.manufacturerUrl}>
+                  Selected family options
                 </Source>
               </div>
             </div>
           </div>
         </section>
 
-        <section className={styles.identify} aria-labelledby="identity-heading">
+        <section
+          id="device-identity"
+          tabIndex={-1}
+          className={styles.identify}
+          aria-labelledby="identity-heading"
+        >
           <div className={styles.sectionHeading}>
             <p className={styles.eyebrow}>02 / IDENTIFY</p>
             <h2 id="identity-heading">The name isn’t the whole identity.</h2>
             <p>
-              “Persona” names a family. A model number and device identifier
-              narrow the question to a specific component.
+              “{profile.family}” names a family. A model number and device
+              identifier narrow the question to a specific component.
             </p>
           </div>
           <div className={styles.identityGrid}>
-            <div className={styles.identityCard}>
+            <div
+              className={styles.identityCard}
+              role="region"
+              aria-label="Exact component identity"
+            >
               <p className={styles.eyebrow}>
                 RESEARCH EXAMPLE / NOT A PRODUCT LABEL
               </p>
@@ -333,27 +392,28 @@ export function DeviceExplainer({
               <dl>
                 <div>
                   <dt>Labeler / company</dt>
-                  <dd>Zimmer, Inc.</dd>
+                  <dd>{profile.labeler}</dd>
                 </div>
                 <div>
                   <dt>Model / catalog number</dt>
-                  <dd className={styles.identifier}>42-5026-066-02</dd>
+                  <dd className={styles.identifier}>{profile.model}</dd>
                 </div>
                 <div>
                   <dt>Primary device identifier (DI)</dt>
-                  <dd className={styles.identifier}>00889024230408</dd>
+                  <dd className={styles.identifier}>{profile.di}</dd>
                 </div>
                 <div>
                   <dt>Listed size</dt>
-                  <dd>9</dd>
+                  <dd>{profile.size}</dd>
                 </div>
               </dl>
-              <Source href={sources.identity}>
+              <Source href={profile.identityUrl}>
                 Check the original AccessGUDID record
               </Source>
               <p className={styles.tiny}>
-                Research snapshot: November 10, 2026. Record version date: March
-                17, 2022. A record date is not a clinical review date.
+                Source checked: {profile.checkedDate}. Record version date:{" "}
+                {profile.recordDate}. A record date is not a clinical review
+                date.
               </p>
             </div>
             <div className={styles.identityNotes}>
@@ -399,9 +459,116 @@ export function DeviceExplainer({
           </div>
         </section>
 
-        <section className={styles.evidence} aria-labelledby="evidence-heading">
+        <section
+          id="device-comparison"
+          tabIndex={-1}
+          className={styles.identify}
+          aria-labelledby="comparison-heading"
+        >
           <div className={styles.sectionHeading}>
-            <p className={styles.eyebrow}>03 / ASK BETTER QUESTIONS</p>
+            <p className={styles.eyebrow}>03 / COMPARE RECORDS</p>
+            <h2 id="comparison-heading">A consistent view of the evidence.</h2>
+            <p>
+              Compare identifiers and source coverage. Clinical performance has
+              not been compared, and size numbers are manufacturer-specific.
+            </p>
+          </div>
+          <p className={styles.scrollHint}>
+            Scroll the table horizontally on smaller screens.
+          </p>
+          <div
+            className={styles.comparisonScroll}
+            role="region"
+            aria-label="Manufacturer record comparison"
+            tabIndex={0}
+          >
+            <table className={styles.comparisonTable}>
+              <caption>
+                Two researched femoral-component examples — identity and
+                evidence coverage
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Field</th>
+                  {deviceProfiles.map((item) => (
+                    <th scope="col" key={item.id}>
+                      {item.manufacturer}
+                      <span>{item.family}</span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  [
+                    "Listed company",
+                    ...deviceProfiles.map((item) => item.labeler),
+                  ],
+                  [
+                    "Model / catalog",
+                    ...deviceProfiles.map((item) => item.model),
+                  ],
+                  [
+                    "Device identifier",
+                    ...deviceProfiles.map((item) => item.di),
+                  ],
+                  [
+                    "Listed size — not equivalent",
+                    ...deviceProfiles.map((item) => item.size),
+                  ],
+                  [
+                    "Record version date",
+                    ...deviceProfiles.map((item) => item.recordDate),
+                  ],
+                  [
+                    "Exact regulatory link",
+                    ...deviceProfiles.map((item) => item.regulatoryStatus),
+                  ],
+                  [
+                    "Current labeling / exact materials",
+                    "Not yet verified",
+                    "Not yet verified",
+                  ],
+                  [
+                    "Complete recall matching",
+                    "Not completed",
+                    "Not completed",
+                  ],
+                  [
+                    "Applicable clinical outcomes",
+                    "Not yet reviewed",
+                    "Not yet reviewed",
+                  ],
+                ].map(([label, ...values]) => (
+                  <tr key={label}>
+                    <th scope="row">{label}</th>
+                    {values.map((value, i) => (
+                      <td key={i}>{value}</td>
+                    ))}
+                  </tr>
+                ))}
+                <tr>
+                  <th scope="row">Original identity source</th>
+                  {deviceProfiles.map((item) => (
+                    <td key={item.id}>
+                      <Source href={item.identityUrl}>
+                        {item.family} device record
+                      </Source>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section
+          id="device-evidence"
+          tabIndex={-1}
+          className={styles.evidence}
+          aria-labelledby="evidence-heading"
+        >
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>04 / CHECK THE EVIDENCE</p>
             <h2 id="evidence-heading">Good information shows its limits.</h2>
             <p>
               Finding an official record is useful. Understanding its scope
@@ -416,28 +583,22 @@ export function DeviceExplainer({
                 The public record supplies this example’s company, model, DI and
                 size.
               </p>
-              <Source href={sources.identity}>Device record</Source>
+              <Source href={profile.identityUrl}>Device record</Source>
             </article>
             <article>
               <span className={styles.status}>REGULATORY CONTEXT</span>
-              <h3>Clearance is not a quality ranking.</h3>
-              <p>
-                The linked FDA record is a 510(k) substantial-equivalence
-                decision. It does not establish that this device performs better
-                than another.
-              </p>
-              <Source href={sources.clearance}>
-                Linked FDA clearance record
-              </Source>
+              <h3>{profile.regulatoryStatus}</h3>
+              <p>{profile.regulatoryNote}</p>
+              {profile.regulatoryLinks.map((link) => (
+                <Source key={link.number} href={link.url}>
+                  FDA record {link.number}
+                </Source>
+              ))}
             </article>
             <article className={styles.gap}>
               <span className={styles.status}>NOT YET VERIFIED</span>
               <h3>Important questions remain open.</h3>
-              <p>
-                Exact materials, current U.S. instructions, MRI conditions,
-                compatible component models, complete recall matching and
-                applicable clinical outcomes.
-              </p>
+              <p>{profile.gaps}</p>
               <p>
                 Missing information is a gap—not evidence that a device is safe
                 or unsafe.
@@ -458,6 +619,45 @@ export function DeviceExplainer({
           </div>
         </section>
 
+        <section
+          id="device-questions"
+          tabIndex={-1}
+          className={styles.questions}
+          aria-labelledby="questions-heading"
+        >
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>05 / TAKE THE NEXT STEP</p>
+            <h2 id="questions-heading">
+              Bring better questions to the conversation.
+            </h2>
+            <p>
+              Use these to discuss the exact proposed configuration with your
+              care team.
+            </p>
+          </div>
+          <ol>
+            <li>
+              What are the model and device identifiers for every component
+              proposed?
+            </li>
+            <li>
+              Where are the applicable labeling, material and MRI information
+              for that configuration?
+            </li>
+            <li>
+              What evidence applies to these exact components, and what does it
+              leave uncertain?
+            </li>
+            <li>
+              How are model and lot-specific safety notices checked and
+              communicated?
+            </li>
+          </ol>
+          <p className={styles.note}>
+            The selected research example is {profile.manufacturer}{" "}
+            {profile.family}. It has not been selected for your situation.
+          </p>
+        </section>
         <section className={styles.check} aria-labelledby="check-heading">
           <div>
             <p className={styles.eyebrow}>A QUICK CHECK</p>

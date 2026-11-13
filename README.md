@@ -100,7 +100,7 @@ The Siona Evolution Engine is at `/workspace/intelligence` (invitation-only Supa
 
 The Opportunities view connects hypotheses, evidence, the existing nine-criterion scorecard, risks, experiments and decisions. See [opportunity validation Phase 1](docs/opportunity-validation-phase1.md) for the unvalidated device-information and supplier-direct Biologics cases, local preview and limits. This UI upgrade requires no migration and never creates starting-case records automatically.
 
-A small [device-information prototype](docs/device-information-prototype.md) is available at `/workspace/intelligence/preview/device-information` during development and to existing signed-in workspace members on Vercel Preview deployments. It explains a knee system's main parts, one researched component identifier and the remaining evidence gaps, with a local-only comprehension check. It returns 404 on the Production deployment.
+A small [device-information prototype](docs/device-information-prototype.md) is available at `/workspace/intelligence/preview/device-information` during development and to existing signed-in workspace members on Vercel Preview deployments. It explains a knee system's main parts, two researched femoral-component examples (Persona and Triathlon), a manufacturer selector, identifier/source-coverage comparison and the remaining evidence gaps, with a local-only comprehension check. It returns 404 on the Production deployment.
 
 ## Practice and supply operations
 

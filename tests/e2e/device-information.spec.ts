@@ -46,8 +46,16 @@ test("device explainer connects parts to exact identity and preserves evidence g
       )
       .toBe(true);
   }
-  await expect(page.getByText("42-5026-066-02", { exact: true })).toBeVisible();
-  await expect(page.getByText("00889024230408", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Exact component identity" })
+      .getByText("42-5026-066-02", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Exact component identity" })
+      .getByText("00889024230408", { exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /Check the original AccessGUDID/ }),
   ).toHaveAttribute(
@@ -105,4 +113,74 @@ test("device explainer has no automated WCAG AA violations across component sele
       name,
     ).toEqual([]);
   }
+});
+
+test("device explainer switches exact manufacturer records without inherited clearance or answers", async ({
+  page,
+}) => {
+  await page.goto(path);
+  await page
+    .getByRole("group", { name: "Explore knee components" })
+    .getByRole("button", { name: /Bearing insert/ })
+    .click();
+  await page
+    .getByRole("radio", { name: "That this whole knee system is recall-free." })
+    .check();
+  const selector = page.getByRole("group", {
+    name: "Choose manufacturer example",
+  });
+  const stryker = selector.getByRole("button", { name: /Stryker/ });
+  await stryker.focus();
+  await page.keyboard.press("Enter");
+  await expect(stryker).toHaveAttribute("aria-pressed", "true");
+  const identity = page.getByRole("region", {
+    name: "Exact component identity",
+  });
+  await expect(identity).toContainText("5510-F-401");
+  await expect(identity).toContainText("07613327040272");
+  await expect(identity).not.toContainText("42-5026-066-02");
+  await expect(identity.getByRole("link")).toHaveAttribute(
+    "href",
+    "https://accessgudid.nlm.nih.gov/devices/07613327040272",
+  );
+  const evidence = page.locator("#device-evidence");
+  await expect(evidence).toContainText("Exact submission link unresolved");
+  await expect(
+    evidence.getByRole("link", { name: /FDA record K/ }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("radio", { checked: true })).toHaveCount(0);
+  await expect(
+    page
+      .getByRole("group", { name: "Explore knee components" })
+      .getByRole("button", { name: /Femoral component/ }),
+  ).toHaveAttribute("aria-pressed", "true");
+  const comparison = page.getByRole("region", {
+    name: "Manufacturer record comparison",
+  });
+  await expect(comparison).toContainText("Listed size — not equivalent");
+  await expect(comparison).toContainText("Not yet verified");
+  await comparison.focus();
+  await page.keyboard.press("ArrowRight");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await selector.getByRole("button", { name: /Zimmer Biomet/ }).click();
+  await expect(identity).toContainText("42-5026-066-02");
+  await expect(
+    evidence.getByRole("link", { name: /FDA record K/ }),
+  ).toHaveCount(2);
+  await page
+    .getByRole("navigation", { name: "Device information sections" })
+    .getByRole("link", { name: /Questions to ask/ })
+    .click();
+  await expect(page.locator("#device-questions")).toBeFocused();
 });

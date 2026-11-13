@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { DeviceResearch } from "./device-research";
+import { claimById } from "@/lib/intelligence/device-library";
 import { PersonaGuide } from "./persona-guide";
 import { KneeViewer } from "./knee-viewer";
 import { deviceProfiles } from "@/lib/intelligence/device-profiles";
@@ -254,6 +256,7 @@ export function DeviceExplainer({
         >
           <a href="#device-parts">01 The parts</a>
           <a href="#device-identity">02 Exact identity</a>
+          <a href="#device-research">Research & sources</a>
           {profile.id === "persona" && (
             <a href="#persona-options">Persona options</a>
           )}
@@ -469,6 +472,7 @@ export function DeviceExplainer({
           </div>
         </section>
 
+        <DeviceResearch key={profile.id} familyId={profile.id} />
         {profile.id === "persona" && <PersonaGuide />}
         <section
           id="device-comparison"
@@ -524,8 +528,8 @@ export function DeviceExplainer({
                 {[
                   [
                     "Design approach · manufacturer description",
-                    "Multiple sizes and profiles aim to match anatomy; several bearing strategies are offered.",
-                    "A single-radius design aims to support natural-like circular motion.",
+                    claimById("persona-design").text,
+                    claimById("triathlon-design").text,
                   ],
                   [
                     "Fixation · family options",

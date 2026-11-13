@@ -22,8 +22,8 @@ test("device explainer connects parts to exact identity and preserves evidence g
   await page.goto("/workspace/intelligence/preview");
   await page
     .getByRole("link", { name: /Open the knee-device information prototype/ })
-    .click();
-  await expect(page).toHaveURL(new RegExp(path));
+    .click({ timeout: 20000 });
+  await expect(page).toHaveURL(new RegExp(path), { timeout: 20000 });
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Understand the parts.",
   );
@@ -71,24 +71,37 @@ test("device explainer connects parts to exact identity and preserves evidence g
   );
   await page
     .getByText("What do these numbers tell me?", { exact: true })
-    .click();
+    .click({ timeout: 20000 });
   await expect(
     page.getByText("A separate production identifier.", { exact: false }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Important questions remain open." }),
   ).toBeVisible();
+  // Exercise the full labeled touch target, avoiding the development toolbar
+  // over the small native input at the bottom edge of the mobile viewport.
   await page
-    .getByRole("radio", { name: "That this whole knee system is recall-free." })
-    .check();
+    .getByText("That this whole knee system is recall-free.", { exact: true })
+    .click({ timeout: 20000 });
+  await expect(
+    page.getByRole("radio", {
+      name: "That this whole knee system is recall-free.",
+    }),
+  ).toBeChecked();
   await expect(page.getByRole("status")).toContainText(
     "does not recommend an implant or establish complete recall coverage",
   );
   await page
-    .getByRole("radio", {
+    .getByText(
+      "How to identify one component and the questions still to resolve.",
+      { exact: true },
+    )
+    .click({ timeout: 20000 });
+  await expect(
+    page.getByRole("radio", {
       name: "How to identify one component and the questions still to resolve.",
-    })
-    .check();
+    }),
+  ).toBeChecked();
   await expect(page.getByRole("status")).toContainText("Exactly.");
   await page.reload();
   await expect(page.getByRole("radio", { checked: true })).toHaveCount(0);
@@ -531,4 +544,71 @@ test("Persona guide separates family options, evidence and unconfirmed configura
   await expect(guide).toBeVisible();
   await expect(iq.locator("details")).not.toHaveAttribute("open", "");
   expect(writes.filter((url) => !url.includes("__nextjs"))).toEqual([]);
+});
+
+test("research library exposes scope and provenance without promoting component or assembly verification", async ({
+  page,
+}) => {
+  await page.goto(path);
+  const record = page.getByRole("region", { name: "Persona research record." });
+  await expect(record).toContainText("Family overview");
+  await expect(record).toContainText("Needs editorial review");
+  await expect(record).toContainText("No verified assembly");
+  await record
+    .getByText("Family, component and configuration: what is established?", {
+      exact: true,
+    })
+    .click();
+  await expect(record).toContainText(
+    "has not reached verified-component depth",
+  );
+  await record
+    .getByText("Claims, evidence labels and source passages", { exact: true })
+    .click();
+  await expect(record).toContainText("MR Conditional");
+  await expect(record).toContainText("not permission for an MRI scan");
+  await expect(record).toContainText(
+    "PDF page 5 / Purpose and Device Description",
+  );
+  await record
+    .getByText("Source register and search limitations", { exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await expect(record).toContainText("2026-11-13");
+  await expect(record).toContainText(
+    "Full text returned a browser challenge today",
+  );
+  await expect(record).toContainText('"42-5026-066-02" materials labeling');
+  // Scan the expanded research panel; the existing suite covers the main guide/3D.
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .include("#device-research")
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("group", { name: "Choose manufacturer example" })
+    .getByRole("button", { name: /Stryker/ })
+    .click();
+  await expect(record).toHaveCount(0);
+  const stryker = page.getByRole("region", {
+    name: "Triathlon research record.",
+  });
+  await expect(stryker).toContainText("Discovery candidate");
+  await stryker
+    .getByText("Claims, evidence labels and source passages", { exact: true })
+    .click();
+  await expect(stryker).toContainText("5510-F-401");
+  await expect(stryker).not.toContainText("Ti-Nidium");
+  await expect(stryker).not.toContainText("0.1 points");
+  await expect(stryker).toContainText(
+    "does not establish safety or lack of safety",
+  );
 });

@@ -1,123 +1,29 @@
+import {
+  deviceLibrary,
+  claimById,
+  sourceById,
+} from "@/lib/intelligence/device-library";
 import styles from "./persona-guide.module.css";
 
-const professional =
-  "https://www.zimmerbiomet.com/en/products-and-solutions/specialties/knee/persona-knee-system.html";
-const consumer =
-  "https://www.thepersonalizedknee.com/en/personalized-knee-system/overview.html";
-const titanium = "https://www.accessdata.fda.gov/cdrh_docs/pdf19/K193223.pdf";
-const iqProfessional =
-  "https://www.zimmerbiomet.com/en/products-and-solutions/specialties/knee/persona-iq.html";
-const iqPatient =
-  "https://www.zimmerbiomet.com/en/patients-caregivers/knee-replacement-implants-technologies/Persona-IQ-smart-knee.html";
-const iqShort = "https://www.accessdata.fda.gov/cdrh_docs/pdf23/K234056.pdf";
-const iqTechnique =
-  "https://www.zimmerbiomet.com/content/dam/zb-corporate/en/education-resources/surgical-techniques/specialties/knee/persona-iq/K05-STB-300005%20Rev.%20A%20CSE%20Surgical%20Technique.pdf";
-const iq = "https://www.accessdata.fda.gov/cdrh_docs/pdf20/DEN200064.pdf";
-const trial = "https://pmc.ncbi.nlm.nih.gov/articles/PMC11862213/";
+import {
+  consumer,
+  iqProfessional,
+  iqPatient,
+  iqShort,
+  iqTechnique,
+  trial,
+  choices,
+  materials,
+  technologies,
+  sensorMetrics,
+} from "@/lib/intelligence/device-library/persona-content";
 
-const choices = [
-  {
-    title: "Fit & sizing",
-    label: "Manufacturer claim",
-    summary: "Several sizes and shapes aim to fit different anatomies.",
-    detail:
-      "Standard and narrow femoral profiles are available. Choosing a catalog configuration does not establish that an implant was custom-manufactured for one person.",
-    question: "Which sizes and profiles are proposed, and why?",
-    href: professional,
-  },
-  {
-    title: "Fixation",
-    label: "Manufacturer-described options",
-    summary: "The family includes cemented and cementless options.",
-    detail:
-      "A family-level option is not permission to use every component either way. Confirm the fixation and current instructions for each proposed model.",
-    question: "How will each component be fixed to bone?",
-    href: professional,
-  },
-  {
-    title: "Bearing & stability",
-    label: "Manufacturer-described options",
-    summary:
-      "Bearing options include cruciate-retaining and sacrificing strategies.",
-    detail:
-      "CR means cruciate retaining. A bearing choice addresses the configuration’s stability strategy; it is not a higher-is-better quality score.",
-    question: "What ligament strategy and bearing are proposed?",
-    href: professional,
-  },
-];
-const materials = [
-  {
-    source: "FDA K193223 · January 24, 2020",
-    title: "Femoral options",
-    label: "Regulatory fact · specific variant",
-    text: "FDA record K193223 describes Ti-Nidium CR femoral components: titanium alloy with a nitriding surface treatment.",
-    gap: "This does not identify the alloy of our example model 42-5026-066-02. Its exact materials remain unverified.",
-    href: titanium,
-  },
-  {
-    source: "Manufacturer overview · revision not displayed",
-    title: "Tibial option",
-    label: "Manufacturer specification · family level",
-    text: "The professional overview describes a Tivanium-alloy tibial option.",
-    gap: "No tibial model has been selected here. Do not apply this description to every tray or surface.",
-    href: professional,
-  },
-  {
-    source: "Manufacturer overview · revision not displayed",
-    title: "Bearing options",
-    label: "Manufacturer claim · family level",
-    text: "Conventional and vitamin-E polyethylene options are described. Vivacit-E is marketed for resistance to oxidation and wear.",
-    gap: "A material-performance claim does not establish longer implant survival for a particular person.",
-    href: professional,
-  },
-];
-const technologies = [
-  {
-    title: "ROSA",
-    category: "During surgery",
-    summary: "Surgical assistance for planning and positioning.",
-    label: "Manufacturer claim",
-    claim: "The consumer site promotes precision and recovery benefits.",
-    evidence:
-      "A 77-patient, single-center, unblinded randomized trial compared ROSA-assisted with manual Persona surgery. At a minimum of one year, alignment improved while patient-reported improvements were similar.",
-    limitation:
-      "Short follow-up and one surgeon limit generalization; long-term survival was not established. Funding/conflict review is incomplete in this guide.",
-    question:
-      "What benefit do you expect from ROSA in this procedure, and is there an additional charge?",
-    href: "https://pmc.ncbi.nlm.nih.gov/articles/PMC13418316/",
-    source: "ROSA clinical study · published 2025, journal issue 2026",
-  },
-  {
-    title: "mymobility",
-    category: "Before & after surgery",
-    summary: "An app for recovery guidance and care-team communication.",
-    label: "Manufacturer claim",
-    claim: "The site describes exercises, reminders and messaging.",
-    evidence:
-      "Manufacturer-described functionality, not a clinical-effectiveness assessment. Independent app-outcome evidence has not been assessed in this iteration.",
-    limitation:
-      "Access depends on the care team and technology requirements. Monitoring, response times, privacy terms and cost remain unresolved.",
-    question:
-      "Who reviews messages and progress, when do they respond, and what support is available without the app?",
-    href: consumer,
-    source: "Manufacturer consumer overview · page revision not displayed",
-  },
-  {
-    title: "Persona IQ",
-    category: "Implanted sensing",
-    summary: "A specific configuration adds movement sensing.",
-    label: "Regulatory fact · original authorization",
-    claim: "The manufacturer promotes additional recovery insight.",
-    evidence:
-      "FDA’s 2021 Canary/CHIRP authorization describes movement data as adjunct information. It states those data are not intended to support clinical decision-making and have not demonstrated clinical benefit.",
-    limitation:
-      "Different sensor-stem versions have different indications: the original Canturio Tibial Extension refers to at least 58 mm; the later Canturio Smart Extension to at least 30 mm. Confirm the proposed version and current labeling. This is not included in every Persona implant.",
-    question:
-      "Is a sensor actually proposed, why is it appropriate, and what happens to the data and long-term support?",
-    href: iq,
-    source: "FDA DEN200064 · August 27, 2021",
-  },
-];
+const personaStudy = deviceLibrary.studies.find(
+  (item) => item.id === "persona-nexgen-rct",
+)!;
+const historicalNotice = deviceLibrary.safetyNotices.find(
+  (item) => item.id === "z-1266-2015",
+)!;
 
 function Source({
   href,
@@ -154,10 +60,11 @@ export function PersonaGuide() {
       <div className={styles.scope}>
         <strong>Family-level education · U.S. context</strong>
         <p>
-          Sources checked November 12, 2026. This is a research example, not
-          your treatment plan. Current exact-model labeling, compatibility and
-          local availability still need verification. Undated web pages are not
-          controlled instructions for use.
+          Source-specific check dates are listed in the research record. This is
+          a research example, not your treatment plan. Current exact-model
+          labeling, compatibility and local availability still need
+          verification. Undated web pages are not controlled instructions for
+          use.
         </p>
       </div>
       <nav className={styles.links} aria-label="Persona guide topics">
@@ -246,14 +153,7 @@ export function PersonaGuide() {
           role="group"
           aria-label="Manufacturer-described Persona IQ movement metrics"
         >
-          {[
-            "Qualified step count",
-            "Walking speed",
-            "Cadence",
-            "Stride length",
-            "Distance traveled",
-            "Functional range of motion",
-          ].map((metric) => (
+          {sensorMetrics.map((metric) => (
             <div key={metric}>
               <span aria-hidden="true">→</span>
               <strong>{metric}</strong>
@@ -346,8 +246,8 @@ export function PersonaGuide() {
           conversations about symptoms and recovery goals.
         </p>
         <p className={styles.metricNote}>
-          Sources checked November 12, 2026 · manufacturer descriptions and
-          stated labeling limitations · no sensor has been selected for this
+          See the research record for source dates · manufacturer descriptions
+          and stated labeling limitations · no sensor has been selected for this
           research example.
         </p>
       </section>
@@ -482,36 +382,29 @@ export function PersonaGuide() {
           </span>
           <h4>Two-year results did not show a patient-reported advantage.</h4>
           <p>
-            A 314-patient randomized trial compared Persona CR with NexGen CR.
-            The adjusted Oxford Knee Score difference was 0.1 points (95%
-            confidence interval −1.4 to 1.7). This concerns those configurations
-            and outcomes, not every Persona variant or technology.
+            {claimById("persona-outcomes").text}{" "}
+            {claimById("persona-outcomes").applicability}
           </p>
           <details>
             <summary>Study scope, funding & limitations</summary>
             <p>
-              Mortensen et al., Acta Orthopaedica, 2025. Multicenter trial in
-              Denmark; primary osteoarthritis; two-year follow-up. Primary
-              outcome available for 289 patients. Institutions received Zimmer
-              Biomet funding. The study was too small and short to settle
-              uncommon complications or long-term survival; introduction-era
-              surgeon experience was another limitation.
+              {personaStudy.design}; {personaStudy.sampleSize} participants.{" "}
+              {personaStudy.population}. {personaStudy.followUp}.{" "}
+              {personaStudy.funding} {personaStudy.limitations}
             </p>
             <Source href={trial}>Persona versus NexGen clinical study</Source>
           </details>
           <p className={styles.interpretation}>
-            <strong>Siona interpretation:</strong> A fit or precision claim
-            needs outcome-specific evidence. These findings do not establish
-            that every device performs identically.
+            <strong>Siona interpretation:</strong>{" "}
+            {claimById("persona-interpretation").text}
           </p>
         </article>
         <details className={styles.history}>
           <summary>Historical safety notice: scope matters</summary>
           <p>
-            <strong>Regulatory fact:</strong> FDA recall Z-1266-2015 concerned
-            Persona Trabecular Metal tibial plates, sizes C–J, left and right,
-            all lots, following complaints of loosening and radiolucent lines.
-            Initiated in 2015; terminated March 13, 2018.
+            <strong>Verified specification or regulatory fact:</strong>{" "}
+            {claimById(historicalNotice.claimId).text}{" "}
+            {historicalNotice.affectedScope} {historicalNotice.status}
           </p>
           <p>
             It is not an assessment of our femoral example or every current
@@ -519,7 +412,7 @@ export function PersonaGuide() {
             remain unverified. Termination does not establish that a proposed
             assembly is recall-free.
           </p>
-          <Source href="https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRes/res.cfm?id=133978">
+          <Source href={sourceById(historicalNotice.sourceId).url}>
             FDA recall record Z-1266-2015
           </Source>
         </details>

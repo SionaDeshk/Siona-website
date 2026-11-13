@@ -11,7 +11,7 @@
     "start": "next start --hostname 0.0.0.0",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test --test-isolation=none tests/contact.test.ts tests/intelligence/model.test.ts tests/operations/model.test.ts tests/practice/model.test.ts tests/commerce/model.test.ts",
+    "test": "node --import tsx --test --test-isolation=none tests/contact.test.ts tests/intelligence/model.test.ts tests/operations/model.test.ts tests/practice/model.test.ts tests/commerce/model.test.ts tests/intelligence/device-library.test.ts",
     "test:e2e": "playwright test",
     "test:db": "node --import tsx --test --test-isolation=none tests/intelligence/database.test.ts"
   },

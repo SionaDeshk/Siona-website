@@ -1,0 +1,131 @@
+.record {
+  border-top: 1px solid #cbd3c6;
+  padding: 40px 0;
+  scroll-margin-top: 20px;
+}
+.eyebrow,
+.label {
+  color: #526456;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.record h2 {
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin: 12px 0 18px;
+}
+.intro {
+  font-size: 14px;
+  max-width: 850px;
+  color: #526456;
+}
+.scope {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px !important;
+}
+.scope > div {
+  padding: 18px;
+  background: #e8eee2;
+  border: 1px solid #c5d0bd;
+  border-radius: 5px;
+}
+.scope dd {
+  font-size: 15px;
+}
+.note {
+  font-size: 11px;
+  color: #526456;
+  margin: 12px 0 !important;
+}
+.record details {
+  border-top: 1px solid #cbd3c6;
+  margin-top: 16px;
+}
+.record summary {
+  min-height: 48px;
+  padding: 14px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+.record details p,
+.record details li,
+.record details dl {
+  font-size: 13px;
+}
+.record details h3 {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.record details p {
+  margin: 10px 0;
+}
+.record a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 6px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.claim,
+.component,
+.source {
+  padding: 20px;
+  background: #fdfcf6;
+  border: 1px solid #c5d0bd;
+  border-radius: 5px;
+  margin: 14px 0;
+}
+.claim dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+.questions {
+  padding-left: 24px;
+}
+.questions li {
+  padding: 12px 0;
+  border-bottom: 1px solid #cbd3c6;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 900px) {
+  .scope {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .scope,
+  .claim dl {
+    grid-template-columns: 1fr;
+  }
+  .scope {
+    gap: 0;
+  }
+  .record {
+    padding: 30px 0;
+  }
+  .claim,
+  .component,
+  .source {
+    padding: 18px;
+  }
+}

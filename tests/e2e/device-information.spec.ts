@@ -234,9 +234,15 @@ test.describe("interactive knee illustrations", () => {
       page.getByRole("button", { name: "Pause spin", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     const firstFrame = await canvas.screenshot();
-    await expect
-      .poll(async () => !(await canvas.screenshot()).equals(firstFrame))
-      .toBe(true);
+    // Software WebGL screenshots can exceed the default five-second poll budget.
+    // Wait for actual frame boundaries, then compare rendered pixels directly.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    );
+    expect((await canvas.screenshot()).equals(firstFrame)).toBe(false);
     await canvas.click();
     await expect(
       page.getByRole("button", { name: "Spin model", exact: true }),
@@ -578,7 +584,7 @@ test("research library exposes scope and provenance without promoting component 
   await expect(record).toContainText(
     "Full text returned a browser challenge today",
   );
-  await expect(record).toContainText('"42-5026-066-02" materials labeling');
+  await expect(record).toContainText('"42-5026-066-02" "package insert"');
   // Scan the expanded research panel; the existing suite covers the main guide/3D.
   expect(
     (
@@ -611,4 +617,194 @@ test("research library exposes scope and provenance without promoting component 
   await expect(stryker).toContainText(
     "does not establish safety or lack of safety",
   );
+});
+
+test("exact-component checklist keeps unresolved MRI, compatibility and manufacturer sources scoped", async ({
+  page,
+}) => {
+  await page.goto(path);
+  const persona = page.getByRole("region", {
+    name: "Persona research record.",
+  });
+  await expect(
+    persona.getByRole("heading", {
+      name: "Exact-component verification checklist",
+    }),
+  ).toBeVisible();
+  await persona
+    .getByText("MRI labeling and conditions · Unresolved", { exact: true })
+    .click();
+  await expect(
+    persona.getByText(/Can the MRI team check the complete implant list/),
+  ).toBeVisible();
+  await expect(
+    persona.getByText(/Non-U.S. patient leaflet and sensor-system MRI leads/),
+  ).toBeVisible();
+  await persona
+    .getByText(
+      "Tibial and bearing compatibility · Partial evidence — unresolved",
+      { exact: true },
+    )
+    .click();
+  await expect(
+    persona
+      .locator("details")
+      .filter({
+        has: page.locator("summary", {
+          hasText: /^Tibial and bearing compatibility ·/,
+        }),
+      })
+      .getByText(/Exact model-to-chart applicability/),
+  ).toBeVisible();
+  await persona
+    .getByText(
+      "Regulatory records and safety notices · Partial evidence — unresolved",
+      { exact: true },
+    )
+    .click();
+  await expect(persona.getByText(/Search results do not prove/)).toHaveCount(0);
+  await expect(
+    persona
+      .locator("details")
+      .filter({
+        has: page.locator("summary", {
+          hasText: /^Regulatory records and safety notices ·/,
+        }),
+      })
+      .getByText(/FDA query retrieval failed/),
+  ).toBeVisible();
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .include("#device-research")
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("group", { name: "Choose manufacturer example" })
+    .getByRole("button", { name: /Stryker/ })
+    .click();
+  const triathlon = page.getByRole("region", {
+    name: "Triathlon research record.",
+  });
+  await triathlon
+    .getByText("Materials and surface treatments · Unresolved", { exact: true })
+    .click();
+  await expect(
+    triathlon
+      .locator("details")
+      .filter({
+        has: page.locator("summary", {
+          hasText: /^Materials and surface treatments ·/,
+        }),
+      })
+      .getByText(/5510-F-401 only/),
+  ).toBeVisible();
+  await triathlon
+    .getByText("Source register and search limitations", { exact: true })
+    .click();
+  await expect(
+    triathlon.getByRole("link", { name: /Stryker electronic labeling portal/ }),
+  ).toHaveAttribute("href", "https://labeling.stryker.com/hcp");
+  await expect(
+    triathlon.getByRole("link", {
+      name: /Zimmer Biomet electronic labeling portal/,
+    }),
+  ).toHaveCount(0);
+  await expect(triathlon).not.toContainText("K172524");
+  await expect(triathlon).toContainText("Discovery candidate");
+});
+
+test("consumer choices precede research detail and scope remains clear across manufacturers", async ({
+  page,
+}) => {
+  await page.goto(path);
+  const scope = page.getByRole("complementary", {
+    name: "What this example establishes",
+  });
+  await expect(scope).toContainText("42-5026-066-02");
+  await expect(scope).toContainText("No compatible assembly is verified");
+  expect(
+    await page.evaluate(
+      () =>
+        document
+          .querySelector("#persona-options")!
+          .compareDocumentPosition(
+            document.querySelector("#device-research")!,
+          ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ),
+  ).toBeTruthy();
+  const guide = page.locator("#persona-options");
+  expect(
+    await guide.evaluate(
+      (node) =>
+        node
+          .querySelector("#persona-configuration")!
+          .compareDocumentPosition(node.querySelector("#persona-iq-feature")!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ),
+  ).toBeTruthy();
+  await guide.getByRole("link", { name: "Materials", exact: true }).click();
+  await expect(page.locator("#persona-materials")).toBeFocused();
+  await expect(page.locator("#persona-materials")).toContainText(
+    "Neither establishes the alloy of femoral model",
+  );
+  const record = page.getByRole("region", { name: "Persona research record." });
+  await record
+    .getByText("Discovery and inclusion record", { exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await expect(record).toContainText("Availability: unknown");
+  await record
+    .getByText("Materials and surface treatments · Unresolved", { exact: true })
+    .click();
+  const material = record
+    .locator("details")
+    .filter({
+      has: page.locator("summary", {
+        hasText: /^Materials and surface treatments ·/,
+      }),
+    });
+  await expect(material).toContainText("Research gap: Source inaccessible");
+  await expect(
+    material.getByText(/Next feasible retrieval route/),
+  ).toBeVisible();
+  await page
+    .getByRole("navigation", { name: "Device information sections" })
+    .getByRole("link", { name: /Questions to ask/ })
+    .click();
+  await expect(page.locator("#device-questions")).toBeFocused();
+  expect(await page.locator("#device-questions li").count()).toBe(6);
+  await page
+    .getByRole("group", { name: "Choose manufacturer example" })
+    .getByRole("button", { name: /Stryker/ })
+    .click();
+  await expect(scope).toContainText("5510-F-401");
+  await expect(scope).not.toContainText("42-5026-066-02");
+  const stryker = page.getByRole("region", {
+    name: "Triathlon research record.",
+  });
+  await stryker
+    .getByText("Source register and search limitations", { exact: true })
+    .click();
+  await expect(stryker).not.toContainText('"42-5026-066-02"');
+  await expect(stryker).not.toContainText("Persona trial");
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

@@ -167,6 +167,129 @@ export const deviceSources: ResearchSource[] = [
   },
 ];
 
+deviceSources.push(
+  {
+    id: "persona-design-rationale",
+    title: "Persona The Personalized Knee Story — Design Rationale",
+    url: "https://www.zimmerbiomet.com/content/dam/zb-corporate/en/products/specialties/knee/persona-the-personalized-knee/0890.2-GLBL-en_Persona%20Knee%20Story_FINAL.pdf",
+    kind: "manufacturer",
+    publicationOrRevision: "2024-04",
+    dateNote: "0890.2-GLBL-en; issue date on PDF page 32",
+    checkedOn: "2026-11-13",
+    access: "read",
+    limitation:
+      "Manufacturer family rationale, not U.S. exact-model IFU. Tibial material description on PDF page 9; no 5026 mapping established. No document mirrored.",
+  },
+  {
+    id: "persona-technique",
+    title: "Persona The Personalized Knee — Surgical Technique",
+    url: "https://www.zimmerbiomet.com/content/dam/zb-corporate/en/education-resources/surgical-techniques/specialties/knee/persona-the-personalized-knee/persona-the-personalized-knee-surgical-technique1.pdf",
+    kind: "manufacturer",
+    publicationOrRevision: "2022-08",
+    dateNote: "3914.1-GLBL-en; issue date on PDF page 78",
+    checkedOn: "2026-11-13",
+    access: "read",
+    limitation:
+      "Global professional technique, not current U.S. exact-model IFU; country applicability requires confirmation. Referenced only; no PDF copied.",
+  },
+  {
+    id: "persona-fda-original",
+    title: "FDA K113369 — Persona Personalized Knee System",
+    url: "https://www.accessdata.fda.gov/cdrh_docs/pdf11/K113369.pdf",
+    kind: "regulatory",
+    publicationOrRevision: "2012-03-27",
+    dateNote: "Clearance date; summary dated March 16, 2012",
+    checkedOn: "2026-11-13",
+    access: "read",
+    limitation:
+      "Historical system clearance linked by exact DI; not a current component package insert.",
+  },
+  {
+    id: "persona-fda-ka",
+    title: "FDA K172524 — Persona alignment indication",
+    url: "https://www.accessdata.fda.gov/cdrh_docs/pdf17/K172524.pdf",
+    kind: "regulatory",
+    publicationOrRevision: "2018-05-17",
+    dateNote: "Clearance date",
+    checkedOn: "2026-11-13",
+    access: "read",
+    limitation:
+      "System-level indication and restrictions; exact DI links submission, but no model-specific compatibility matrix or full MRI conditions established.",
+  },
+  {
+    id: "persona-fda-titanium-history",
+    title: "FDA K142787 — Persona titanium femoral additions",
+    url: "https://www.accessdata.fda.gov/cdrh_docs/pdf14/K142787.pdf",
+    kind: "regulatory",
+    publicationOrRevision: "2014-12-22",
+    dateNote: "Clearance date; summary dated September 25, 2014",
+    checkedOn: "2026-11-13",
+    access: "read",
+    limitation:
+      "5050/5056/5070/5076 component families; not model 42-5026-066-02. MRI discussion omits numeric scan conditions.",
+  },
+  {
+    id: "zimmer-labeling-portal",
+    title: "Zimmer Biomet electronic labeling portal",
+    url: "https://docs.zimmerbiomet.com/hcp",
+    kind: "manufacturer",
+    publicationOrRevision: null,
+    dateNote: "No document revision retrieved",
+    checkedOn: "2026-11-13",
+    access: "partial",
+    limitation:
+      "Research tool exposes only portal shell, not model search/results. Direct environment HTTPS attempt returned CONNECT 403. No IFU retrieved; no document request submitted.",
+  },
+  {
+    id: "stryker-labeling-portal",
+    title: "Stryker electronic labeling portal",
+    url: "https://labeling.stryker.com/hcp",
+    kind: "manufacturer",
+    publicationOrRevision: null,
+    dateNote: "No document revision retrieved",
+    checkedOn: "2026-11-13",
+    access: "partial",
+    limitation:
+      "ifu.stryker.com redirects here; research tool exposes portal shell, not model search/results. No IFU retrieved or request submitted.",
+  },
+  {
+    id: "persona-exact-recall-search",
+    title: "FDA recall database — Persona exact-model query attempted",
+    url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm?start_search=1&productdescriptiontxt=42-5026-066-02",
+    kind: "safety",
+    publicationOrRevision: null,
+    dateNote: "Search endpoint, not a notice or negative result",
+    checkedOn: "2026-11-13",
+    access: "unavailable",
+    limitation:
+      "Endpoint inaccessible through research tool; do not interpret as zero recalls.",
+  },
+  {
+    id: "triathlon-exact-recall-search",
+    title: "FDA recall database — Triathlon exact-model query attempted",
+    url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm?start_search=1&productdescriptiontxt=5510-F-401",
+    kind: "safety",
+    publicationOrRevision: null,
+    dateNote: "Search endpoint, not a notice or negative result",
+    checkedOn: "2026-11-13",
+    access: "unavailable",
+    limitation:
+      "Endpoint inaccessible through research tool; exact-model and lot matching remain incomplete.",
+  },
+  {
+    id: "persona-revision-excluded-notice",
+    title: "FDA Z-2578-2026 — different Persona Revision component",
+    url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfres/res.cfm?id=220738",
+    kind: "safety",
+    publicationOrRevision: "2026-06-24",
+    dateNote: "Posting date; record showed open/classified when checked",
+    checkedOn: "2026-11-13",
+    access: "read",
+    limitation:
+      "Model 42-5572-066-10 / DI 00889024561014, lot 66232947; different identifiers from the research femoral component. Search lead excluded from matching, not evidence of recall-free status.",
+  },
+);
+
 export function sourceById(id: string): ResearchSource {
   const source = deviceSources.find((item) => item.id === id);
   if (!source) throw new Error(`Unknown device source: ${id}`);

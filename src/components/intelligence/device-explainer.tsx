@@ -256,13 +256,13 @@ export function DeviceExplainer({
         >
           <a href="#device-parts">01 The parts</a>
           <a href="#device-identity">02 Exact identity</a>
-          <a href="#device-research">Research & sources</a>
           {profile.id === "persona" && (
             <a href="#persona-options">Persona options</a>
           )}
           <a href="#device-comparison">03 Compare options</a>
           <a href="#device-evidence">04 Evidence gaps</a>
           <a href="#device-questions">05 Questions to ask</a>
+          <a href="#device-research">Research & sources</a>
         </nav>
         <section
           className={styles.profilePicker}
@@ -472,7 +472,25 @@ export function DeviceExplainer({
           </div>
         </section>
 
-        <DeviceResearch key={profile.id} familyId={profile.id} />
+        <aside
+          className={styles.readingScope}
+          aria-label="What this example establishes"
+        >
+          <p className={styles.eyebrow}>KEEP THE LEVELS SEPARATE</p>
+          <h2>A family explains choices. An identifier names one part.</h2>
+          <p>
+            You are exploring {profile.manufacturer} {profile.family} at family
+            level, alongside femoral research example {profile.model}. The
+            bearing, tibial tray and optional patellar identifiers are missing.
+            No compatible assembly is verified.
+          </p>
+          <p>
+            <strong>Still unresolved:</strong> exact femoral materials, current
+            fixation instructions, component compatibility, full MRI conditions
+            and complete safety-notice matching.
+          </p>
+          <a href="#device-questions">Prepare your care-team questions →</a>
+        </aside>
         {profile.id === "persona" && <PersonaGuide />}
         <section
           id="device-comparison"
@@ -704,8 +722,16 @@ export function DeviceExplainer({
               for that configuration?
             </li>
             <li>
+              How will each component be fixed to bone, and what bearing and
+              ligament strategy is planned?
+            </li>
+            <li>
               What evidence applies to these exact components, and what does it
               leave uncertain?
+            </li>
+            <li>
+              Are a robot, recovery app or sensor proposed separately? What are
+              the costs, data access, alternatives and support arrangements?
             </li>
             <li>
               How are model and lot-specific safety notices checked and
@@ -717,6 +743,7 @@ export function DeviceExplainer({
             {profile.family}. It has not been selected for your situation.
           </p>
         </section>
+        <DeviceResearch key={profile.id} familyId={profile.id} />
         <section className={styles.check} aria-labelledby="check-heading">
           <div>
             <p className={styles.eyebrow}>A QUICK CHECK</p>

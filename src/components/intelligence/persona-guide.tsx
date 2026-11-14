@@ -68,12 +68,151 @@ export function PersonaGuide() {
         </p>
       </div>
       <nav className={styles.links} aria-label="Persona guide topics">
-        <a href="#persona-iq-feature">The smart implant</a>
         <a href="#persona-configuration">Configuration</a>
         <a href="#persona-materials">Materials</a>
         <a href="#persona-technology">Supporting technology</a>
+        <a href="#persona-iq-feature">The sensor stem</a>
         <a href="#persona-findings">Claims & evidence</a>
       </nav>
+      <div id="persona-configuration" tabIndex={-1} className={styles.block}>
+        <h3>Start with the configuration.</h3>
+        <p className={styles.intro}>
+          “Personalized” needs an explanation of the actual choices. A family
+          name is not a complete component list.
+        </p>
+        <div className={styles.grid}>
+          {choices.map((item) => (
+            <article key={item.title}>
+              <span className={styles.label}>{item.label}</span>
+              <h4>{item.title}</h4>
+              <p>{item.summary}</p>
+              <details>
+                <summary>Tradeoff & question to ask</summary>
+                <p>
+                  <strong>Aim and practical tradeoff:</strong> {item.detail}
+                </p>
+                <p>
+                  <strong>Evidence scope:</strong> {item.applicability} This is
+                  a manufacturer proposition, not proof of a patient-outcome
+                  advantage.
+                </p>
+                <blockquote>{item.question}</blockquote>
+                <Source href={item.href} />
+              </details>
+            </article>
+          ))}
+        </div>
+        <div className={styles.unknown}>
+          <span className={styles.label}>UNKNOWN / NOT YET VERIFIED</span>
+          <h4>What is actually included?</h4>
+          <dl>
+            {[
+              [
+                "Femoral component",
+                "One research identifier located; not a patient selection.",
+              ],
+              [
+                "Bearing, tibial and optional patellar components",
+                "Exact models, materials, fixation and compatibility unconfirmed.",
+              ],
+              [
+                "ROSA, mymobility and Persona IQ",
+                "Whether any are included in a proposed procedure is unknown.",
+              ],
+              [
+                "Costs and access",
+                "Coverage, out-of-pocket cost and local availability unverified.",
+              ],
+            ].map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p>
+            No configuration has been chosen for you. No medical details or
+            uploads are needed.
+          </p>
+        </div>
+      </div>
+      <div id="persona-materials" tabIndex={-1} className={styles.block}>
+        <h3>Materials belong to components.</h3>
+        <p className={styles.intro}>
+          Metal alloy, surface treatment and plastic bearing are different
+          specifications. The illustration’s colors do not identify any of them.
+        </p>
+        <div className={styles.scope}>
+          <strong>Read material descriptions at component level.</strong>
+          <p>
+            The consumer page uses broad Tivanium wording; the professional page
+            assigns that description to the tibial option. Neither establishes
+            the alloy of femoral model 42-5026-066-02. Both assertions and their
+            scopes are retained in the research record.
+          </p>
+        </div>
+        <div className={styles.grid}>
+          {materials.map((item) => (
+            <article key={item.title}>
+              <span className={styles.label}>{item.label}</span>
+              <h4>{item.title}</h4>
+              <p>{item.text}</p>
+              <details>
+                <summary>Applicability & remaining gap</summary>
+                <p>{item.gap}</p>
+                <blockquote>
+                  What are the exact materials and applicable MRI conditions for
+                  every component?
+                </blockquote>
+                <Source href={item.href}>{item.source}</Source>
+              </details>
+            </article>
+          ))}
+        </div>
+      </div>
+      <div id="persona-technology" tabIndex={-1} className={styles.block}>
+        <h3>Three technologies. Different jobs.</h3>
+        <p className={styles.intro}>
+          Do not assume that a Persona implant includes a robot, an app or an
+          implanted sensor. Each needs its own explanation.
+        </p>
+        <div className={styles.grid}>
+          {technologies.map((item) => (
+            <article key={item.title}>
+              <span className={styles.label}>
+                {item.category} · inclusion unknown
+              </span>
+              <h4>{item.title}</h4>
+              <p>{item.summary}</p>
+              <details>
+                <summary>Claim, evidence & limits</summary>
+                <dl>
+                  <div>
+                    <dt>Manufacturer claim</dt>
+                    <dd>{item.claim}</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      {item.title === "mymobility"
+                        ? "Evidence not yet assessed"
+                        : item.title === "ROSA"
+                          ? "Clinical finding"
+                          : "Regulatory context"}
+                    </dt>
+                    <dd>{item.evidence}</dd>
+                  </div>
+                  <div>
+                    <dt>Limitations / unknowns</dt>
+                    <dd>{item.limitation}</dd>
+                  </div>
+                </dl>
+                <blockquote>{item.question}</blockquote>
+                <Source href={item.href}>{item.source}</Source>
+              </details>
+            </article>
+          ))}
+        </div>
+      </div>
       <section
         id="persona-iq-feature"
         tabIndex={-1}
@@ -251,129 +390,6 @@ export function PersonaGuide() {
           research example.
         </p>
       </section>
-      <div id="persona-configuration" tabIndex={-1} className={styles.block}>
-        <h3>Start with the configuration.</h3>
-        <p className={styles.intro}>
-          “Personalized” needs an explanation of the actual choices. A family
-          name is not a complete component list.
-        </p>
-        <div className={styles.grid}>
-          {choices.map((item) => (
-            <article key={item.title}>
-              <span className={styles.label}>{item.label}</span>
-              <h4>{item.title}</h4>
-              <p>{item.summary}</p>
-              <details>
-                <summary>Tradeoff & question to ask</summary>
-                <p>{item.detail}</p>
-                <blockquote>{item.question}</blockquote>
-                <Source href={item.href} />
-              </details>
-            </article>
-          ))}
-        </div>
-        <div className={styles.unknown}>
-          <span className={styles.label}>UNKNOWN / NOT YET VERIFIED</span>
-          <h4>What is actually included?</h4>
-          <dl>
-            {[
-              [
-                "Femoral component",
-                "One research identifier located; not a patient selection.",
-              ],
-              [
-                "Bearing, tibial and optional patellar components",
-                "Exact models, materials, fixation and compatibility unconfirmed.",
-              ],
-              [
-                "ROSA, mymobility and Persona IQ",
-                "Whether any are included in a proposed procedure is unknown.",
-              ],
-              [
-                "Costs and access",
-                "Coverage, out-of-pocket cost and local availability unverified.",
-              ],
-            ].map(([label, value]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <p>
-            No configuration has been chosen for you. No medical details or
-            uploads are needed.
-          </p>
-        </div>
-      </div>
-      <div id="persona-materials" tabIndex={-1} className={styles.block}>
-        <h3>Materials belong to components.</h3>
-        <p className={styles.intro}>
-          Metal alloy, surface treatment and plastic bearing are different
-          specifications. The illustration’s colors do not identify any of them.
-        </p>
-        <div className={styles.grid}>
-          {materials.map((item) => (
-            <article key={item.title}>
-              <span className={styles.label}>{item.label}</span>
-              <h4>{item.title}</h4>
-              <p>{item.text}</p>
-              <details>
-                <summary>Applicability & remaining gap</summary>
-                <p>{item.gap}</p>
-                <blockquote>
-                  What are the exact materials and applicable MRI conditions for
-                  every component?
-                </blockquote>
-                <Source href={item.href}>{item.source}</Source>
-              </details>
-            </article>
-          ))}
-        </div>
-      </div>
-      <div id="persona-technology" tabIndex={-1} className={styles.block}>
-        <h3>Three technologies. Different jobs.</h3>
-        <p className={styles.intro}>
-          Do not assume that a Persona implant includes a robot, an app or an
-          implanted sensor. Each needs its own explanation.
-        </p>
-        <div className={styles.grid}>
-          {technologies.map((item) => (
-            <article key={item.title}>
-              <span className={styles.label}>
-                {item.category} · inclusion unknown
-              </span>
-              <h4>{item.title}</h4>
-              <p>{item.summary}</p>
-              <details>
-                <summary>Claim, evidence & limits</summary>
-                <dl>
-                  <div>
-                    <dt>Manufacturer claim</dt>
-                    <dd>{item.claim}</dd>
-                  </div>
-                  <div>
-                    <dt>
-                      {item.title === "mymobility"
-                        ? "Evidence not yet assessed"
-                        : item.title === "ROSA"
-                          ? "Clinical finding"
-                          : "Regulatory context"}
-                    </dt>
-                    <dd>{item.evidence}</dd>
-                  </div>
-                  <div>
-                    <dt>Limitations / unknowns</dt>
-                    <dd>{item.limitation}</dd>
-                  </div>
-                </dl>
-                <blockquote>{item.question}</blockquote>
-                <Source href={item.href}>{item.source}</Source>
-              </details>
-            </article>
-          ))}
-        </div>
-      </div>
       <div id="persona-findings" tabIndex={-1} className={styles.block}>
         <h3>Does more choice mean better outcomes?</h3>
         <article className={styles.finding}>
@@ -419,27 +435,11 @@ export function PersonaGuide() {
         <div className={styles.next}>
           <span className={styles.label}>NEXT STEP / CARE-TEAM DISCUSSION</span>
           <h4>Ask for the plan behind the product name.</h4>
-          <ol>
-            <li>
-              List the exact models, identifiers and fixation for every
-              component.
-            </li>
-            <li>
-              Explain the bearing strategy, materials, compatibility and MRI
-              labeling.
-            </li>
-            <li>
-              Separate the implant from any robot, app or sensor, including
-              costs and support.
-            </li>
-            <li>
-              Discuss the evidence relevant to that configuration, the
-              uncertainties and alternatives.
-            </li>
-            <li>
-              Explain how model- and lot-specific safety notices are checked.
-            </li>
-          </ol>
+          <p>
+            Bring the exact component list, the evidence gaps and any separate
+            technology commitments to the discussion.
+          </p>
+          <a href="#device-questions">Use the care-team checklist →</a>
           <Source href={consumer}>Manufacturer consumer overview</Source>
         </div>
       </div>

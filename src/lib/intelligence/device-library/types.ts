@@ -4,7 +4,37 @@ export type ResearchDepth =
   | "family-overview"
   | "verified-component"
   | "evidence-comparison";
-export type EditorialStatus = "draft" | "needs-review" | "reviewed";
+export type EditorialStatus =
+  | "draft"
+  | "needs-review"
+  | "reviewed"
+  | "needs-reverification";
+export interface EditorialReview {
+  reference: string;
+  reviewedOn: string;
+  scope: string;
+  independentClinicalReview: boolean;
+}
+export type ResearchGapState =
+  | "unknown"
+  | "not-searched"
+  | "source-inaccessible"
+  | "not-applicable"
+  | "resolved";
+export const evidenceLabels = [
+  "Verified specification or regulatory fact",
+  "Manufacturer claim",
+  "Clinical finding",
+  "Unknown or not yet verified",
+  "Siona interpretation",
+  "Business hypothesis",
+] as const;
+export type VerificationField =
+  | "labeling"
+  | "materials"
+  | "fixation"
+  | "compatibility"
+  | "safetyReview";
 export type EvidenceLabel =
   | "Verified specification or regulatory fact"
   | "Manufacturer claim"
@@ -32,6 +62,12 @@ export interface Citation {
   locator: string;
 }
 export interface DeviceClaim {
+  editorialReview?: EditorialReview;
+  relatedClaims?: {
+    claimId: string;
+    relationship: "scope-difference" | "conflicts-with";
+    explanation: string;
+  }[];
   id: string;
   familyId: string;
   subject: Subject;
@@ -45,6 +81,16 @@ export interface DeviceClaim {
   editorialStatus: EditorialStatus;
 }
 export interface DeviceFamily {
+  editorialReview?: EditorialReview;
+  discovery: {
+    aliases: string[];
+    sourceId: string;
+    discoveredOn: string;
+    availability: "unknown" | "documented";
+    availabilitySourceId: string | null;
+    availabilityScope: string;
+    nextAction: string;
+  };
   id: string;
   name: string;
   manufacturer: string;
@@ -72,6 +118,7 @@ export interface ComponentRecord {
   checkedOn: string;
   sourceId: string;
   identification: "located";
+  verificationEvidence?: Partial<Record<VerificationField, string[]>>;
   verification: {
     labeling: boolean;
     materials: boolean;
@@ -92,6 +139,7 @@ export interface ConfigurationRecord {
   compatibilityCitations: Citation[];
 }
 export interface StudyRecord {
+  editorialReview?: EditorialReview;
   id: string;
   familyId: string;
   claimId: string;
@@ -101,6 +149,7 @@ export interface StudyRecord {
   comparator: string;
   design: string;
   sampleSize: number;
+  denominators?: { label: string; count: number }[];
   followUp: string;
   outcome: string;
   finding: string;
@@ -126,6 +175,30 @@ export interface OpenQuestion {
   question: string;
   nextStep: string;
   priority: "identity-or-safety" | "interpretation" | "access";
+}
+export const investigationTopics = [
+  "identity",
+  "materials",
+  "fixation",
+  "compatibility",
+  "mri",
+  "regulatory-safety",
+] as const;
+export interface ComponentInvestigation {
+  id: string;
+  familyId: string;
+  componentId: string;
+  topic: (typeof investigationTopics)[number];
+  outcome: "record-observation" | "partial" | "unresolved" | "supported";
+  gapState: ResearchGapState;
+  whyItMatters: string;
+  nextRetrievalRoute: string;
+  claimIds: string[];
+  searched: string[];
+  barrier: string;
+  documentNeeded: string;
+  careTeamQuestion: string;
+  checkedOn: string;
 }
 export interface ResearchSession {
   id: string;

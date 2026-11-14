@@ -4,6 +4,11 @@ import {
   technologies,
   sensorMetrics,
 } from "./persona-content";
+import {
+  componentInvestigations,
+  investigationClaims,
+  investigationSessions,
+} from "./component-investigations";
 import { components } from "./components";
 import { deviceSources, sourceById } from "./sources";
 import type {
@@ -21,6 +26,20 @@ import type {
 export const families: DeviceFamily[] = [
   {
     id: "persona",
+    discovery: {
+      aliases: [
+        "Persona The Personalized Knee",
+        "Persona Personalized Knee System",
+      ],
+      sourceId: "persona-professional",
+      discoveredOn: "2026-11-12",
+      availability: "unknown",
+      availabilitySourceId: null,
+      availabilityScope:
+        "U.S. family education; local access, exact configurations and costs not established. A DI distribution listing does not establish availability of the whole family at a care site.",
+      nextAction:
+        "Retrieve current U.S. model-matched labeling for the identified femoral component before selecting other component identifiers.",
+    },
     exampleComponentId: "persona-femoral",
     name: "Persona",
     manufacturer: "Zimmer Biomet",
@@ -41,6 +60,17 @@ export const families: DeviceFamily[] = [
   },
   {
     id: "triathlon",
+    discovery: {
+      aliases: ["Triathlon Knee System"],
+      sourceId: "triathlon-professional",
+      discoveredOn: "2026-11-12",
+      availability: "unknown",
+      availabilitySourceId: null,
+      availabilityScope:
+        "U.S. portfolio lead; exact configuration availability and local access have not been established.",
+      nextAction:
+        "Use 5510-F-401 / 07613327040272 to locate the current U.S. insert and model-specific compatibility evidence; keep the investigation bounded.",
+    },
     exampleComponentId: "triathlon-femoral",
     name: "Triathlon",
     manufacturer: "Stryker",
@@ -91,6 +121,18 @@ function claim(
   };
 }
 export const claims: DeviceClaim[] = [
+  ...investigationClaims,
+  claim(
+    "persona-consumer-material-scope",
+    "persona",
+    { kind: "family", id: "persona" },
+    "The consumer overview broadly describes metal components using Tivanium Alloy Technology; the professional page specifically describes the tibial option that way.",
+    "Manufacturer claim",
+    "persona-consumer",
+    "What is the Persona Knee implant made from?",
+    "Consumer family description, not an alloy specification for 42-5026-066-02.",
+    "Different source scopes are retained. The femoral model's exact alloy and surface treatment remain unresolved; do not inherit the tibial material.",
+  ),
   claim(
     "iq-metrics",
     "persona",
@@ -281,6 +323,29 @@ export const claims: DeviceClaim[] = [
   ),
 ];
 
+claims.find(
+  (item) => item.id === "persona-consumer-material-scope",
+)!.relatedClaims = [
+  {
+    claimId: "persona-tibial-material",
+    relationship: "scope-difference",
+    explanation:
+      "Broad consumer wording and component-specific professional wording have different scope; neither establishes the exact femoral composition.",
+  },
+  {
+    claimId: "persona-material-check",
+    relationship: "scope-difference",
+    explanation:
+      "The exact-component field stays unresolved despite family-level material descriptions.",
+  },
+];
+claims
+  .find((item) => item.id === "persona-consumer-material-scope")!
+  .citations.push({
+    sourceId: "persona-professional",
+    locator: "System Features / Anatomic Tibia and Bearings",
+  });
+
 claims
   .find((item) => item.id === "iq-short-version")!
   .citations.push({
@@ -299,6 +364,10 @@ export const studies: StudyRecord[] = [
     comparator: "NexGen CR",
     design: "Multicenter randomized controlled trial",
     sampleSize: 314,
+    denominators: [
+      { label: "Randomized participants", count: 314 },
+      { label: "Participants with primary two-year outcome", count: 289 },
+    ],
     followUp: "2 years; primary outcome available for 289 participants",
     outcome: "Oxford Knee Score",
     finding: claims.find((c) => c.id === "persona-outcomes")!.text,
@@ -321,6 +390,10 @@ export const studies: StudyRecord[] = [
     comparator: "Manual Persona surgery",
     design: "Unblinded randomized trial; one surgeon",
     sampleSize: 77,
+    denominators: [
+      { label: "Patients", count: 77 },
+      { label: "Knees", count: 78 },
+    ],
     followUp: "At least 1 year",
     outcome: "Alignment, Oxford Knee Score and quality of life",
     finding: "Improved alignment; similar patient-reported improvements.",
@@ -410,6 +483,50 @@ openQuestions.push({
 
 export const researchSessions: ResearchSession[] = [
   {
+    id: "2026-11-13-persona-refinement",
+    date: "2026-11-13",
+    familyIds: ["persona"],
+    terms: [
+      '"42-5026-066-02" "package insert"',
+      '"00889024230408" "MRI"',
+      'site.zimmerbiomet.com "Persona" "instructions for use" femoral',
+      "Manufacturer-linked Design Rationale: text searches cobalt, 5026, Tivanium and revision footer",
+    ],
+    openedSourceIds: [
+      "persona-gudid",
+      "persona-professional",
+      "persona-consumer",
+      "zimmer-labeling-portal",
+      "persona-design-rationale",
+    ],
+    inaccessible: [
+      {
+        sourceId: "zimmer-labeling-portal",
+        reason:
+          "Portal shell only in research tool; direct HTTPS retry returned CONNECT 403. No model IFU or request submitted.",
+      },
+    ],
+    limitations: [
+      "One bounded retrieval pass after reviewing prior searches; no repeat search loop, manufacturer contact or document request.",
+      "Design rationale 0890.2-GLBL-en (April 2024) is family marketing/design context, not current U.S. exact-model labeling. No match for 5026 in extracted text; this is not proof the document contains no relevant information.",
+      "Required technical fields remain unresolved. Next route: use the public eIFU model/DI search from a browser with portal access, select United States, and capture document applicability, revision and relevant pages. No current numeric MRI conditions or compatibility relationship inferred.",
+    ],
+  },
+  {
+    id: "2026-11-13-triathlon-repeatability",
+    date: "2026-11-13",
+    familyIds: ["triathlon"],
+    terms: [
+      "Re-open exact AccessGUDID 07613327040272; inspect existing six-topic findings",
+    ],
+    openedSourceIds: ["triathlon-gudid"],
+    inaccessible: [],
+    limitations: [
+      "Exact identifier rechecked; existing unresolved findings retained. No full dossier, new catalog or fresh exhaustive safety search.",
+    ],
+  },
+  ...investigationSessions,
+  {
     id: "2026-11-13-device-library",
     date: "2026-11-13",
     familyIds: ["persona", "triathlon"],
@@ -456,5 +573,6 @@ export const deviceLibrary = {
   safetyNotices,
   openQuestions,
   researchSessions,
+  componentInvestigations,
 };
 export type DeviceLibrary = typeof deviceLibrary;

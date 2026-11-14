@@ -2,15 +2,14 @@ import {
   depthLabels,
   familyResearch,
   sourceById,
+  gapLabels,
+  editorialLabels,
+  componentIsVerified,
 } from "@/lib/intelligence/device-library";
 import styles from "./device-research.module.css";
 
-const reviewLabel = (value: string) =>
-  value === "needs-review"
-    ? "Needs editorial review"
-    : value === "reviewed"
-      ? "Editorial review recorded"
-      : "Draft";
+const reviewLabel = (value: keyof typeof editorialLabels) =>
+  editorialLabels[value];
 export function DeviceResearch({ familyId }: { familyId: string }) {
   const record = familyResearch(familyId);
   if (!record) return null;
@@ -24,6 +23,7 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
     safetyNotices,
     sessions,
     configurations,
+    investigations,
   } = record;
   return (
     <section
@@ -46,7 +46,9 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
           <dt>Component status</dt>
           <dd>
             {components.length
-              ? "Identifier located only"
+              ? components.every((item) => componentIsVerified(item))
+                ? "Verified component evidence recorded"
+                : "Identifier located only"
               : "No identifier record located"}
           </dd>
         </div>
@@ -68,6 +70,151 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
         quality, safety or completeness score. A located identifier does not
         establish materials, current labeling or compatibility.
       </p>
+      {investigations.length > 0 && (
+        <div className={styles.investigation}>
+          <h3>Exact-component verification checklist</h3>
+          <p className={styles.note}>
+            Record observations and partial findings are not completed labeling
+            checks. Open a topic for sources, limits and the next question to
+            ask.
+          </p>
+          {investigations.map((item) => (
+            <details key={item.id}>
+              <summary>
+                {
+                  {
+                    identity: "Identity and role",
+                    materials: "Materials and surface treatments",
+                    fixation: "Fixation",
+                    compatibility: "Tibial and bearing compatibility",
+                    mri: "MRI labeling and conditions",
+                    "regulatory-safety":
+                      "Regulatory records and safety notices",
+                  }[item.topic]
+                }{" "}
+                ·{" "}
+                {
+                  {
+                    "record-observation": "Identifier evidence",
+                    partial: "Partial evidence — unresolved",
+                    unresolved: "Unresolved",
+                    supported: "Supported within stated scope",
+                  }[item.outcome]
+                }
+              </summary>
+              <p>
+                <strong>Research gap:</strong> {gapLabels[item.gapState]}
+              </p>
+              <p>
+                <strong>Why it matters:</strong> {item.whyItMatters}
+              </p>
+              {item.claimIds.map((id) => {
+                const claim = claims.find((entry) => entry.id === id)!;
+                return (
+                  <article className={styles.claim} key={id}>
+                    <span className={styles.label}>
+                      {claim.label} · {reviewLabel(claim.editorialStatus)}
+                    </span>
+                    <h4>{claim.text}</h4>
+                    <p>
+                      <strong>Applies to:</strong> {claim.applicability}{" "}
+                      {claim.geography}
+                    </p>
+                    <p>
+                      <strong>Limits:</strong> {claim.limitations}
+                    </p>
+                    {claim.citations.length === 0 && (
+                      <p>
+                        No authoritative answer established; this field remains
+                        unresolved.
+                      </p>
+                    )}
+                    {claim.citations.map((citation) => {
+                      const source = sourceById(citation.sourceId);
+                      return (
+                        <div key={citation.sourceId + citation.locator}>
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {source.title} →
+                            <span className={styles.srOnly}>
+                              {" "}
+                              (opens a new tab)
+                            </span>
+                          </a>
+                          <p className={styles.note}>
+                            Passage: {citation.locator}. Revision/date:{" "}
+                            {source.publicationOrRevision ?? "Not established"};{" "}
+                            {source.dateNote}. Access: {source.access}. Claim
+                            checked {claim.checkedOn}.
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </article>
+                );
+              })}
+              <p>
+                <strong>Internal research — searches / paths checked:</strong>{" "}
+                {item.searched.join("; ")}
+              </p>
+              <p>
+                <strong>Access and scope barrier:</strong> {item.barrier}
+              </p>
+              <p>
+                <strong>Document still needed:</strong> {item.documentNeeded}
+              </p>
+              <p>
+                <strong>Next feasible retrieval route:</strong>{" "}
+                {item.nextRetrievalRoute}
+              </p>
+              <p>
+                <strong>Ask your care team:</strong> {item.careTeamQuestion}
+              </p>
+              <p className={styles.note}>
+                Investigation checked {item.checkedOn}. No assembly verified.
+              </p>
+            </details>
+          ))}
+        </div>
+      )}
+      <details>
+        <summary>Discovery and inclusion record</summary>
+        <p>
+          <strong>Family candidate:</strong> {family.name}. Known family
+          aliases: {family.discovery.aliases.join("; ")}. Manufacturer:{" "}
+          {family.manufacturer}. Labeler of the identified example:{" "}
+          {components.map((item) => item.labeler).join("; ")}.
+        </p>
+        <p>
+          <strong>Category and role:</strong> {family.category}.{" "}
+          {family.purpose}
+        </p>
+        <p>
+          <strong>Availability:</strong> {family.discovery.availability}.{" "}
+          {family.discovery.availabilityScope}
+        </p>
+        <p>
+          <strong>Reason to investigate:</strong> {family.reasonForInclusion}
+        </p>
+        <p>
+          <strong>Internal next action:</strong> {family.discovery.nextAction}
+        </p>
+        <p className={styles.note}>
+          Discovery recorded {family.discovery.discoveredOn}; {family.geography}
+          . This is research prioritization, not a demand or market-share claim.
+        </p>
+        <a
+          href={sourceById(family.discovery.sourceId).url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Discovery source →
+          <span className={styles.srOnly}> (opens a new tab)</span>
+        </a>
+      </details>
       <details>
         <summary>
           Family, component and configuration: what is established?
@@ -117,7 +264,11 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
           composition of another component.
         </p>
         {claims.map((claim) => (
-          <article key={claim.id} className={styles.claim}>
+          <article
+            id={`claim-${claim.id}`}
+            key={claim.id}
+            className={styles.claim}
+          >
             <span className={styles.label}>
               {claim.label} · {reviewLabel(claim.editorialStatus)}
             </span>
@@ -144,6 +295,20 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
                 <dd>{claim.checkedOn}</dd>
               </div>
             </dl>
+            {claim.relatedClaims?.map((relation) => (
+              <p key={relation.claimId}>
+                <strong>
+                  {relation.relationship === "scope-difference"
+                    ? "Different evidence scope"
+                    : "Conflicting assertion retained"}
+                  :
+                </strong>{" "}
+                {relation.explanation}{" "}
+                <a href={`#claim-${relation.claimId}`}>
+                  Compare the retained assertion →
+                </a>
+              </p>
+            ))}
             {claim.citations.map((citation) => {
               const source = sourceById(citation.sourceId);
               return (
@@ -188,6 +353,10 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
                   "Comparator & follow-up",
                   `${study.comparator}; ${study.followUp}`,
                 ],
+                ...(study.denominators ?? []).map((item) => [
+                  item.label,
+                  String(item.count),
+                ]),
                 ["Outcome", study.outcome],
                 ["Finding", study.finding],
                 ["Uncertainty", study.uncertainty],
@@ -270,23 +439,31 @@ export function DeviceResearch({ familyId }: { familyId: string }) {
             <p>{source.limitation}</p>
           </article>
         ))}
-        {sessions.map((session) => (
-          <div className={styles.claim} key={session.id}>
-            <h3>Research session · {session.date}</h3>
-            <p>Search terms: {session.terms.join("; ")}</p>
-            {session.inaccessible.map((item) => (
-              <p key={item.sourceId}>
-                <strong>Access limitation:</strong>{" "}
-                {sourceById(item.sourceId).title}: {item.reason}
-              </p>
-            ))}
-            <ul>
-              {session.limitations.map((limit) => (
-                <li key={limit}>{limit}</li>
+        {sessions.some((session) => session.familyIds.length > 1) && (
+          <p className={styles.note}>
+            Earlier shared research sessions are retained in maintainer history.
+            The logs below contain this family’s research only.
+          </p>
+        )}
+        {sessions
+          .filter((session) => session.familyIds.length === 1)
+          .map((session) => (
+            <div className={styles.claim} key={session.id}>
+              <h3>Research session · {session.date}</h3>
+              <p>Search terms: {session.terms.join("; ")}</p>
+              {session.inaccessible.map((item) => (
+                <p key={item.sourceId}>
+                  <strong>Access limitation:</strong>{" "}
+                  {sourceById(item.sourceId).title}: {item.reason}
+                </p>
               ))}
-            </ul>
-          </div>
-        ))}
+              <ul>
+                {session.limitations.map((limit) => (
+                  <li key={limit}>{limit}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
       </details>
     </section>
   );

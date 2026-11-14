@@ -10,13 +10,121 @@ import {
   parseRss,
   ingestApprovedFeed,
 } from "../../src/lib/intelligence/ingestion";
+import {
+  planningCases,
+  planningCaseRow,
+} from "../../src/lib/intelligence/planning-cases";
+import { previewData } from "../../src/lib/intelligence/demo";
+import {
+  devicePreviewMode,
+  isDevicePreviewDestination,
+  devicePreviewPath,
+} from "../../src/lib/intelligence/device-preview";
+
+test("device prototype requires the protected gate on hosted previews and is disabled on Production", () => {
+  assert.equal(devicePreviewMode("development", undefined), "development");
+  assert.equal(devicePreviewMode("production", "preview"), "protected");
+  for (const [nodeEnv, vercelEnv] of [
+    ["production", "production"],
+    ["development", "production"],
+    ["production", undefined],
+    ["production", "development"],
+    [undefined, "preview"],
+    ["test", "preview"],
+  ]) {
+    assert.equal(devicePreviewMode(nodeEnv, vercelEnv), "disabled");
+  }
+});
+
+test("preview login uses one fixed destination and rejects arbitrary redirects", () => {
+  assert.equal(
+    devicePreviewPath,
+    "/workspace/intelligence/preview/device-information",
+  );
+  assert.equal(
+    isDevicePreviewDestination("device-preview", "production", "preview"),
+    true,
+  );
+  for (const destination of [
+    null,
+    "",
+    "practice",
+    "https://example.com",
+    "//example.com",
+    "/workspace/intelligence/preview/device-information",
+  ]) {
+    assert.equal(
+      isDevicePreviewDestination(destination, "production", "preview"),
+      false,
+    );
+  }
+  assert.equal(
+    isDevicePreviewDestination("device-preview", "production", "production"),
+    false,
+  );
+  assert.equal(
+    isDevicePreviewDestination("device-preview", "production", undefined),
+    false,
+  );
+});
 const weights = criteria.map(([criterion]) => ({ criterion, weight: 10 }));
+test("planning cases use existing opportunity validation and never assume evidence, scores or decisions", () => {
+  for (const item of planningCases) {
+    const row = planningCaseRow(item);
+    assert.equal(row.stage, "Discovered");
+    assert.match(String(row.title), /^UNVALIDATED/);
+    assert.equal(
+      operationSchema.safeParse({
+        operation: "opportunity",
+        data: { ...row, signal_ids: [] },
+      }).success,
+      false,
+    );
+    assert.equal(
+      operationSchema.safeParse({
+        operation: "opportunity",
+        data: { ...row, signal_ids: ["10000000-0000-4000-8000-000000000001"] },
+      }).success,
+      true,
+    );
+    assert.equal(
+      previewData.evaluations.some((e) => e.opportunity_id === row.id),
+      false,
+    );
+    assert.equal(
+      previewData.decisions.some((d) => d.opportunity_id === row.id),
+      false,
+    );
+    const link = previewData.evidence.find((e) => e.opportunity_id === row.id)!;
+    assert.equal(
+      previewData.signals.find((s) => s.id === link.signal_id)?.review_status,
+      "unreviewed",
+    );
+    const task = previewData.tasks.find((t) => t.opportunity_id === row.id)!;
+    assert.equal(task.status, "Open");
+    assert.equal(task.owner_id, undefined);
+    assert.equal(task.result, undefined);
+    assert.ok(String(task.success_criteria).length > 20);
+  }
+});
 test("missing evidence produces neither a favorable score nor confidence", () => {
   assert.deepEqual(scoreOpportunity([], weights), {
     score: 0,
     confidence: 0,
     coverage: 0,
   });
+  const unfavorable = scoreOpportunity(
+    [
+      {
+        criterion: "demand",
+        score: 0,
+        rationale: "Buyer evidence contradicts the demand hypothesis.",
+      },
+    ],
+    weights,
+  );
+  assert.equal(unfavorable.score, 0);
+  assert.ok(unfavorable.coverage > 0);
   const one = scoreOpportunity(
     [{ criterion: "fit", score: 5, rationale: "A documented reason for fit." }],
     weights,

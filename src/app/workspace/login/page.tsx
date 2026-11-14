@@ -1,15 +1,23 @@
 import Link from "next/link";
 import { signIn } from "./actions";
 import { supabaseConfig } from "@/lib/intelligence/auth";
+import { isDevicePreviewDestination } from "@/lib/intelligence/device-preview";
 import styles from "@/components/intelligence/workspace.module.css";
 
 export default async function Login({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; preview?: string }>;
 }) {
-  const { error } = await searchParams,
+  const { error, preview } = await searchParams,
     configured = !!supabaseConfig();
+  const devicePreview =
+    preview === "device-information" &&
+    isDevicePreviewDestination(
+      "device-preview",
+      process.env.NODE_ENV,
+      process.env.VERCEL_ENV,
+    );
   return (
     <main id="main" className={`${styles.root} ${styles.login}`}>
       <div className={styles.loginCard}>
@@ -22,15 +30,25 @@ export default async function Login({
           <br />
           to action.
         </h1>
-        <p>Sign in to the Siona Evolution Engine.</p>
+        <p>
+          {devicePreview
+            ? "Sign in with your existing Siona workspace account to view the device-information prototype."
+            : "Sign in to the Siona Evolution Engine."}
+        </p>
         {!configured && (
           <div className={styles.notice}>
             <strong>Project connection required</strong>
             <p>
-              Connect the existing Supabase project, apply the supplied
-              migration, and provision an internal member. See{" "}
-              <code>docs/evolution-engine.md</code>. Access remains closed until
-              configured.
+              {devicePreview ? (
+                "Restore this deployment’s existing Preview connection settings. No database or administrator setup should be repeated."
+              ) : (
+                <>
+                  Connect the existing Supabase project, apply the supplied
+                  migration, and provision an internal member. See{" "}
+                  <code>docs/evolution-engine.md</code>. Access remains closed
+                  until configured.
+                </>
+              )}
             </p>
           </div>
         )}
@@ -42,6 +60,9 @@ export default async function Login({
           </p>
         )}
         <form action={signIn}>
+          {devicePreview && (
+            <input type="hidden" name="destination" value="device-preview" />
+          )}
           <label>
             Email
             <input

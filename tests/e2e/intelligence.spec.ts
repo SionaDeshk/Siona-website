@@ -194,3 +194,107 @@ test("workspace preview has no automated WCAG AA violations", async ({
     })),
   ).toEqual([]);
 });
+
+test("unvalidated cases connect evidence, unknowns, blockers and experiments without writes", async ({
+  page,
+}) => {
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() !== "GET" &&
+      request.url().includes("/api/intelligence")
+    )
+      writes.push(request.url());
+  });
+  await page.goto("/workspace/intelligence/preview");
+  await page
+    .getByRole("navigation", { name: "Intelligence workspace" })
+    .getByRole("button", { name: /Opportunities$/ })
+    .click();
+  const review = page.getByRole("article", {
+    name: "Opportunity validation review",
+  });
+  for (const [name, title, experiment, blocker] of [
+    [
+      "Device information",
+      "UNVALIDATED · Device-information service",
+      "Test one implant-category information prototype",
+      "device identification is not comparative clinical quality",
+    ],
+    [
+      "Supplier-direct Biologics",
+      "UNVALIDATED · Supplier-direct Biologics",
+      "Validate one exact supplier-direct product route",
+      "written resale/fulfillment terms are missing",
+    ],
+  ]) {
+    await page
+      .getByRole("button", { name: `Explore ${name} case`, exact: true })
+      .click();
+    await expect(
+      review.getByRole("heading", { name: title, exact: true }),
+    ).toBeVisible();
+    await expect(
+      review.getByText("PLANNING CASE · UNVALIDATED · NOT SAVED"),
+    ).toBeVisible();
+    const scorecard = review.getByRole("region", {
+      name: "Nine-criterion scorecard",
+    });
+    await expect(scorecard.getByText("Unknown", { exact: true })).toHaveCount(
+      9,
+    );
+    await expect(
+      review.getByRole("region", { name: "Evidence", exact: true }),
+    ).toContainText("0 of 1 linked sources reviewed");
+    await expect(
+      review.getByRole("region", { name: "Risks, blockers and unknowns" }),
+    ).toContainText(blocker);
+    await expect(
+      review.getByRole("region", { name: "Experiments and outcomes" }),
+    ).toContainText(experiment);
+    await expect(
+      review.getByRole("region", { name: "Experiments and outcomes" }),
+    ).toContainText("Unassigned");
+    await expect(
+      review.getByRole("region", { name: "Decision history" }),
+    ).toContainText("No decision recorded");
+    await expect(
+      review.getByRole("button", { name: "Record decision", exact: true }),
+    ).toBeDisabled();
+    await expect(
+      review
+        .getByRole("region", { name: "Experiments and outcomes" })
+        .getByRole("button", { name: "Record outcome", exact: true }),
+    ).toBeDisabled();
+    const navigation = review.getByRole("navigation", {
+      name: "Opportunity review steps",
+    });
+    await expect(navigation.getByRole("link")).toHaveCount(6);
+    await navigation.getByRole("link", { name: "05 Experiments" }).focus();
+    await page.keyboard.press("Enter");
+    await expect(
+      review.getByRole("region", { name: "Experiments and outcomes" }),
+    ).toBeFocused();
+    await expect(
+      review.getByRole("heading", { name: "Experiments and outcomes" }),
+    ).toBeInViewport();
+    await expect
+      .poll(() =>
+        page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      )
+      .toBe(true);
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(
+      results.violations.map((v) => ({
+        id: v.id,
+        targets: v.nodes.map((n) => n.target),
+      })),
+    ).toEqual([]);
+  }
+  await expect(
+    review.getByRole("region", { name: "Experiments and outcomes" }),
+  ).not.toContainText("Test one implant-category information prototype");
+  expect(writes).toEqual([]);
+});
